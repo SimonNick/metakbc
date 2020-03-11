@@ -22,7 +22,7 @@ class Regularizer(nn.Module, ABC):
         raise NotImplementedError
 
 
-class N2(Regularizer):
+class F2(Regularizer):
     def __init__(self):
         super().__init__()
 

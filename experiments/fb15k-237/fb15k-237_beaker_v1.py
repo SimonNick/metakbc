@@ -24,7 +24,7 @@ def to_cmd(c, _path=None):
         f'--dev data/fb15k-237/dev.tsv ' \
         f'--test data/fb15k-237/test.tsv ' \
         f'-m {c["m"]} -k {c["k"]} -b {c["b"]} -e {c["e"]} ' \
-        f'--N3 {c["n3"]} -l {c["lr"]} -I {c["i"]} -V {c["V"]} -o {c["o"]} -q '
+        f'--F2 {c["f2"]} --N3 {c["n3"]} -l {c["lr"]} -I {c["i"]} -V {c["V"]} -o {c["o"]} -q '
     return command
 
 
@@ -39,7 +39,8 @@ def main(argv):
         k=[500, 1000, 2000],
         b=[100],
         e=[100],
-        n3=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
+        f2=[5e-3, 1e-2, 5e-2, 1e-1],
+        n3=[5e-3, 1e-2, 5e-2, 1e-1],
         lr=[0.1],
         i=['standard', 'reciprocal'],
         V=[3],

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="" />
+    <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/bin/meta-cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/meta-cli.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metakbc/regularizers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/regularizers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metakbc/regularizers/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/regularizers/base.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="146" column="16" lean-forward="true" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
+            <state relative-caret-position="-7">
+              <caret line="161" lean-forward="true" selection-start-line="161" selection-end-line="161" />
               <folding>
                 <element signature="e#48#57#0" expanded="true" />
               </folding>
@@ -25,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/kbcr/models/test_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1960">
-              <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
+            <state relative-caret-position="440">
+              <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
               <folding>
                 <element signature="e#25#43#0" expanded="true" />
               </folding>
@@ -34,11 +39,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="26" column="74" selection-start-line="26" selection-start-column="74" selection-end-line="26" selection-end-column="74" />
+            <state relative-caret-position="300">
+              <caret line="26" column="14" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -67,11 +72,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/metakbc/regularizers/base.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="840">
-              <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+            <state relative-caret-position="340">
+              <caret line="24" column="8" selection-start-line="24" selection-start-column="8" selection-end-line="24" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -95,6 +100,8 @@
       <find>Neural</find>
       <find>v3</find>
       <find>neural</find>
+      <find>N2</find>
+      <find>f2_reg</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -113,12 +120,12 @@
         <option value="$PROJECT_DIR$/metakbc/training/data.py" />
         <option value="$PROJECT_DIR$/metakbc/models/distmult.py" />
         <option value="$PROJECT_DIR$/metakbc/evaluation/base.py" />
-        <option value="$PROJECT_DIR$/bin/meta-cli.py" />
         <option value="$PROJECT_DIR$/metakbc/evaluation/__init__.py" />
         <option value="$PROJECT_DIR$/metakbc/regularizers/__init__.py" />
-        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
         <option value="$PROJECT_DIR$/tests/kbcr/models/test_models.py" />
         <option value="$PROJECT_DIR$/metakbc/regularizers/base.py" />
+        <option value="$PROJECT_DIR$/bin/meta-cli.py" />
+        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
       </list>
     </option>
   </component>
@@ -223,12 +230,12 @@
       <updated>1582759891977</updated>
       <workItem from="1582759893516" duration="474000" />
       <workItem from="1583012021091" duration="2657000" />
-      <workItem from="1583832567734" duration="7958000" />
+      <workItem from="1583832567734" duration="8368000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11089000" />
+    <option name="totallyTimeSpent" value="11499000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3142" y="-441" width="1713" height="1315" extended-state="0" />
@@ -369,13 +376,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="26" column="74" selection-start-line="26" selection-start-column="74" selection-end-line="26" selection-end-column="74" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/kbcr/test_kb.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
@@ -386,20 +386,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="146" column="16" lean-forward="true" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
-          <folding>
-            <element signature="e#48#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/kbcr/models/test_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1960">
-          <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
+        <state relative-caret-position="440">
+          <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
           <folding>
             <element signature="e#25#43#0" expanded="true" />
           </folding>
@@ -408,8 +398,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/metakbc/regularizers/base.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="840">
-          <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+        <state relative-caret-position="340">
+          <caret line="24" column="8" selection-start-line="24" selection-start-column="8" selection-end-line="24" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-7">
+          <caret line="161" lean-forward="true" selection-start-line="161" selection-end-line="161" />
+          <folding>
+            <element signature="e#48#57#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="26" column="14" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
         </state>
       </provider>
     </entry>

@@ -17,7 +17,7 @@ from metakbc.training.batcher import Batcher
 
 from metakbc.models import DistMult, ComplEx
 
-from metakbc.regularizers import N2, N3
+from metakbc.regularizers import F2, N3
 from metakbc.evaluation import evaluate
 
 import logging
@@ -60,7 +60,7 @@ def main(argv):
     parser.add_argument('--optimizer', '-o', action='store', type=str, default='adagrad',
                         choices=['adagrad', 'adam', 'sgd'])
 
-    parser.add_argument('--N2', action='store', type=float, default=None)
+    parser.add_argument('--F2', action='store', type=float, default=None)
     parser.add_argument('--N3', action='store', type=float, default=None)
 
     parser.add_argument('--seed', action='store', type=int, default=0)
@@ -101,7 +101,7 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    N2_weight = args.N2
+    F2_weight = args.F2
     N3_weight = args.N3
 
     validate_every = args.validate_every
@@ -175,10 +175,10 @@ def main(argv):
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
-    N2_reg = N3_reg = None
+    F2_reg = N3_reg = None
 
-    if N2_weight is not None:
-        N2_reg = N2()
+    if F2_weight is not None:
+        F2_reg = F2()
     if N3_weight is not None:
         N3_reg = N3()
 
@@ -207,8 +207,8 @@ def main(argv):
 
             loss = s_loss + o_loss
 
-            if N2_weight is not None:
-                loss += N2_weight * N2_reg(factors)
+            if F2_weight is not None:
+                loss += F2_weight * F2_reg(factors)
 
             if N3_weight is not None:
                 loss += N3_weight * N3_reg(factors)
