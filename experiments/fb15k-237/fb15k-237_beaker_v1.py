@@ -98,7 +98,7 @@ conda activate gpu
 export LANG="en_US.utf8"
 export LANGUAGE="en_US:en"
 
-cd $HOME/workspace/kbc-research
+cd $HOME/workspace/meta-kbc
 
 """.format(nb_jobs)
 

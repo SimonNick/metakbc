@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/bin/meta-cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/meta-cli.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metakbc/regularizers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/regularizers/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metakbc/regularizers/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/regularizers/base.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,8 +39,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="26" column="14" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
+            <state relative-caret-position="739">
+              <caret line="100" column="27" selection-start-line="100" selection-start-column="27" selection-end-line="100" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -230,12 +227,12 @@
       <updated>1582759891977</updated>
       <workItem from="1582759893516" duration="474000" />
       <workItem from="1583012021091" duration="2657000" />
-      <workItem from="1583832567734" duration="8368000" />
+      <workItem from="1583832567734" duration="8578000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11499000" />
+    <option name="totallyTimeSpent" value="11709000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3142" y="-441" width="1713" height="1315" extended-state="0" />
@@ -415,8 +412,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="26" column="14" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
+        <state relative-caret-position="739">
+          <caret line="100" column="27" selection-start-line="100" selection-start-column="27" selection-end-line="100" selection-end-column="27" />
         </state>
       </provider>
     </entry>
