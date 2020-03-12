@@ -15,28 +15,29 @@ def cartesian_product(dicts):
 
 def summary(configuration):
     kvs = sorted([(k, v) for k, v in configuration.items()], key=lambda e: e[0])
-    return '_'.join([('%s=%s' % (k, v)) for (k, v) in kvs if k not in {'c', 'd'}])
+    return '_'.join([('%s=%s' % (k, v)) for (k, v) in kvs])
 
 
 def to_cmd(c, _path=None):
     command = f'PYTHONPATH=. python3 ./bin/meta-cli.py ' \
-        f'--train data/fb15k-237/train.tsv ' \
-        f'--dev data/fb15k-237/dev.tsv ' \
-        f'--test data/fb15k-237/test.tsv ' \
+        f'--train data/{c["data"]}/train.tsv ' \
+        f'--dev data/{c["data"]}/dev.tsv ' \
+        f'--test data/{c["data"]}/test.tsv ' \
         f'-m {c["m"]} -k {c["k"]} -b {c["b"]} -e {c["e"]} ' \
         f'--F2 {c["f2"]} --N3 {c["n3"]} -l {c["lr"]} -I {c["i"]} -V {c["V"]} -o {c["o"]} -q '
     return command
 
 
 def to_logfile(c, path):
-    outfile = "{}/fb15k-237_beaker_v1.{}.log".format(path, summary(c).replace("/", "_"))
+    outfile = "{}/rc_v1.{}.log".format(path, summary(c).replace("/", "_").replace(" ", "_"))
     return outfile
 
 
 def main(argv):
     hyp_space_1 = dict(
         m=['complex'],
-        k=[500, 1000, 2000],
+        data=['umls', 'nations', 'kinship'],
+        k=[10, 50, 100, 500, 1000],
         b=[100],
         e=[100],
         f2=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
@@ -49,7 +50,8 @@ def main(argv):
 
     hyp_space_2 = dict(
         m=['complex'],
-        k=[500, 1000, 2000],
+        data=['umls', 'nations', 'kinship'],
+        k=[10, 50, 100, 500, 1000],
         b=[100],
         e=[100],
         f2=[0],
@@ -62,29 +64,32 @@ def main(argv):
 
     configurations = list(cartesian_product(hyp_space_1)) + list(cartesian_product(hyp_space_2))
 
-    path = 'logs/fb15k-237/fb15k-237_beaker_v1'
-    is_rc = False
+    path = '/home/ucacmin/Scratch/meta-kbc/logs/base/rc_v1'
 
     # Check that we are on the UCLCS cluster first
-    if os.path.exists('/home/pminervi/'):
-        is_rc = True
+    if os.path.exists('/home/ucacmin/'):
         # If the folder that will contain logs does not exist, create it
         if not os.path.exists(path):
             os.makedirs(path)
+
+    if os.path.exists('/Users/pasquale/'):
+        path = './logs/base/rc_v1'
 
     command_lines = set()
     for cfg in configurations:
         logfile = to_logfile(cfg, path)
 
         completed = False
-        if is_rc is True and os.path.isfile(logfile):
+        if os.path.isfile(logfile):
             with open(logfile, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
                 completed = 'Training finished' in content
 
         if not completed:
-            command_line = '{} > {} 2>&1'.format(to_cmd(cfg), logfile)
-            command_lines |= {command_line}
+            cmd = to_cmd(cfg)
+            if cmd is not None:
+                command_line = '{} > {} 2>&1'.format(cmd, logfile)
+                command_lines |= {command_line}
 
     # Sort command lines and remove duplicates
     sorted_command_lines = sorted(command_lines)
@@ -99,26 +104,25 @@ def main(argv):
 
 #$ -cwd
 #$ -S /bin/bash
-#$ -o $HOME/array.out
-#$ -e $HOME/array.err
+#$ -o /dev/null
+#$ -e /dev/null
 #$ -t 1-{}
-#$ -l tmem=16G
-#$ -l h_rt=24:00:00
-#$ -l gpu=true
+#$ -l mem=8G
+#$ -l h_rt=8:00:00
 
-conda activate gpu
+conda activate cpu
 
 export LANG="en_US.utf8"
 export LANGUAGE="en_US:en"
 
-cd $HOME/workspace/meta-kbc
+cd $HOME/workspace/meta-kbc/
 
 """.format(nb_jobs)
 
     print(header)
 
     for job_id, command_line in enumerate(sorted_command_lines, 1):
-        print('test $SGE_TASK_ID -eq {} && sleep 30 && {}'.format(job_id, command_line))
+        print('test $SGE_TASK_ID -eq {} && sleep 10 && {}'.format(job_id, command_line))
 
 
 if __name__ == '__main__':

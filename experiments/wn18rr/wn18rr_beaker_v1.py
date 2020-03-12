@@ -34,20 +34,33 @@ def to_logfile(c, path):
 
 
 def main(argv):
-    hyp_space = dict(
+    hyp_space_1 = dict(
         m=['complex'],
         k=[500, 1000, 2000],
         b=[100],
         e=[100],
-        f2=[5e-3, 1e-2, 5e-2, 1e-1],
-        n3=[5e-3, 1e-2, 5e-2, 1e-1],
+        f2=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
+        n3=[0],
         lr=[0.1],
         i=['standard', 'reciprocal'],
         V=[3],
         o=['adagrad'],
     )
 
-    configurations = list(cartesian_product(hyp_space))
+    hyp_space_2 = dict(
+        m=['complex'],
+        k=[500, 1000, 2000],
+        b=[100],
+        e=[100],
+        f2=[0],
+        n3=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
+        lr=[0.1],
+        i=['standard', 'reciprocal'],
+        V=[3],
+        o=['adagrad'],
+    )
+
+    configurations = list(cartesian_product(hyp_space_1)) + list(cartesian_product(hyp_space_2))
 
     path = 'logs/wn18rr/wn18rr_beaker_v1'
     is_rc = False
