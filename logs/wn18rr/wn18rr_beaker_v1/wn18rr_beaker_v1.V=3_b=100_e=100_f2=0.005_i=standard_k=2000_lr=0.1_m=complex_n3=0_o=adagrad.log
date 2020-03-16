@@ -1,0 +1,194 @@
+./bin/meta-cli.py --train data/wn18rr/train.tsv --dev data/wn18rr/dev.tsv --test data/wn18rr/test.tsv -m complex -k 2000 -b 100 -e 100 --F2 0.005 --N3 0 -l 0.1 -I standard -V 3 -o adagrad -q
+{'F2': 0.005,
+ 'N3': 0.0,
+ 'batch_size': 100,
+ 'dev': 'data/wn18rr/dev.tsv',
+ 'embedding_size': 2000,
+ 'epochs': 100,
+ 'eval_batch_size': None,
+ 'input_type': 'standard',
+ 'learning_rate': 0.1,
+ 'load': None,
+ 'model': 'complex',
+ 'optimizer': 'adagrad',
+ 'quiet': True,
+ 'save': None,
+ 'seed': 0,
+ 'test': 'data/wn18rr/test.tsv',
+ 'test_i': None,
+ 'test_ii': None,
+ 'train': 'data/wn18rr/train.tsv',
+ 'validate_every': 3}
+INFO:meta-cli.py:Device: cuda
+INFO:meta-cli.py:Model state:
+INFO:meta-cli.py:	entities.weight	torch.Size([40943, 4000])
+INFO:meta-cli.py:	predicates.weight	torch.Size([11, 4000])
+INFO:meta-cli.py:Epoch 1/100	Loss 20.1279 ± 1.3162
+INFO:meta-cli.py:Epoch 2/100	Loss 11.4854 ± 0.5734
+INFO:meta-cli.py:Epoch 3/100	Loss 6.8319 ± 0.4048
+INFO:meta-cli.py:Epoch 3/100	dev results	MRR 0.419449	H@1 0.392881	H@3 0.429466	H@5 0.446605	H@10 0.466875
+INFO:meta-cli.py:Epoch 3/100	test results	MRR 0.421320	H@1 0.397096	H@3 0.429164	H@5 0.444320	H@10 0.464901
+INFO:meta-cli.py:Epoch 4/100	Loss 5.9528 ± 0.3080
+INFO:meta-cli.py:Epoch 5/100	Loss 5.5361 ± 0.2978
+INFO:meta-cli.py:Epoch 6/100	Loss 5.2911 ± 0.2846
+INFO:meta-cli.py:Epoch 6/100	dev results	MRR 0.434688	H@1 0.409196	H@3 0.442815	H@5 0.460613	H@10 0.481213
+INFO:meta-cli.py:Epoch 6/100	test results	MRR 0.434542	H@1 0.409860	H@3 0.441130	H@5 0.457881	H@10 0.484205
+INFO:meta-cli.py:Epoch 7/100	Loss 5.1102 ± 0.2736
+INFO:meta-cli.py:Epoch 8/100	Loss 4.9712 ± 0.2761
+INFO:meta-cli.py:Epoch 9/100	Loss 4.8549 ± 0.2627
+INFO:meta-cli.py:Epoch 9/100	dev results	MRR 0.439422	H@1 0.411997	H@3 0.451220	H@5 0.466051	H@10 0.488134
+INFO:meta-cli.py:Epoch 9/100	test results	MRR 0.441491	H@1 0.414167	H@3 0.450862	H@5 0.466018	H@10 0.492342
+INFO:meta-cli.py:Epoch 10/100	Loss 4.7554 ± 0.2533
+INFO:meta-cli.py:Epoch 11/100	Loss 4.6702 ± 0.2533
+INFO:meta-cli.py:Epoch 12/100	Loss 4.5968 ± 0.2537
+INFO:meta-cli.py:Epoch 12/100	dev results	MRR 0.441899	H@1 0.414140	H@3 0.452868	H@5 0.469512	H@10 0.492419
+INFO:meta-cli.py:Epoch 12/100	test results	MRR 0.444302	H@1 0.416879	H@3 0.452936	H@5 0.469209	H@10 0.495373
+INFO:meta-cli.py:Epoch 13/100	Loss 4.5276 ± 0.2472
+INFO:meta-cli.py:Epoch 14/100	Loss 4.4660 ± 0.2475
+INFO:meta-cli.py:Epoch 15/100	Loss 4.4104 ± 0.2464
+INFO:meta-cli.py:Epoch 15/100	dev results	MRR 0.445185	H@1 0.416777	H@3 0.456658	H@5 0.474786	H@10 0.496704
+INFO:meta-cli.py:Epoch 15/100	test results	MRR 0.447510	H@1 0.419113	H@3 0.457403	H@5 0.474633	H@10 0.502393
+INFO:meta-cli.py:Epoch 16/100	Loss 4.3611 ± 0.2435
+INFO:meta-cli.py:Epoch 17/100	Loss 4.3131 ± 0.2355
+INFO:meta-cli.py:Epoch 18/100	Loss 4.2700 ± 0.2284
+INFO:meta-cli.py:Epoch 18/100	dev results	MRR 0.447783	H@1 0.418425	H@3 0.458800	H@5 0.476763	H@10 0.501318
+INFO:meta-cli.py:Epoch 18/100	test results	MRR 0.450384	H@1 0.421347	H@3 0.459796	H@5 0.478781	H@10 0.505903
+INFO:meta-cli.py:Epoch 19/100	Loss 4.2293 ± 0.2346
+INFO:meta-cli.py:Epoch 20/100	Loss 4.1923 ± 0.2253
+INFO:meta-cli.py:Epoch 21/100	Loss 4.1564 ± 0.2231
+INFO:meta-cli.py:Epoch 21/100	dev results	MRR 0.448895	H@1 0.420567	H@3 0.456658	H@5 0.478247	H@10 0.501978
+INFO:meta-cli.py:Epoch 21/100	test results	MRR 0.450817	H@1 0.421187	H@3 0.462029	H@5 0.479579	H@10 0.508934
+INFO:meta-cli.py:Epoch 22/100	Loss 4.1233 ± 0.2302
+INFO:meta-cli.py:Epoch 23/100	Loss 4.0912 ± 0.2233
+INFO:meta-cli.py:Epoch 24/100	Loss 4.0628 ± 0.2233
+INFO:meta-cli.py:Epoch 24/100	dev results	MRR 0.450312	H@1 0.420897	H@3 0.460283	H@5 0.479895	H@10 0.504450
+INFO:meta-cli.py:Epoch 24/100	test results	MRR 0.452987	H@1 0.423580	H@3 0.461551	H@5 0.483567	H@10 0.511168
+INFO:meta-cli.py:Epoch 25/100	Loss 4.0338 ± 0.2190
+INFO:meta-cli.py:Epoch 26/100	Loss 4.0071 ± 0.2205
+INFO:meta-cli.py:Epoch 27/100	Loss 3.9814 ± 0.2243
+INFO:meta-cli.py:Epoch 27/100	dev results	MRR 0.451173	H@1 0.421885	H@3 0.460778	H@5 0.480719	H@10 0.505768
+INFO:meta-cli.py:Epoch 27/100	test results	MRR 0.452834	H@1 0.421985	H@3 0.464103	H@5 0.483089	H@10 0.512444
+INFO:meta-cli.py:Epoch 28/100	Loss 3.9571 ± 0.2187
+INFO:meta-cli.py:Epoch 29/100	Loss 3.9341 ± 0.2189
+INFO:meta-cli.py:Epoch 30/100	Loss 3.9129 ± 0.2098
+INFO:meta-cli.py:Epoch 30/100	dev results	MRR 0.452394	H@1 0.423533	H@3 0.460943	H@5 0.483191	H@10 0.505933
+INFO:meta-cli.py:Epoch 30/100	test results	MRR 0.454076	H@1 0.423421	H@3 0.464103	H@5 0.484046	H@10 0.513082
+INFO:meta-cli.py:Epoch 31/100	Loss 3.8908 ± 0.2168
+INFO:meta-cli.py:Epoch 32/100	Loss 3.8705 ± 0.2135
+INFO:meta-cli.py:Epoch 33/100	Loss 3.8513 ± 0.2121
+INFO:meta-cli.py:Epoch 33/100	dev results	MRR 0.453782	H@1 0.424687	H@3 0.462920	H@5 0.484838	H@10 0.508075
+INFO:meta-cli.py:Epoch 33/100	test results	MRR 0.455592	H@1 0.425016	H@3 0.466337	H@5 0.485960	H@10 0.513561
+INFO:meta-cli.py:Epoch 34/100	Loss 3.8327 ± 0.2027
+INFO:meta-cli.py:Epoch 35/100	Loss 3.8150 ± 0.2134
+INFO:meta-cli.py:Epoch 36/100	Loss 3.7970 ± 0.2075
+INFO:meta-cli.py:Epoch 36/100	dev results	MRR 0.454742	H@1 0.425181	H@3 0.464403	H@5 0.484674	H@10 0.510053
+INFO:meta-cli.py:Epoch 36/100	test results	MRR 0.456561	H@1 0.425973	H@3 0.466816	H@5 0.488513	H@10 0.514518
+INFO:meta-cli.py:Epoch 37/100	Loss 3.7805 ± 0.2067
+INFO:meta-cli.py:Epoch 38/100	Loss 3.7642 ± 0.2156
+INFO:meta-cli.py:Epoch 39/100	Loss 3.7486 ± 0.2064
+INFO:meta-cli.py:Epoch 39/100	dev results	MRR 0.455107	H@1 0.425346	H@3 0.464898	H@5 0.486322	H@10 0.510877
+INFO:meta-cli.py:Epoch 39/100	test results	MRR 0.456560	H@1 0.425335	H@3 0.468730	H@5 0.487077	H@10 0.518188
+INFO:meta-cli.py:Epoch 40/100	Loss 3.7339 ± 0.1991
+INFO:meta-cli.py:Epoch 41/100	Loss 3.7190 ± 0.2025
+INFO:meta-cli.py:Epoch 42/100	Loss 3.7054 ± 0.1976
+INFO:meta-cli.py:Epoch 42/100	dev results	MRR 0.455764	H@1 0.425676	H@3 0.465392	H@5 0.485662	H@10 0.512690
+INFO:meta-cli.py:Epoch 42/100	test results	MRR 0.457091	H@1 0.426133	H@3 0.467613	H@5 0.487396	H@10 0.517709
+INFO:meta-cli.py:Epoch 43/100	Loss 3.6920 ± 0.1996
+INFO:meta-cli.py:Epoch 44/100	Loss 3.6784 ± 0.1948
+INFO:meta-cli.py:Epoch 45/100	Loss 3.6660 ± 0.1929
+INFO:meta-cli.py:Epoch 45/100	dev results	MRR 0.455666	H@1 0.426664	H@3 0.463744	H@5 0.485662	H@10 0.511206
+INFO:meta-cli.py:Epoch 45/100	test results	MRR 0.456443	H@1 0.425495	H@3 0.467773	H@5 0.487237	H@10 0.516911
+INFO:meta-cli.py:Epoch 46/100	Loss 3.6528 ± 0.1959
+INFO:meta-cli.py:Epoch 47/100	Loss 3.6413 ± 0.1997
+INFO:meta-cli.py:Epoch 48/100	Loss 3.6298 ± 0.1978
+INFO:meta-cli.py:Epoch 48/100	dev results	MRR 0.456171	H@1 0.426500	H@3 0.465227	H@5 0.486816	H@10 0.512360
+INFO:meta-cli.py:Epoch 48/100	test results	MRR 0.457472	H@1 0.426292	H@3 0.468571	H@5 0.487875	H@10 0.518347
+INFO:meta-cli.py:Epoch 49/100	Loss 3.6177 ± 0.1934
+INFO:meta-cli.py:Epoch 50/100	Loss 3.6065 ± 0.1951
+INFO:meta-cli.py:Epoch 51/100	Loss 3.5958 ± 0.1893
+INFO:meta-cli.py:Epoch 51/100	dev results	MRR 0.456440	H@1 0.426500	H@3 0.467205	H@5 0.486816	H@10 0.513184
+INFO:meta-cli.py:Epoch 51/100	test results	MRR 0.457563	H@1 0.425335	H@3 0.470485	H@5 0.490108	H@10 0.519783
+INFO:meta-cli.py:Epoch 52/100	Loss 3.5852 ± 0.1984
+INFO:meta-cli.py:Epoch 53/100	Loss 3.5747 ± 0.1895
+INFO:meta-cli.py:Epoch 54/100	Loss 3.5647 ± 0.1962
+INFO:meta-cli.py:Epoch 54/100	dev results	MRR 0.456731	H@1 0.426500	H@3 0.467205	H@5 0.486322	H@10 0.514338
+INFO:meta-cli.py:Epoch 54/100	test results	MRR 0.458430	H@1 0.426611	H@3 0.470325	H@5 0.490268	H@10 0.520421
+INFO:meta-cli.py:Epoch 55/100	Loss 3.5550 ± 0.1982
+INFO:meta-cli.py:Epoch 56/100	Loss 3.5453 ± 0.1854
+INFO:meta-cli.py:Epoch 57/100	Loss 3.5360 ± 0.1992
+INFO:meta-cli.py:Epoch 57/100	dev results	MRR 0.457295	H@1 0.427983	H@3 0.466381	H@5 0.486981	H@10 0.514502
+INFO:meta-cli.py:Epoch 57/100	test results	MRR 0.458408	H@1 0.426771	H@3 0.470166	H@5 0.491385	H@10 0.520102
+INFO:meta-cli.py:Epoch 58/100	Loss 3.5268 ± 0.1915
+INFO:meta-cli.py:Epoch 59/100	Loss 3.5180 ± 0.1956
+INFO:meta-cli.py:Epoch 60/100	Loss 3.5093 ± 0.1868
+INFO:meta-cli.py:Epoch 60/100	dev results	MRR 0.457163	H@1 0.427324	H@3 0.466875	H@5 0.486816	H@10 0.515821
+INFO:meta-cli.py:Epoch 60/100	test results	MRR 0.459367	H@1 0.427888	H@3 0.470964	H@5 0.491066	H@10 0.520900
+INFO:meta-cli.py:Epoch 61/100	Loss 3.5008 ± 0.1934
+INFO:meta-cli.py:Epoch 62/100	Loss 3.4920 ± 0.1910
+INFO:meta-cli.py:Epoch 63/100	Loss 3.4845 ± 0.1835
+INFO:meta-cli.py:Epoch 63/100	dev results	MRR 0.457019	H@1 0.427488	H@3 0.466051	H@5 0.486981	H@10 0.514502
+INFO:meta-cli.py:Epoch 63/100	test results	MRR 0.458827	H@1 0.427409	H@3 0.470804	H@5 0.490268	H@10 0.518666
+INFO:meta-cli.py:Epoch 64/100	Loss 3.4767 ± 0.1852
+INFO:meta-cli.py:Epoch 65/100	Loss 3.4684 ± 0.1875
+INFO:meta-cli.py:Epoch 66/100	Loss 3.4609 ± 0.1779
+INFO:meta-cli.py:Epoch 66/100	dev results	MRR 0.456954	H@1 0.426829	H@3 0.467205	H@5 0.485827	H@10 0.514173
+INFO:meta-cli.py:Epoch 66/100	test results	MRR 0.459014	H@1 0.426930	H@3 0.471602	H@5 0.490587	H@10 0.520740
+INFO:meta-cli.py:Epoch 67/100	Loss 3.4531 ± 0.1872
+INFO:meta-cli.py:Epoch 68/100	Loss 3.4461 ± 0.1894
+INFO:meta-cli.py:Epoch 69/100	Loss 3.4388 ± 0.1876
+INFO:meta-cli.py:Epoch 69/100	dev results	MRR 0.457131	H@1 0.427653	H@3 0.466381	H@5 0.486816	H@10 0.514832
+INFO:meta-cli.py:Epoch 69/100	test results	MRR 0.458339	H@1 0.426133	H@3 0.470006	H@5 0.490587	H@10 0.518826
+INFO:meta-cli.py:Epoch 70/100	Loss 3.4317 ± 0.1863
+INFO:meta-cli.py:Epoch 71/100	Loss 3.4249 ± 0.1835
+INFO:meta-cli.py:Epoch 72/100	Loss 3.4183 ± 0.1834
+INFO:meta-cli.py:Epoch 72/100	dev results	MRR 0.457226	H@1 0.427653	H@3 0.466381	H@5 0.487310	H@10 0.515656
+INFO:meta-cli.py:Epoch 72/100	test results	MRR 0.458803	H@1 0.426771	H@3 0.471442	H@5 0.491385	H@10 0.520102
+INFO:meta-cli.py:Epoch 73/100	Loss 3.4116 ± 0.1847
+INFO:meta-cli.py:Epoch 74/100	Loss 3.4045 ± 0.1837
+INFO:meta-cli.py:Epoch 75/100	Loss 3.3983 ± 0.1793
+INFO:meta-cli.py:Epoch 75/100	dev results	MRR 0.457539	H@1 0.427818	H@3 0.467205	H@5 0.488299	H@10 0.515491
+INFO:meta-cli.py:Epoch 75/100	test results	MRR 0.459228	H@1 0.427250	H@3 0.472080	H@5 0.490906	H@10 0.520262
+INFO:meta-cli.py:Epoch 76/100	Loss 3.3922 ± 0.1841
+INFO:meta-cli.py:Epoch 77/100	Loss 3.3862 ± 0.1789
+INFO:meta-cli.py:Epoch 78/100	Loss 3.3797 ± 0.1766
+INFO:meta-cli.py:Epoch 78/100	dev results	MRR 0.457161	H@1 0.427324	H@3 0.467864	H@5 0.487310	H@10 0.515162
+INFO:meta-cli.py:Epoch 78/100	test results	MRR 0.459113	H@1 0.427090	H@3 0.471123	H@5 0.492183	H@10 0.518666
+INFO:meta-cli.py:Epoch 79/100	Loss 3.3736 ± 0.1763
+INFO:meta-cli.py:Epoch 80/100	Loss 3.3682 ± 0.1802
+INFO:meta-cli.py:Epoch 81/100	Loss 3.3619 ± 0.1832
+INFO:meta-cli.py:Epoch 81/100	dev results	MRR 0.457010	H@1 0.427324	H@3 0.466711	H@5 0.488134	H@10 0.515326
+INFO:meta-cli.py:Epoch 81/100	test results	MRR 0.459070	H@1 0.426930	H@3 0.471602	H@5 0.491544	H@10 0.520262
+INFO:meta-cli.py:Epoch 82/100	Loss 3.3567 ± 0.1780
+INFO:meta-cli.py:Epoch 83/100	Loss 3.3507 ± 0.1748
+INFO:meta-cli.py:Epoch 84/100	Loss 3.3452 ± 0.1802
+INFO:meta-cli.py:Epoch 84/100	dev results	MRR 0.457376	H@1 0.427653	H@3 0.466546	H@5 0.488299	H@10 0.516150
+INFO:meta-cli.py:Epoch 84/100	test results	MRR 0.459648	H@1 0.428526	H@3 0.470645	H@5 0.490268	H@10 0.519464
+INFO:meta-cli.py:Epoch 85/100	Loss 3.3400 ± 0.1781
+INFO:meta-cli.py:Epoch 86/100	Loss 3.3348 ± 0.1766
+INFO:meta-cli.py:Epoch 87/100	Loss 3.3297 ± 0.1791
+INFO:meta-cli.py:Epoch 87/100	dev results	MRR 0.457558	H@1 0.428148	H@3 0.466875	H@5 0.487970	H@10 0.515491
+INFO:meta-cli.py:Epoch 87/100	test results	MRR 0.458738	H@1 0.426771	H@3 0.470645	H@5 0.492023	H@10 0.520102
+INFO:meta-cli.py:Epoch 88/100	Loss 3.3240 ± 0.1794
+INFO:meta-cli.py:Epoch 89/100	Loss 3.3191 ± 0.1747
+INFO:meta-cli.py:Epoch 90/100	Loss 3.3140 ± 0.1858
+INFO:meta-cli.py:Epoch 90/100	dev results	MRR 0.456945	H@1 0.426829	H@3 0.467535	H@5 0.488958	H@10 0.514997
+INFO:meta-cli.py:Epoch 90/100	test results	MRR 0.459138	H@1 0.427250	H@3 0.470166	H@5 0.491704	H@10 0.520581
+INFO:meta-cli.py:Epoch 91/100	Loss 3.3090 ± 0.1788
+INFO:meta-cli.py:Epoch 92/100	Loss 3.3045 ± 0.1822
+INFO:meta-cli.py:Epoch 93/100	Loss 3.2998 ± 0.1766
+INFO:meta-cli.py:Epoch 93/100	dev results	MRR 0.457358	H@1 0.427653	H@3 0.466546	H@5 0.487805	H@10 0.513843
+INFO:meta-cli.py:Epoch 93/100	test results	MRR 0.459203	H@1 0.427569	H@3 0.470485	H@5 0.490747	H@10 0.521378
+INFO:meta-cli.py:Epoch 94/100	Loss 3.2953 ± 0.1785
+INFO:meta-cli.py:Epoch 95/100	Loss 3.2901 ± 0.1742
+INFO:meta-cli.py:Epoch 96/100	Loss 3.2857 ± 0.1739
+INFO:meta-cli.py:Epoch 96/100	dev results	MRR 0.457361	H@1 0.427653	H@3 0.466875	H@5 0.487640	H@10 0.514173
+INFO:meta-cli.py:Epoch 96/100	test results	MRR 0.458654	H@1 0.426292	H@3 0.471123	H@5 0.490747	H@10 0.520421
+INFO:meta-cli.py:Epoch 97/100	Loss 3.2812 ± 0.1740
+INFO:meta-cli.py:Epoch 98/100	Loss 3.2765 ± 0.1772
+INFO:meta-cli.py:Epoch 99/100	Loss 3.2723 ± 0.1622
+INFO:meta-cli.py:Epoch 99/100	dev results	MRR 0.457367	H@1 0.427653	H@3 0.467535	H@5 0.487146	H@10 0.514338
+INFO:meta-cli.py:Epoch 99/100	test results	MRR 0.459220	H@1 0.427250	H@3 0.471921	H@5 0.490428	H@10 0.520421
+INFO:meta-cli.py:Epoch 100/100	Loss 3.2679 ± 0.1745
+INFO:meta-cli.py:Final 	dev results	MRR 0.457363	H@1 0.427488	H@3 0.467864	H@5 0.487475	H@10 0.514173
+INFO:meta-cli.py:Final 	test results	MRR 0.459020	H@1 0.427090	H@3 0.471602	H@5 0.490268	H@10 0.519943
+INFO:meta-cli.py:Training finished

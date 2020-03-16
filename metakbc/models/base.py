@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class BaseModel(nn.Module, ABC):
+class BaseModel(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
@@ -35,9 +35,3 @@ class BaseModel(nn.Module, ABC):
     def factor(self,
                embedding_vector: Tensor) -> Tensor:
         raise NotImplementedError
-
-    def extra_factors(self,
-                      rel: Tensor,
-                      arg1: Optional[Tensor],
-                      arg2: Optional[Tensor]) -> List[Tensor]:
-        return []
