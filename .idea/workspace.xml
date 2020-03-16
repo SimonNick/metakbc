@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/metakbc/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/models/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,14 +23,44 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="807">
+            <state relative-caret-position="2194">
               <caret line="206" selection-start-line="206" selection-end-line="206" />
               <folding>
                 <element signature="e#48#57#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="100">
+                <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1890">
+              <caret line="105" column="13" selection-start-line="105" selection-start-column="13" selection-end-line="105" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="883">
+              <caret line="104" column="13" selection-start-line="104" selection-start-column="13" selection-end-line="104" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -60,8 +92,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="888">
-              <caret line="75" column="33" selection-start-line="75" selection-start-column="33" selection-end-line="75" selection-end-column="33" />
+            <state relative-caret-position="1000">
+              <caret line="50" column="30" lean-forward="true" selection-start-line="50" selection-start-column="30" selection-end-line="50" selection-end-column="30" />
               <folding>
                 <element signature="e#25#39#0" expanded="true" />
               </folding>
@@ -88,8 +120,8 @@
       <find>crs</find>
       <find>(nb</find>
       <find>optimizer.</find>
-      <find>optimizer</find>
       <find>ran</find>
+      <find>optimizer</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -116,13 +148,14 @@
         <option value="$PROJECT_DIR$/experiments/nations/nations_rc_v1.py" />
         <option value="$PROJECT_DIR$/experiments/kinship/kinship_rc_v1.py" />
         <option value="$PROJECT_DIR$/experiments/base/umls_rc_v1.py" />
-        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
-        <option value="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" />
         <option value="$PROJECT_DIR$/experiments/base/base_rc_v1.py" />
         <option value="$PROJECT_DIR$/metakbc/meta/base.py" />
         <option value="$PROJECT_DIR$/playground/meta.py" />
         <option value="$PROJECT_DIR$/metakbc/models/base.py" />
         <option value="$PROJECT_DIR$/playground/meta2.py" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
+        <option value="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" />
       </list>
     </option>
   </component>
@@ -150,6 +183,23 @@
               <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
               <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
               <item name="bin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+              <item name="fb15k-237" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+              <item name="wn18rr" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
@@ -204,12 +254,12 @@
       <workItem from="1582759893516" duration="474000" />
       <workItem from="1583012021091" duration="2657000" />
       <workItem from="1583832567734" duration="10306000" />
-      <workItem from="1584027115943" duration="23496000" />
+      <workItem from="1584027115943" duration="24751000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36933000" />
+    <option name="totallyTimeSpent" value="38188000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3079" y="-510" width="1770" height="1321" extended-state="0" />
@@ -379,20 +429,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="35" column="15" selection-start-line="35" selection-start-column="15" selection-end-line="35" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="41" column="48" selection-start-line="41" selection-start-column="48" selection-end-line="41" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/experiments/base/base_rc_v1.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="780">
@@ -424,16 +460,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="888">
-          <caret line="75" column="33" selection-start-line="75" selection-start-column="33" selection-end-line="75" selection-end-column="33" />
-          <folding>
-            <element signature="e#25#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/optim/asgd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="640">
@@ -461,13 +487,47 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="100">
+            <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1000">
+          <caret line="50" column="30" lean-forward="true" selection-start-line="50" selection-start-column="30" selection-end-line="50" selection-end-column="30" />
+          <folding>
+            <element signature="e#25#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="807">
+        <state relative-caret-position="2194">
           <caret line="206" selection-start-line="206" selection-end-line="206" />
           <folding>
             <element signature="e#48#57#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1890">
+          <caret line="105" column="13" selection-start-line="105" selection-start-column="13" selection-end-line="105" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="883">
+          <caret line="104" column="13" selection-start-line="104" selection-start-column="13" selection-end-line="104" selection-end-column="13" />
         </state>
       </provider>
     </entry>

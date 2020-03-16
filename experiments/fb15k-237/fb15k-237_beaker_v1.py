@@ -36,8 +36,8 @@ def to_logfile(c, path):
 def main(argv):
     hyp_space_1 = dict(
         m=['complex'],
-        k=[500, 1000, 2000],
-        b=[100],
+        k=[500, 1000, 2000, 4000],
+        b=[100, 500, 1000],
         e=[100],
         f2=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
         n3=[0],
@@ -49,8 +49,8 @@ def main(argv):
 
     hyp_space_2 = dict(
         m=['complex'],
-        k=[500, 1000, 2000],
-        b=[100],
+        k=[500, 1000, 2000, 4000],
+        b=[100, 500, 1000],
         e=[100],
         f2=[0],
         n3=[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1],
@@ -103,7 +103,7 @@ def main(argv):
 #$ -e $HOME/array.err
 #$ -t 1-{}
 #$ -l tmem=16G
-#$ -l h_rt=24:00:00
+#$ -l h_rt=48:00:00
 #$ -l gpu=true
 
 conda activate gpu
