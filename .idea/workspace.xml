@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metakbc/models/complex.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/models/complex.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metakbc/models/distmult.py" beforeDir="false" afterPath="$PROJECT_DIR$/metakbc/models/distmult.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/playground/meta4.py" beforeDir="false" afterPath="$PROJECT_DIR$/playground/meta4.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,8 +39,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/playground/meta4.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="346">
-              <caret line="35" column="36" lean-forward="true" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
+            <state relative-caret-position="383">
+              <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
               <folding>
                 <element signature="e#48#57#0" expanded="true" />
               </folding>
@@ -222,12 +220,12 @@
       <workItem from="1583012021091" duration="2657000" />
       <workItem from="1583832567734" duration="10306000" />
       <workItem from="1584027115943" duration="29283000" />
-      <workItem from="1585007774339" duration="9826000" />
+      <workItem from="1585007774339" duration="11649000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52546000" />
+    <option name="totallyTimeSpent" value="54369000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -242,7 +240,7 @@
     <frame x="-3630" y="-1040" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23782235" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23782235" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -251,7 +249,7 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49938875" visible="true" weight="0.16905071" />
+      <window_info active="true" anchor="bottom" id="TODO" order="6" sideWeight="0.49938875" visible="true" weight="0.16905071" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.3295838" />
@@ -502,10 +500,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/__init__.pyi">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="1591" column="4" selection-start-line="1591" selection-start-column="4" selection-end-line="1591" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/playground/meta4.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="346">
-          <caret line="35" column="36" lean-forward="true" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
+        <state relative-caret-position="383">
+          <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
           <folding>
             <element signature="e#48#57#0" expanded="true" />
           </folding>

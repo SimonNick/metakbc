@@ -23,8 +23,8 @@ logger = logging.getLogger(os.path.basename(sys.argv[0]))
 def main(argv):
     torch.random.manual_seed(0)
 
-    e_tensor = torch.rand(8, 10, requires_grad=True)
-    p_tensor = torch.rand(16, 10, requires_grad=True)
+    e_tensor = torch.randn(8, 10, requires_grad=True)
+    p_tensor = torch.randn(16, 10, requires_grad=True)
 
     entity_embeddings = nn.Embedding.from_pretrained(e_tensor, freeze=False, sparse=False)
     predicate_embeddings = nn.Embedding.from_pretrained(p_tensor, freeze=False, sparse=False)
@@ -33,7 +33,7 @@ def main(argv):
     regularizer = N3()
 
     param_lst = [e_tensor, p_tensor]
-    opt = optim.SGD(param_lst, lr=0.1)
+    opt = optim.Adagrad(param_lst, lr=0)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -54,7 +54,7 @@ def main(argv):
         sp_scores, po_scores = model.forward(xp_emb, xs_emb, xo_emb, entity_embeddings=e_tensor)
 
         loss = loss_function(sp_scores, xo) + loss_function(po_scores, xs)
-        loss += 0.01 * regularizer([xp_emb, xs_emb, xo_emb])
+        loss += 0.1 * regularizer([xp_emb, xs_emb, xo_emb])
 
         print(loss)
 
