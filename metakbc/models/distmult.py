@@ -31,9 +31,10 @@ class DistMult(BaseModel):
                 rel: Tensor,
                 arg1: Optional[Tensor],
                 arg2: Optional[Tensor],
+                entity_embeddings: Optional[Tensor] = None,
                 *args, **kwargs) -> Tuple[Optional[Tensor], Optional[Tensor]]:
         # [N, E]
-        emb = self.entity_embeddings.weight
+        emb = self.entity_embeddings.weight if entity_embeddings is None else entity_embeddings
 
         score_sp = score_po = None
 

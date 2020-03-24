@@ -44,8 +44,9 @@ class ComplEx(BaseModel):
                 rel: Tensor,
                 arg1: Optional[Tensor],
                 arg2: Optional[Tensor],
+                entity_embeddings: Optional[Tensor] = None,
                 *args, **kwargs) -> Tuple[Optional[Tensor], Optional[Tensor]]:
-        emb = self.entity_embeddings.weight
+        emb = self.entity_embeddings.weight if entity_embeddings is None else entity_embeddings
 
         rel_real, rel_img = rel[:, :self.embedding_size], rel[:, self.embedding_size:]
         emb_real, emb_img = emb[:, :self.embedding_size], emb[:, self.embedding_size:]
