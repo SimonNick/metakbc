@@ -8,6 +8,7 @@ import numpy as np
 
 import torch
 from torch import nn, optim
+from torch.nn import Parameter
 
 from metakbc.models import ComplEx
 from metakbc.regularizers import N3
@@ -23,8 +24,11 @@ logger = logging.getLogger(os.path.basename(sys.argv[0]))
 def main(argv):
     torch.random.manual_seed(0)
 
-    e_tensor = torch.randn(8, 10, requires_grad=True)
-    p_tensor = torch.randn(16, 10, requires_grad=True)
+    e_tensor = Parameter(torch.rand(8, 10, requires_grad=True))
+    p_tensor = Parameter(torch.rand(16, 10, requires_grad=True))
+
+    e_tensor.data *= (1 + 1e-1)
+    p_tensor.data *= (1 + 1e-1)
 
     entity_embeddings = nn.Embedding.from_pretrained(e_tensor, freeze=False, sparse=False)
     predicate_embeddings = nn.Embedding.from_pretrained(p_tensor, freeze=False, sparse=False)
@@ -33,7 +37,7 @@ def main(argv):
     regularizer = N3()
 
     param_lst = [e_tensor, p_tensor]
-    opt = optim.Adagrad(param_lst, lr=0)
+    opt = optim.SGD(param_lst, lr=0.1)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -43,7 +47,7 @@ def main(argv):
 
     diff_opt = higher.get_diff_optim(opt, param_lst)
 
-    for i in range(6):
+    for i in range(8):
         entity_emb = nn.Embedding.from_pretrained(e_tensor, freeze=False, sparse=False)
         predicate_emb = nn.Embedding.from_pretrained(p_tensor, freeze=False, sparse=False)
 

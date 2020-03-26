@@ -19,7 +19,7 @@ def summary(configuration):
 
 
 def to_cmd(c, _path=None):
-    command = f'PYTHONPATH=. python3 ./bin/meta-cli.py ' \
+    command = f'PYTHONPATH=. python3 ./bin/kbc-cli.py ' \
         f'--train data/fb15k-237/train.tsv ' \
         f'--dev data/fb15k-237/dev.tsv ' \
         f'--test data/fb15k-237/test.tsv ' \

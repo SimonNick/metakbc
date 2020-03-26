@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/meta-cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/kbc-cli.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/base/base_rc_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/base/base_rc_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/playground/meta4.py" beforeDir="false" afterPath="$PROJECT_DIR$/playground/meta4.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -13,22 +18,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/playground/meta2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="740">
-              <caret line="53" selection-start-line="53" selection-end-line="53" />
-              <folding>
-                <element signature="e#48#57#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/playground/meta3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="27" selection-start-line="27" selection-end-line="28" selection-end-column="49" />
+            <state relative-caret-position="-186">
+              <caret line="28" selection-start-line="28" selection-end-line="28" selection-end-column="49" />
               <folding>
                 <element signature="e#48#57#0" expanded="true" />
               </folding>
@@ -37,10 +30,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/playground/meta4.py">
+        <entry file="file://$PROJECT_DIR$/bin/kbc-cli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
+            <state relative-caret-position="181">
+              <caret line="187" lean-forward="true" selection-start-line="187" selection-end-line="187" />
               <folding>
                 <element signature="e#48#57#0" expanded="true" />
               </folding>
@@ -49,10 +42,61 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/playground/meta4.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="531">
+              <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
+              <folding>
+                <element signature="e#48#57#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments/base/base_rc_v1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-395">
+              <caret line="21" column="46" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
+              <folding>
+                <element signature="e#48#64#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="320">
+              <caret line="21" column="46" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="217">
+              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/optim/sgd.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="50" column="8" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/nn/modules/sparse.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
+            <state relative-caret-position="441">
+              <caret line="96" column="32" selection-start-line="96" selection-start-column="32" selection-end-line="96" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -60,7 +104,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
+            <state relative-caret-position="630">
               <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="95" />
               <folding>
                 <element signature="e#25#39#0" expanded="true" />
@@ -104,9 +148,9 @@
       <find>optimizer</find>
       <find>update_para</find>
       <find>self.entity_emb</find>
-      <find>self.entity_embeddings</find>
       <find>print</find>
       <find>_lanb</find>
+      <find>self.entity_embeddings</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -131,24 +175,24 @@
         <option value="$PROJECT_DIR$/experiments/nations/nations_rc_v1.py" />
         <option value="$PROJECT_DIR$/experiments/kinship/kinship_rc_v1.py" />
         <option value="$PROJECT_DIR$/experiments/base/umls_rc_v1.py" />
-        <option value="$PROJECT_DIR$/experiments/base/base_rc_v1.py" />
         <option value="$PROJECT_DIR$/metakbc/meta/base.py" />
         <option value="$PROJECT_DIR$/playground/meta.py" />
         <option value="$PROJECT_DIR$/metakbc/models/base.py" />
         <option value="$PROJECT_DIR$/playground/meta2.py" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
-        <option value="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" />
         <option value="$PROJECT_DIR$/playground/meta3.py" />
         <option value="$PROJECT_DIR$/metakbc/models/complex.py" />
         <option value="$PROJECT_DIR$/metakbc/models/distmult.py" />
         <option value="$PROJECT_DIR$/playground/meta4.py" />
+        <option value="$PROJECT_DIR$/experiments/base/base_rc_v1.py" />
+        <option value="$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py" />
+        <option value="$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-3630" />
-    <option name="y" value="-1040" />
+    <option name="x" value="-3004" />
+    <option name="y" value="-1055" />
     <option name="width" value="1440" />
     <option name="height" value="877" />
   </component>
@@ -169,13 +213,35 @@
             <path>
               <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
               <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
-              <item name="metakbc" type="462c0819:PsiDirectoryNode" />
+              <item name="bin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+              <item name="base" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+              <item name="fb15k-237" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments" type="462c0819:PsiDirectoryNode" />
+              <item name="wn18rr" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
               <item name="meta-kbc" type="462c0819:PsiDirectoryNode" />
               <item name="metakbc" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="meta-kbc" type="b2602c69:ProjectViewProjectNode" />
@@ -220,12 +286,12 @@
       <workItem from="1583012021091" duration="2657000" />
       <workItem from="1583832567734" duration="10306000" />
       <workItem from="1584027115943" duration="29283000" />
-      <workItem from="1585007774339" duration="11649000" />
+      <workItem from="1585007774339" duration="16254000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54369000" />
+    <option name="totallyTimeSpent" value="58974000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -237,10 +303,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-3630" y="-1040" width="1440" height="877" extended-state="0" />
+    <frame x="-3004" y="-1055" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23782235" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23782235" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -249,7 +315,7 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info active="true" anchor="bottom" id="TODO" order="6" sideWeight="0.49938875" visible="true" weight="0.16905071" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49938875" visible="true" weight="0.16905071" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.3295838" />
@@ -363,16 +429,6 @@
     <entry file="file://$PROJECT_DIR$/experiments/nations/nations_rc_v1.py" />
     <entry file="file://$PROJECT_DIR$/experiments/kinship/kinship_rc_v1.py" />
     <entry file="file://$PROJECT_DIR$/experiments/base/umls_rc_v1.py" />
-    <entry file="file://$PROJECT_DIR$/experiments/base/base_rc_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="780">
-          <caret line="39" column="33" selection-start-line="39" selection-start-column="11" selection-end-line="39" selection-end-column="33" />
-          <folding>
-            <element signature="e#48#64#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/metakbc/meta/base.py" />
     <entry file="file://$PROJECT_DIR$/playground/meta.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -405,30 +461,6 @@
             <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
           </first_editor>
           <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bin/meta-cli.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2194">
-          <caret line="206" selection-start-line="206" selection-end-line="206" />
-          <folding>
-            <element signature="e#48#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1980">
-          <caret line="104" column="13" selection-start-line="104" selection-start-column="13" selection-end-line="104" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1835">
-          <caret line="105" column="13" selection-start-line="105" selection-start-column="13" selection-end-line="105" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -466,37 +498,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="95" />
-          <folding>
-            <element signature="e#25#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/metakbc/regularizers/base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="261">
           <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/nn/modules/sparse.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/playground/meta3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="27" selection-start-line="27" selection-end-line="28" selection-end-column="49" />
-          <folding>
-            <element signature="e#48#57#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -507,10 +512,85 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/metakbc/models/complex.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="95" />
+          <folding>
+            <element signature="e#25#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/nn/modules/sparse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="441">
+          <caret line="96" column="32" selection-start-line="96" selection-start-column="32" selection-end-line="96" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/optim/adadelta.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/cpu/lib/python3.7/site-packages/torch/optim/sgd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="50" column="8" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/base/base_rc_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-395">
+          <caret line="21" column="46" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
+          <folding>
+            <element signature="e#48#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/fb15k-237/fb15k-237_beaker_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="21" column="46" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/wn18rr/wn18rr_beaker_v1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/playground/meta4.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
+        <state relative-caret-position="531">
+          <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
+          <folding>
+            <element signature="e#48#57#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/playground/meta3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-186">
+          <caret line="28" selection-start-line="28" selection-end-line="28" selection-end-column="49" />
+          <folding>
+            <element signature="e#48#57#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/kbc-cli.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="187" lean-forward="true" selection-start-line="187" selection-end-line="187" />
           <folding>
             <element signature="e#48#57#0" expanded="true" />
           </folding>
