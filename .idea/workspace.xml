@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="975dfaa4-f8db-47d0-b125-0f1f571d0406" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pytest.ini" beforeDir="false" afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/kbcr/models/test_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/metakbc/models/test_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,7 +45,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/test_cli.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="469">
@@ -55,6 +53,18 @@
               <folding>
                 <element signature="e#25#34#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="474">
+                <caret line="36" column="125" selection-start-line="36" selection-start-column="125" selection-end-line="36" selection-end-column="125" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -113,7 +123,6 @@
         <option value="$PROJECT_DIR$/playground/meta.py" />
         <option value="$PROJECT_DIR$/metakbc/models/base.py" />
         <option value="$PROJECT_DIR$/playground/meta2.py" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/playground/meta3.py" />
         <option value="$PROJECT_DIR$/metakbc/models/complex.py" />
         <option value="$PROJECT_DIR$/metakbc/models/distmult.py" />
@@ -124,6 +133,7 @@
         <option value="$PROJECT_DIR$/bin/kbc-cli.py" />
         <option value="$PROJECT_DIR$/bin/meta-cli.py" />
         <option value="$PROJECT_DIR$/tests/test_cli.py" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -208,12 +218,12 @@
       <workItem from="1583012021091" duration="2657000" />
       <workItem from="1583832567734" duration="10306000" />
       <workItem from="1584027115943" duration="29283000" />
-      <workItem from="1585007774339" duration="19926000" />
+      <workItem from="1585007774339" duration="20481000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="62646000" />
+    <option name="totallyTimeSpent" value="63201000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -353,16 +363,6 @@
           <folding>
             <element signature="e#25#53#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="100">
-            <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -533,6 +533,16 @@
           <folding>
             <element signature="e#25#34#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="474">
+            <caret line="36" column="125" selection-start-line="36" selection-start-column="125" selection-end-line="36" selection-end-column="125" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
