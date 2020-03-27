@@ -14,13 +14,15 @@ def read_triples(path: str) -> List[Tuple[str, str, str]]:
     return triples
 
 
-def triples_to_vectors(triples: List[Tuple[str, str, str]],
-                       entity_to_idx: Dict[str, int],
-                       predicate_to_idx: Dict[str, int]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    Xs = np.array([entity_to_idx[s] for (s, p, o) in triples], dtype=np.int32)
-    Xp = np.array([predicate_to_idx[p] for (s, p, o) in triples], dtype=np.int32)
-    Xo = np.array([entity_to_idx[o] for (s, p, o) in triples], dtype=np.int32)
-    return Xs, Xp, Xo
+def triples_to_X(triples: List[Tuple[str, str, str]],
+                 entity_to_idx: Dict[str, int],
+                 predicate_to_idx: Dict[str, int]) -> np.ndarray:
+    res = np.array([
+        [entity_to_idx[s] for (s, p, o) in triples],
+        [predicate_to_idx[p] for (s, p, o) in triples],
+        [entity_to_idx[o] for (s, p, o) in triples]
+    ], dtype=np.int32).T
+    return res
 
 
 class Data:
@@ -81,8 +83,8 @@ class Data:
                 self.inverse_of_idx.update({p_idx: ip_idx, ip_idx: p_idx})
 
         # Triples
-        self.Xs, self.Xp, self.Xo = triples_to_vectors(self.train_triples, self.entity_to_idx, self.predicate_to_idx)
-        self.Xi = np.arange(start=0, stop=self.Xs.shape[0], dtype=np.int32)
+        self.X = triples_to_X(self.train_triples, self.entity_to_idx, self.predicate_to_idx)
+        self.dev_X = triples_to_X(self.dev_triples, self.entity_to_idx, self.predicate_to_idx)
+        self.test_X = triples_to_X(self.test_triples, self.entity_to_idx, self.predicate_to_idx)
 
-        assert self.Xs.shape == self.Xp.shape == self.Xo.shape == self.Xi.shape
         return

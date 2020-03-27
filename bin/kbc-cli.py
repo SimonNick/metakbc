@@ -183,20 +183,21 @@ def main(argv):
         N3_reg = N3()
 
     for epoch_no in range(1, nb_epochs + 1):
-        batcher = Batcher(data, batch_size, 1, random_state)
+        batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
         nb_batches = len(batcher.batches)
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
-            xp_batch, xs_batch, xo_batch, xi_batch = batcher.get_batch(batch_start, batch_end)
+            indices = batcher.get_batch(batch_start, batch_end)
 
-            xp_batch = torch.from_numpy(xp_batch.astype('int64')).to(device)
-            xs_batch = torch.from_numpy(xs_batch.astype('int64')).to(device)
-            xo_batch = torch.from_numpy(xo_batch.astype('int64')).to(device)
-            xi_batch = torch.from_numpy(xi_batch.astype('int64')).to(device)
+            x_batch = data.X[indices, :]
 
-            xp_batch_emb = predicate_embeddings(xp_batch)
+            xs_batch = torch.from_numpy(x_batch[:, 0].astype('int64')).to(device)
+            xp_batch = torch.from_numpy(x_batch[:, 1].astype('int64')).to(device)
+            xo_batch = torch.from_numpy(x_batch[:, 2].astype('int64')).to(device)
+
             xs_batch_emb = entity_embeddings(xs_batch)
+            xp_batch_emb = predicate_embeddings(xp_batch)
             xo_batch_emb = entity_embeddings(xo_batch)
 
             sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb)
