@@ -189,22 +189,17 @@ def main(argv):
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             indices = batcher.get_batch(batch_start, batch_end)
+            x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
 
-            x_batch = data.X[indices, :]
-
-            xs_batch = torch.from_numpy(x_batch[:, 0].astype('int64')).to(device)
-            xp_batch = torch.from_numpy(x_batch[:, 1].astype('int64')).to(device)
-            xo_batch = torch.from_numpy(x_batch[:, 2].astype('int64')).to(device)
-
-            xs_batch_emb = entity_embeddings(xs_batch)
-            xp_batch_emb = predicate_embeddings(xp_batch)
-            xo_batch_emb = entity_embeddings(xo_batch)
+            xs_batch_emb = entity_embeddings(x_batch[:, 0])
+            xp_batch_emb = predicate_embeddings(x_batch[:, 1])
+            xo_batch_emb = entity_embeddings(x_batch[:, 2])
 
             sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb)
             factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
-            s_loss = loss_function(sp_scores, xo_batch)
-            o_loss = loss_function(po_scores, xs_batch)
+            s_loss = loss_function(sp_scores, x_batch[:, 2])
+            o_loss = loss_function(po_scores, x_batch[:, 0])
 
             loss = s_loss + o_loss
 

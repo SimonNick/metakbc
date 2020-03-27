@@ -12,11 +12,7 @@ build:
       code: |
         sudo apt-get update
         sudo apt-get -y install build-essential unzip libboost-all-dev libgsl0-dev libeigen3-dev libopenblas-dev
-        python -m pip install torch
-        # python -m pip install -r requirements.txt
-        python -m pip install faiss allennlp nltk parsimonious tabulate termcolor tqdm torch scikit-learn scipy PyYAML colorclass terminaltables sklearn nmslib pytest pytest-xdist pytest-forked
-        conda install pytorch-cpu torchvision-cpu -c pytorch
-        conda install -y -c pytorch faiss-cpu
+        python -m pip install -r requirements.txt
 
     - script:
         name: Run unit tests
