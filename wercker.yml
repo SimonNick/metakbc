@@ -11,7 +11,7 @@ build:
       name: install
       code: |
         sudo apt-get update
-        sudo apt-get -y install build-essential unzip libboost-all-dev libgsl0-dev libeigen3-dev libopenblas-dev
+        sudo apt-get -y install build-essential unzip libboost-all-dev libgsl0-dev libeigen3-dev libopenblas-dev apt-utils
         python -m pip install -r requirements.txt
 
     - script:
