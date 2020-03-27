@@ -1,5 +1,7 @@
 # META-KBC
 
+[![wercker status](https://app.wercker.com/status/d1bfa901741714e764a76b9533e71608/m/master "wercker status")](https://app.wercker.com/project/byKey/d1bfa901741714e764a76b9533e71608)
+
 Meta-learning in Knowledge Base Completion.
 
 Baselines:
