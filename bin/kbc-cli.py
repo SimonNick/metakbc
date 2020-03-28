@@ -142,12 +142,7 @@ def main(argv):
     entity_embeddings.weight.data *= init_size
     predicate_embeddings.weight.data *= init_size
 
-    parameters_lst = nn.ModuleDict({
-        'entities': entity_embeddings,
-        'predicates': predicate_embeddings
-    })
-    parameters_lst.to(device)
-
+    parameters_lst = nn.ModuleDict({'entities': entity_embeddings, 'predicates': predicate_embeddings}).to(device)
     if load_path is not None:
         parameters_lst.load_state_dict(torch.load(load_path))
 
