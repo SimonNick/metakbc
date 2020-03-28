@@ -11,6 +11,7 @@ import numpy as np
 
 import torch
 from torch import nn, optim
+from torch.nn import Parameter
 
 import higher
 
@@ -103,8 +104,8 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    F2_weight = torch.tensor(args.F2, dtype=torch.float64)
-    N3_weight = torch.tensor(args.N3, dtype=torch.float64)
+    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float64))
+    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float64))
 
     validate_every = args.validate_every
     input_type = args.input_type
