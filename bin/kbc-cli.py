@@ -142,9 +142,11 @@ def main(argv):
     entity_embeddings.weight.data *= init_size
     predicate_embeddings.weight.data *= init_size
 
-    parameters_lst = nn.ModuleDict({'entities': entity_embeddings, 'predicates': predicate_embeddings}).to(device)
+    param_module = nn.ModuleDict({'entities': entity_embeddings, 'predicates': predicate_embeddings}).to(device)
     if load_path is not None:
-        parameters_lst.load_state_dict(torch.load(load_path))
+        param_module.load_state_dict(torch.load(load_path))
+
+    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
 
     model_factory = {
         'distmult': lambda: DistMult(entity_embeddings=entity_embeddings),
@@ -156,13 +158,13 @@ def main(argv):
     model.to(device)
 
     logger.info('Model state:')
-    for param_tensor in parameters_lst.state_dict():
-        logger.info(f'\t{param_tensor}\t{parameters_lst.state_dict()[param_tensor].size()}')
+    for param_tensor in param_module.state_dict():
+        logger.info(f'\t{param_tensor}\t{param_module.state_dict()[param_tensor].size()}')
 
     optimizer_factory = {
-        'adagrad': lambda: optim.Adagrad(parameters_lst.parameters(), lr=learning_rate),
-        'adam': lambda: optim.Adam(parameters_lst.parameters(), lr=learning_rate),
-        'sgd': lambda: optim.SGD(parameters_lst.parameters(), lr=learning_rate)
+        'adagrad': lambda: optim.Adagrad(parameter_lst, lr=learning_rate),
+        'adam': lambda: optim.Adam(parameter_lst, lr=learning_rate),
+        'sgd': lambda: optim.SGD(parameter_lst, lr=learning_rate)
     }
 
     assert optimizer_name in optimizer_factory
@@ -234,7 +236,7 @@ def main(argv):
         logger.info(f'Final \t{name} results\t{metrics_to_str(metrics)}')
 
     if save_path is not None:
-        torch.save(parameters_lst.state_dict(), save_path)
+        torch.save(param_module.state_dict(), save_path)
 
     logger.info("Training finished")
 
