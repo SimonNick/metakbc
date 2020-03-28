@@ -1,6 +1,7 @@
 torch
 numpy
 scikit-learn
+typing
 pytest
 pytest-xdist
 pytest-forked
