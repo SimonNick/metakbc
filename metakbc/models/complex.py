@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class ComplEx(BaseModel):
     def __init__(self,
-                 entity_embeddings: Optional[nn.Embedding],
+                 entity_embeddings: Optional[nn.Embedding] = None,
                  embedding_size: Optional[int] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings

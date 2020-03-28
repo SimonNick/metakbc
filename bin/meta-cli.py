@@ -155,8 +155,8 @@ def main(argv):
         parameters_lst.load_state_dict(torch.load(load_path))
 
     model_factory = {
-        'distmult': lambda: DistMult(entity_embeddings=entity_embeddings),
-        'complex': lambda: ComplEx(entity_embeddings=entity_embeddings)
+        'distmult': lambda: DistMult(),
+        'complex': lambda: ComplEx(embedding_size=embedding_size)
     }
 
     assert model_name in model_factory
@@ -187,19 +187,26 @@ def main(argv):
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
+        # batcher_lh = Batcher(data.nb_examples, batch_size, 1, random_state)
 
         nb_batches = len(batcher.batches)
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             indices = batcher.get_batch(batch_start, batch_end)
+            # indices_lh = batcher_lh.get_batch(batch_start, batch_end)
+
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
+            # x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
+
+            diff_opt = higher.get_diff_optim(optimizer, parameters_lst.parameters())
 
             xs_batch_emb = entity_embeddings(x_batch[:, 0])
             xp_batch_emb = predicate_embeddings(x_batch[:, 1])
             xo_batch_emb = entity_embeddings(x_batch[:, 2])
 
-            sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb)
+            sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb,
+                                                 entity_embeddings=entity_embeddings.weight)
             factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
             s_loss = loss_function(sp_scores, x_batch[:, 2])
@@ -212,6 +219,9 @@ def main(argv):
 
             if N3_weight is not None:
                 loss += N3_weight * N3_reg(factors)
+
+            # diff_opt.step(loss, params=parameters_lst.parameters())
+
 
             loss.backward()
 

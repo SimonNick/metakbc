@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class DistMult(BaseModel):
     def __init__(self,
-                 entity_embeddings: Optional[nn.Embedding]) -> None:
+                 entity_embeddings: Optional[nn.Embedding] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
 
