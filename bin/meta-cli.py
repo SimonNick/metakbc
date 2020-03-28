@@ -12,6 +12,8 @@ import numpy as np
 import torch
 from torch import nn, optim
 
+import higher
+
 from metakbc.training.data import Data
 from metakbc.training.batcher import Batcher
 
@@ -184,6 +186,8 @@ def main(argv):
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
+        # batcher_lh = Batcher(data.nb_examples, batch_size, 1, random_state)
+
         nb_batches = len(batcher.batches)
 
         epoch_loss_values = []
