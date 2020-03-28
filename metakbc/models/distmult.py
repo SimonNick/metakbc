@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class DistMult(BaseModel):
     def __init__(self,
-                 entity_embeddings: nn.Embedding) -> None:
+                 entity_embeddings: Optional[nn.Embedding]) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
 
@@ -33,6 +33,8 @@ class DistMult(BaseModel):
                 arg2: Optional[Tensor],
                 entity_embeddings: Optional[Tensor] = None,
                 *args, **kwargs) -> Tuple[Optional[Tensor], Optional[Tensor]]:
+        assert (entity_embeddings is not None) or (self.entity_embeddings is not None)
+
         # [N, E]
         emb = self.entity_embeddings.weight if entity_embeddings is None else entity_embeddings
 

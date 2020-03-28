@@ -14,10 +14,17 @@ logger = logging.getLogger(__name__)
 
 class ComplEx(BaseModel):
     def __init__(self,
-                 entity_embeddings: nn.Embedding) -> None:
+                 entity_embeddings: Optional[nn.Embedding],
+                 embedding_size: Optional[int] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
-        self.embedding_size = self.entity_embeddings.weight.shape[1] // 2
+
+        if self.entity_embeddings is not None:
+            self.embedding_size = self.entity_embeddings.weight.shape[1] // 2
+        else:
+            self.embedding_size = embedding_size
+
+        assert self.embedding_size is not None
 
     def score(self,
               rel: Tensor,
@@ -46,6 +53,8 @@ class ComplEx(BaseModel):
                 arg2: Optional[Tensor],
                 entity_embeddings: Optional[Tensor] = None,
                 *args, **kwargs) -> Tuple[Optional[Tensor], Optional[Tensor]]:
+        assert (entity_embeddings is not None) or (self.entity_embeddings is not None)
+
         emb = self.entity_embeddings.weight if entity_embeddings is None else entity_embeddings
 
         rel_real, rel_img = rel[:, :self.embedding_size], rel[:, self.embedding_size:]
