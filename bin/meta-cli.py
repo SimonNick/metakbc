@@ -103,8 +103,8 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    F2_weight = args.F2
-    N3_weight = args.N3
+    F2_weight = torch.tensor(args.F2, dtype=torch.float64)
+    N3_weight = torch.tensor(args.N3, dtype=torch.float64)
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -186,7 +186,6 @@ def main(argv):
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
-        # batcher_lh = Batcher(data.nb_examples, batch_size, 1, random_state)
 
         nb_batches = len(batcher.batches)
 

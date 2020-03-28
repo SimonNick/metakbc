@@ -3,9 +3,6 @@
 import numpy as np
 
 from metakbc.util import make_batches
-from metakbc.training.data import Data
-
-from typing import Tuple
 
 
 class Batcher:
