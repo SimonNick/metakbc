@@ -14,27 +14,21 @@ logger = logging.getLogger(__name__)
 
 class ComplEx(BaseModel):
     def __init__(self,
-                 entity_embeddings: Optional[nn.Embedding] = None,
-                 embedding_size: Optional[int] = None) -> None:
+                 entity_embeddings: Optional[nn.Embedding] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
-
-        if self.entity_embeddings is not None:
-            self.embedding_size = self.entity_embeddings.weight.shape[1] // 2
-        else:
-            self.embedding_size = embedding_size
-
-        assert self.embedding_size is not None
 
     def score(self,
               rel: Tensor,
               arg1: Tensor,
               arg2: Tensor,
               *args, **kwargs) -> Tensor:
+        rank = rel.shape[1] // 2
+
         # [B, E]
-        rel_real, rel_img = rel[:, :self.embedding_size], rel[:, self.embedding_size:]
-        arg1_real, arg1_img = arg1[:, :self.embedding_size], arg1[:, self.embedding_size:]
-        arg2_real, arg2_img = arg2[:, :self.embedding_size], arg2[:, self.embedding_size:]
+        rel_real, rel_img = rel[:, :rank], rel[:, rank:]
+        arg1_real, arg1_img = arg1[:, :rank], arg1[:, rank:]
+        arg2_real, arg2_img = arg2[:, :rank], arg2[:, rank:]
 
         # [B] Tensor
         score1 = torch.sum(rel_real * arg1_real * arg2_real, 1)
@@ -53,18 +47,20 @@ class ComplEx(BaseModel):
                 arg2: Optional[Tensor],
                 entity_embeddings: Optional[Tensor] = None,
                 *args, **kwargs) -> Tuple[Optional[Tensor], Optional[Tensor]]:
+        rank = rel.shape[1] // 2
+
         assert (entity_embeddings is not None) or (self.entity_embeddings is not None)
 
         emb = self.entity_embeddings.weight if entity_embeddings is None else entity_embeddings
 
-        rel_real, rel_img = rel[:, :self.embedding_size], rel[:, self.embedding_size:]
-        emb_real, emb_img = emb[:, :self.embedding_size], emb[:, self.embedding_size:]
+        rel_real, rel_img = rel[:, :rank], rel[:, rank:]
+        emb_real, emb_img = emb[:, :rank], emb[:, rank:]
 
         # [B] Tensor
         score_sp = score_po = None
 
         if arg1 is not None:
-            arg1_real, arg1_img = arg1[:, :self.embedding_size], arg1[:, self.embedding_size:]
+            arg1_real, arg1_img = arg1[:, :rank], arg1[:, rank:]
 
             score1_sp = (rel_real * arg1_real) @ emb_real.t()
             score2_sp = (rel_real * arg1_img) @ emb_img.t()
@@ -74,7 +70,7 @@ class ComplEx(BaseModel):
             score_sp = score1_sp + score2_sp + score3_sp - score4_sp
 
         if arg2 is not None:
-            arg2_real, arg2_img = arg2[:, :self.embedding_size], arg2[:, self.embedding_size:]
+            arg2_real, arg2_img = arg2[:, :rank], arg2[:, rank:]
 
             score1_po = (rel_real * arg2_real) @ emb_real.t()
             score2_po = (rel_real * arg2_img) @ emb_img.t()
@@ -87,6 +83,7 @@ class ComplEx(BaseModel):
 
     def factor(self,
                embedding_vector: Tensor) -> Tensor:
-        vec_real = embedding_vector[:, :self.embedding_size]
-        vec_img = embedding_vector[:, self.embedding_size:]
+        rank = embedding_vector.shape[1] // 2
+        vec_real = embedding_vector[:, :rank]
+        vec_img = embedding_vector[:, rank:]
         return torch.sqrt(vec_real ** 2 + vec_img ** 2)

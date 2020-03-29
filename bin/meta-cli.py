@@ -152,7 +152,7 @@ def main(argv):
 
     model_factory = {
         'distmult': lambda: DistMult(),
-        'complex': lambda: ComplEx(embedding_size=embedding_size)
+        'complex': lambda: ComplEx()
     }
 
     assert model_name in model_factory
