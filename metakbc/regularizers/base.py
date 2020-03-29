@@ -35,6 +35,19 @@ class F2(Regularizer):
         return norm / factors[0].shape[0]
 
 
+class L1(Regularizer):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self,
+                 factors: List[Tensor]):
+        norm = 0
+        for f in factors:
+            norm += torch.sum(torch.abs(f))
+
+        return norm / factors[0].shape[0]
+
+
 class N3(Regularizer):
     def __init__(self):
         super().__init__()

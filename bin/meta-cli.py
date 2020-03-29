@@ -177,7 +177,9 @@ def main(argv):
 
     print(optimizer)
 
-    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=0.1)
+    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=learning_rate)
+
+    print(hyper_optimizer)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -189,7 +191,6 @@ def main(argv):
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
-
             diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
 
             indices = batcher.get_batch(batch_start, batch_end)
@@ -208,7 +209,8 @@ def main(argv):
 
             loss = s_loss + o_loss
             # loss += torch.sigmoid(F2_weight) * F2_reg(factors) + torch.sigmoid(N3_weight) * N3_reg(factors)
-            loss += torch.relu(F2_weight) * F2_reg(factors) + torch.relu(N3_weight) * N3_reg(factors)
+            # loss += torch.relu(F2_weight) * F2_reg(factors) + torch.relu(N3_weight) * N3_reg(factors)
+            loss += F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
 
             loss.backward(retain_graph=True)
 
@@ -242,6 +244,9 @@ def main(argv):
 
             optimizer.zero_grad()
             hyper_optimizer.zero_grad()
+
+            F2_weight.data.clamp_(0)
+            N3_weight.data.clamp_(0)
 
             # print(F2_weight, N3_weight)
 
