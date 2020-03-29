@@ -11,7 +11,6 @@ import numpy as np
 
 import torch
 from torch import nn, optim
-from torch.nn import Parameter
 
 import higher
 
@@ -104,8 +103,8 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float64), requires_grad=True)
-    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float64), requires_grad=True)
+    F2_weight = args.F2
+    N3_weight = args.N3
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -139,20 +138,17 @@ def main(argv):
     rank = embedding_size * 2 if model_name in {'complex'} else embedding_size
     init_size = 1e-3
 
-    entity_embeddings = nn.Embedding(data.nb_entities, rank, sparse=True)
-    predicate_embeddings = nn.Embedding(data.nb_predicates, rank, sparse=True)
+    entity_embeddings = nn.Embedding(data.nb_entities, rank, sparse=False)
+    predicate_embeddings = nn.Embedding(data.nb_predicates, rank, sparse=False)
 
     entity_embeddings.weight.data *= init_size
     predicate_embeddings.weight.data *= init_size
 
-    parameters_lst = nn.ModuleDict({
-        'entities': entity_embeddings,
-        'predicates': predicate_embeddings
-    })
-    parameters_lst.to(device)
-
+    param_module = nn.ModuleDict({'entities': entity_embeddings, 'predicates': predicate_embeddings}).to(device)
     if load_path is not None:
-        parameters_lst.load_state_dict(torch.load(load_path))
+        param_module.load_state_dict(torch.load(load_path))
+
+    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
 
     model_factory = {
         'distmult': lambda: DistMult(),
@@ -164,13 +160,13 @@ def main(argv):
     model.to(device)
 
     logger.info('Model state:')
-    for param_tensor in parameters_lst.state_dict():
-        logger.info(f'\t{param_tensor}\t{parameters_lst.state_dict()[param_tensor].size()}')
+    for param_tensor in param_module.state_dict():
+        logger.info(f'\t{param_tensor}\t{param_module.state_dict()[param_tensor].size()}')
 
     optimizer_factory = {
-        'adagrad': lambda: optim.Adagrad(parameters_lst.parameters(), lr=learning_rate),
-        'adam': lambda: optim.Adam(parameters_lst.parameters(), lr=learning_rate),
-        'sgd': lambda: optim.SGD(parameters_lst.parameters(), lr=learning_rate)
+        'adagrad': lambda: optim.Adagrad(parameter_lst, lr=learning_rate),
+        'adam': lambda: optim.Adam(parameter_lst, lr=learning_rate),
+        'sgd': lambda: optim.SGD(parameter_lst, lr=learning_rate)
     }
 
     assert optimizer_name in optimizer_factory
@@ -187,19 +183,15 @@ def main(argv):
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
-        # batcher_lh = Batcher(data.nb_examples, batch_size, 1, random_state)
-
         nb_batches = len(batcher.batches)
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
+
+            diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
+
             indices = batcher.get_batch(batch_start, batch_end)
-            # indices_lh = batcher_lh.get_batch(batch_start, batch_end)
-
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
-            # x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
-
-            diff_opt = higher.get_diff_optim(optimizer, parameters_lst.parameters())
 
             xs_batch_emb = entity_embeddings(x_batch[:, 0])
             xp_batch_emb = predicate_embeddings(x_batch[:, 1])
@@ -220,7 +212,11 @@ def main(argv):
             if N3_weight is not None:
                 loss += N3_weight * N3_reg(factors)
 
-            # diff_opt.step(loss, params=parameters_lst.parameters())
+            e_tensor_lh, p_tensor_lh = diff_opt.step(loss, params=parameter_lst)
+
+            entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
+            predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
+
 
 
             loss.backward()
@@ -253,7 +249,7 @@ def main(argv):
         logger.info(f'Final \t{name} results\t{metrics_to_str(metrics)}')
 
     if save_path is not None:
-        torch.save(parameters_lst.state_dict(), save_path)
+        torch.save(param_module.state_dict(), save_path)
 
     logger.info("Training finished")
 
