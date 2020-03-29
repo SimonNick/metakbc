@@ -149,8 +149,8 @@ def main(argv):
     if load_path is not None:
         param_module.load_state_dict(torch.load(load_path))
 
-    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight, F2_weight, N3_weight])
-    # hyperparameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight, F2_weight, N3_weight])
+    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
+    hyperparameter_lst = nn.ParameterList([F2_weight, N3_weight])
 
     model_factory = {
         'distmult': lambda: DistMult(),
@@ -173,16 +173,11 @@ def main(argv):
     assert optimizer_name in optimizer_factory
 
     optimizer = optimizer_factory[optimizer_name](parameter_lst, learning_rate)
-    # hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, learning_rate)
+    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, learning_rate)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
-    F2_reg = N3_reg = None
-
-    if F2_weight is not None:
-        F2_reg = F2()
-    if N3_weight is not None:
-        N3_reg = N3()
+    F2_reg, N3_reg = F2(), N3()
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
@@ -191,7 +186,7 @@ def main(argv):
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
 
-            # diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
+            diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
@@ -207,25 +202,17 @@ def main(argv):
             s_loss = loss_function(sp_scores, x_batch[:, 2])
             o_loss = loss_function(po_scores, x_batch[:, 0])
 
-            loss = s_loss + o_loss
+            loss = s_loss + o_loss + F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
 
-            if F2_weight is not None:
-                loss += F2_weight * F2_reg(factors)
-
-            if N3_weight is not None:
-                loss += N3_weight * N3_reg(factors)
-
-            loss = s_loss + o_loss
-
-            loss.backward()
+            loss.backward(retain_graph=True)
 
             optimizer.step()
 
             loss_value = loss.item()
             epoch_loss_values += [loss_value]
 
-            if 0 > 1:
-                e_tensor_lh, p_tensor_lh, _, _ = diff_opt.step(loss, params=parameter_lst)
+            if True:
+                e_tensor_lh, p_tensor_lh, = diff_opt.step(loss, params=parameter_lst)
 
                 entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
                 predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
@@ -243,13 +230,12 @@ def main(argv):
                 o_loss_lh = loss_function(po_scores_lh, x_val_batch[:, 0])
 
                 loss_lh = s_loss_lh + o_loss_lh
-
                 loss_lh.backward()
 
-                # hyper_optimizer.step()
+                hyper_optimizer.step()
 
             optimizer.zero_grad()
-            # hyper_optimizer.zero_grad()
+            hyper_optimizer.zero_grad()
 
             print(F2_weight, N3_weight)
 
