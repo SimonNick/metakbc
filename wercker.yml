@@ -12,7 +12,7 @@ build:
       code: |
         sudo apt-get update
         sudo apt-get -y install build-essential unzip libboost-all-dev libgsl0-dev libeigen3-dev libopenblas-dev apt-utils git
-        git clone https://github.com/facebookresearch/higher.git ; cd higher ; python -m pip install . ; cd .. ; rm -rf higher
+        # git clone https://github.com/facebookresearch/higher.git ; cd higher ; python -m pip install . ; cd .. ; rm -rf higher
         python -m pip install -r requirements.txt
 
     - script:

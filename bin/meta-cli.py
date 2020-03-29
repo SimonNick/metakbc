@@ -167,13 +167,13 @@ def main(argv):
     optimizer_factory = {
         'adagrad': lambda p, lr: optim.Adagrad(p, lr=lr),
         'adam': lambda p, lr: optim.Adam(p, lr=lr),
-        'sgd': lambda p, lr: optim.SGD(p, lr=lr)
+        'sgd': lambda p, lr: optim.SGD(p, lr=lr, momentum=0.9)
     }
 
     assert optimizer_name in optimizer_factory
 
     optimizer = optimizer_factory[optimizer_name](parameter_lst, learning_rate)
-    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, learning_rate)
+    hyper_optimizer = optimizer_factory['sgd'](hyperparameter_lst, 0.0)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -202,7 +202,9 @@ def main(argv):
             s_loss = loss_function(sp_scores, x_batch[:, 2])
             o_loss = loss_function(po_scores, x_batch[:, 0])
 
-            loss = s_loss + o_loss + F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
+            loss = s_loss + o_loss
+            # loss += torch.sigmoid(F2_weight) * F2_reg(factors) + torch.sigmoid(N3_weight) * N3_reg(factors)
+            loss += F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
 
             loss.backward(retain_graph=True)
 
@@ -237,7 +239,7 @@ def main(argv):
             optimizer.zero_grad()
             hyper_optimizer.zero_grad()
 
-            print(F2_weight, N3_weight)
+            # print(F2_weight, N3_weight)
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')

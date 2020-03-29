@@ -1,5 +1,4 @@
 torch
-higher
 numpy
 scikit-learn
 typing
