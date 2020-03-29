@@ -173,7 +173,7 @@ def main(argv):
     assert optimizer_name in optimizer_factory
 
     optimizer = optimizer_factory[optimizer_name](parameter_lst, learning_rate)
-    hyper_optimizer = optimizer_factory['sgd'](hyperparameter_lst, 0.0)
+    hyper_optimizer = optimizer_factory['sgd'](hyperparameter_lst, 0.01)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -203,8 +203,8 @@ def main(argv):
             o_loss = loss_function(po_scores, x_batch[:, 0])
 
             loss = s_loss + o_loss
-            # loss += torch.sigmoid(F2_weight) * F2_reg(factors) + torch.sigmoid(N3_weight) * N3_reg(factors)
-            loss += F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
+            loss += torch.sigmoid(F2_weight) * F2_reg(factors) + torch.sigmoid(N3_weight) * N3_reg(factors)
+            # loss += torch.relu(F2_weight) * F2_reg(factors) + torch.relu(N3_weight) * N3_reg(factors)
 
             loss.backward(retain_graph=True)
 
@@ -243,6 +243,7 @@ def main(argv):
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')
+                print(torch.sigmoid(N3_weight).data, torch.sigmoid(F2_weight).data)
 
         loss_mean, loss_std = np.mean(epoch_loss_values), np.std(epoch_loss_values)
         logger.info(f'Epoch {epoch_no}/{nb_epochs}\tLoss {loss_mean:.4f} ± {loss_std:.4f}')
