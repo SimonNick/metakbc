@@ -84,6 +84,8 @@ class ComplEx(BaseModel):
     def factor(self,
                embedding_vector: Tensor) -> Tensor:
         rank = embedding_vector.shape[1] // 2
+
         vec_real = embedding_vector[:, :rank]
         vec_img = embedding_vector[:, rank:]
+
         return torch.sqrt(vec_real ** 2 + vec_img ** 2)
