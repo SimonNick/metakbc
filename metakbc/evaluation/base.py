@@ -75,7 +75,8 @@ def evaluate(entity_embeddings: nn.Embedding,
             tensor_xp_emb = predicate_embeddings(tensor_xp)
             tensor_xo_emb = entity_embeddings(tensor_xo)
 
-            scores = model.forward(tensor_xp_emb, tensor_xs_emb, tensor_xo_emb)
+            scores = model.forward(tensor_xp_emb, tensor_xs_emb, tensor_xo_emb,
+                                   entity_embeddings=entity_embeddings.weight)
             scores_sp, scores_po = scores[0].cpu().numpy(), scores[1].cpu().numpy()
 
         batch_size = batch_xs.shape[0]

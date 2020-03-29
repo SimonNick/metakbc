@@ -11,6 +11,7 @@ import numpy as np
 
 import torch
 from torch import nn, optim
+from torch.nn import Parameter
 
 import higher
 
@@ -103,8 +104,8 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    F2_weight = args.F2
-    N3_weight = args.N3
+    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float64), requires_grad=True)
+    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float64), requires_grad=True)
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -148,7 +149,8 @@ def main(argv):
     if load_path is not None:
         param_module.load_state_dict(torch.load(load_path))
 
-    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
+    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight, F2_weight, N3_weight])
+    # hyperparameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight, F2_weight, N3_weight])
 
     model_factory = {
         'distmult': lambda: DistMult(),
@@ -156,21 +158,22 @@ def main(argv):
     }
 
     assert model_name in model_factory
-    model = model_factory[model_name]()
-    model.to(device)
+    model = model_factory[model_name]().to(device)
 
     logger.info('Model state:')
     for param_tensor in param_module.state_dict():
         logger.info(f'\t{param_tensor}\t{param_module.state_dict()[param_tensor].size()}')
 
     optimizer_factory = {
-        'adagrad': lambda: optim.Adagrad(parameter_lst, lr=learning_rate),
-        'adam': lambda: optim.Adam(parameter_lst, lr=learning_rate),
-        'sgd': lambda: optim.SGD(parameter_lst, lr=learning_rate)
+        'adagrad': lambda p, lr: optim.Adagrad(p, lr=lr),
+        'adam': lambda p, lr: optim.Adam(p, lr=lr),
+        'sgd': lambda p, lr: optim.SGD(p, lr=lr)
     }
 
     assert optimizer_name in optimizer_factory
-    optimizer = optimizer_factory[optimizer_name]()
+
+    optimizer = optimizer_factory[optimizer_name](parameter_lst, learning_rate)
+    # hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, learning_rate)
 
     loss_function = nn.CrossEntropyLoss(reduction='mean')
 
@@ -188,7 +191,7 @@ def main(argv):
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
 
-            diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
+            # diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
@@ -212,20 +215,43 @@ def main(argv):
             if N3_weight is not None:
                 loss += N3_weight * N3_reg(factors)
 
-            e_tensor_lh, p_tensor_lh = diff_opt.step(loss, params=parameter_lst)
-
-            entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
-            predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
-
-
+            loss = s_loss + o_loss
 
             loss.backward()
 
             optimizer.step()
-            optimizer.zero_grad()
 
             loss_value = loss.item()
             epoch_loss_values += [loss_value]
+
+            if 0 > 1:
+                e_tensor_lh, p_tensor_lh, _, _ = diff_opt.step(loss, params=parameter_lst)
+
+                entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
+                predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
+
+                x_val_batch = torch.from_numpy(data.dev_X.astype('int64')).to(device)
+
+                xs_batch_emb_lh = entity_embeddings_lh(x_val_batch[:, 0])
+                xp_batch_emb_lh = predicate_embeddings_lh(x_val_batch[:, 1])
+                xo_batch_emb_lh = entity_embeddings_lh(x_val_batch[:, 2])
+
+                sp_scores_lh, po_scores_lh = model.forward(xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh,
+                                                           entity_embeddings=entity_embeddings_lh.weight)
+
+                s_loss_lh = loss_function(sp_scores_lh, x_val_batch[:, 2])
+                o_loss_lh = loss_function(po_scores_lh, x_val_batch[:, 0])
+
+                loss_lh = s_loss_lh + o_loss_lh
+
+                loss_lh.backward()
+
+                # hyper_optimizer.step()
+
+            optimizer.zero_grad()
+            # hyper_optimizer.zero_grad()
+
+            print(F2_weight, N3_weight)
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')
