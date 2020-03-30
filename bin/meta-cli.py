@@ -220,9 +220,10 @@ def main(argv):
                     F2_weight * F2_reg(factors) + \
                     N3_weight * N3_reg(factors)
 
-            loss.backward(retain_graph=True)
+            loss.backward()
 
             optimizer.step()
+            optimizer.zero_grad()
 
             loss_value = loss.item()
             epoch_loss_values += [loss_value]
@@ -230,31 +231,27 @@ def main(argv):
             entity_embeddings_lh = entity_embeddings
             predicate_embeddings_lh = predicate_embeddings
 
-            loss_lh = loss
-
             for i in range(nb_lookahead_steps):
+                batch_start_lh, batch_end_lh = batcher.batches[(batch_no + i) % nb_batches]
 
-                if i > 0:
-                    batch_start_lh, batch_end_lh = batcher.batches[(batch_no + i) % nb_batches]
+                indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
+                x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                    indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
-                    x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
+                xs_batch_emb_lh = entity_embeddings(x_batch_lh[:, 0])
+                xp_batch_emb_lh = predicate_embeddings(x_batch_lh[:, 1])
+                xo_batch_emb_lh = entity_embeddings(x_batch_lh[:, 2])
 
-                    xs_batch_emb_lh = entity_embeddings(x_batch_lh[:, 0])
-                    xp_batch_emb_lh = predicate_embeddings(x_batch_lh[:, 1])
-                    xo_batch_emb_lh = entity_embeddings(x_batch_lh[:, 2])
+                sp_scores_lh, po_scores_lh = model.forward(xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh,
+                                                           entity_embeddings=entity_embeddings_lh.weight)
+                factors_lh = [model.factor(e) for e in [xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh]]
 
-                    sp_scores_lh, po_scores_lh = model.forward(xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh,
-                                                               entity_embeddings=entity_embeddings_lh.weight)
-                    factors_lh = [model.factor(e) for e in [xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh]]
+                s_loss_lh = loss_function(sp_scores_lh, x_batch_lh[:, 2])
+                o_loss_lh = loss_function(po_scores_lh, x_batch_lh[:, 0])
 
-                    s_loss_lh = loss_function(sp_scores_lh, x_batch_lh[:, 2])
-                    o_loss_lh = loss_function(po_scores_lh, x_batch_lh[:, 0])
-
-                    loss_lh = s_loss_lh + o_loss_lh
-                    loss_lh += L1_weight * L1_reg(factors_lh) + \
-                               F2_weight * F2_reg(factors_lh) + \
-                               N3_weight * N3_reg(factors_lh)
+                loss_lh = s_loss_lh + o_loss_lh
+                loss_lh += L1_weight * L1_reg(factors_lh) + \
+                           F2_weight * F2_reg(factors_lh) + \
+                           N3_weight * N3_reg(factors_lh)
 
                 e_tensor_lh, p_tensor_lh, = diff_opt.step(loss_lh, params=parameter_lst)
 
@@ -276,9 +273,8 @@ def main(argv):
             loss_val = s_loss_val + o_loss_val
 
             loss_val.backward()
+
             hyper_optimizer.step()
-    
-            optimizer.zero_grad()
             hyper_optimizer.zero_grad()
 
             L1_weight.data.clamp_(0)
