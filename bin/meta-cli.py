@@ -181,13 +181,11 @@ def main(argv):
     }
 
     assert optimizer_name in optimizer_factory
-
     optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate)
-    # optimizer = optimizer_factory['sgd'](parameter_lst, lr=0.1)
 
     print(optimizer)
 
-    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=learning_rate)
+    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=0.01)
 
     print(hyper_optimizer)
 
@@ -277,15 +275,9 @@ def main(argv):
 
             loss_val = s_loss_val + o_loss_val
 
-
-
-
             loss_val.backward()
             hyper_optimizer.step()
-
-
-
-
+    
             optimizer.zero_grad()
             hyper_optimizer.zero_grad()
 
