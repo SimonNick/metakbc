@@ -10,7 +10,7 @@ import multiprocessing
 import numpy as np
 
 import torch
-from torch import nn, optim
+from torch import nn, optim, Tensor
 from torch.nn import Parameter
 
 from torch.utils.tensorboard import SummaryWriter
@@ -20,10 +20,12 @@ import higher
 from metakbc.training.data import Data
 from metakbc.training.batcher import Batcher
 
-from metakbc.models import DistMult, ComplEx
+from metakbc.models import BaseModel, DistMult, ComplEx
 
 from metakbc.regularizers import F2, L1, N3
 from metakbc.evaluation import evaluate
+
+from typing import List, Tuple
 
 import logging
 
@@ -37,6 +39,27 @@ torch.set_num_threads(multiprocessing.cpu_count())
 def metrics_to_str(metrics):
     return f'MRR {metrics["MRR"]:.6f}\tH@1 {metrics["hits@1"]:.6f}\tH@3 {metrics["hits@3"]:.6f}\t' \
         f'H@5 {metrics["hits@5"]:.6f}\tH@10 {metrics["hits@10"]:.6f}'
+
+
+def get_loss(X: Tensor,
+             entity_embeddings: nn.Embedding,
+             predicate_embeddings: nn.Embedding,
+             model: BaseModel,
+             loss_function: nn.CrossEntropyLoss) -> Tuple[Tensor, List[Tensor]]:
+    xs_batch_emb = entity_embeddings(X[:, 0])
+    xp_batch_emb = predicate_embeddings(X[:, 1])
+    xo_batch_emb = entity_embeddings(X[:, 2])
+
+    sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb,
+                                         entity_embeddings=entity_embeddings.weight)
+    factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
+
+    s_loss = loss_function(sp_scores, X[:, 2])
+    o_loss = loss_function(po_scores, X[:, 0])
+
+    loss = s_loss + o_loss
+
+    return loss, factors
 
 
 def main(argv):
@@ -201,33 +224,6 @@ def main(argv):
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             diff_opt = higher.get_diff_optim(optimizer, parameter_lst)
 
-            indices = batcher.get_batch(batch_start, batch_end)
-            x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
-
-            xs_batch_emb = entity_embeddings(x_batch[:, 0])
-            xp_batch_emb = predicate_embeddings(x_batch[:, 1])
-            xo_batch_emb = entity_embeddings(x_batch[:, 2])
-
-            sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb,
-                                                 entity_embeddings=entity_embeddings.weight)
-            factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
-
-            s_loss = loss_function(sp_scores, x_batch[:, 2])
-            o_loss = loss_function(po_scores, x_batch[:, 0])
-
-            loss = s_loss + o_loss
-            loss += L1_weight * L1_reg(factors) + \
-                    F2_weight * F2_reg(factors) + \
-                    N3_weight * N3_reg(factors)
-
-            loss.backward()
-
-            optimizer.step()
-            optimizer.zero_grad()
-
-            loss_value = loss.item()
-            epoch_loss_values += [loss_value]
-
             entity_embeddings_lh = entity_embeddings
             predicate_embeddings_lh = predicate_embeddings
 
@@ -237,21 +233,8 @@ def main(argv):
                 indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                xs_batch_emb_lh = entity_embeddings(x_batch_lh[:, 0])
-                xp_batch_emb_lh = predicate_embeddings(x_batch_lh[:, 1])
-                xo_batch_emb_lh = entity_embeddings(x_batch_lh[:, 2])
-
-                sp_scores_lh, po_scores_lh = model.forward(xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh,
-                                                           entity_embeddings=entity_embeddings_lh.weight)
-                factors_lh = [model.factor(e) for e in [xp_batch_emb_lh, xs_batch_emb_lh, xo_batch_emb_lh]]
-
-                s_loss_lh = loss_function(sp_scores_lh, x_batch_lh[:, 2])
-                o_loss_lh = loss_function(po_scores_lh, x_batch_lh[:, 0])
-
-                loss_lh = s_loss_lh + o_loss_lh
-                loss_lh += L1_weight * L1_reg(factors_lh) + \
-                           F2_weight * F2_reg(factors_lh) + \
-                           N3_weight * N3_reg(factors_lh)
+                loss_lh, factors_lh = get_loss(x_batch_lh, entity_embeddings_lh, predicate_embeddings_lh, model, loss_function)
+                loss_lh += L1_weight * L1_reg(factors_lh) + F2_weight * F2_reg(factors_lh) + N3_weight * N3_reg(factors_lh)
 
                 e_tensor_lh, p_tensor_lh, = diff_opt.step(loss_lh, params=parameter_lst)
 
@@ -260,26 +243,34 @@ def main(argv):
 
             x_val_batch = torch.from_numpy(data.dev_X.astype('int64')).to(device)
 
-            xs_batch_emb_val = entity_embeddings_lh(x_val_batch[:, 0])
-            xp_batch_emb_val = predicate_embeddings_lh(x_val_batch[:, 1])
-            xo_batch_emb_val = entity_embeddings_lh(x_val_batch[:, 2])
-
-            sp_scores_val, po_scores_val = model.forward(xp_batch_emb_val, xs_batch_emb_val, xo_batch_emb_val,
-                                                         entity_embeddings=entity_embeddings_lh.weight)
-
-            s_loss_val = loss_function(sp_scores_val, x_val_batch[:, 2])
-            o_loss_val = loss_function(po_scores_val, x_val_batch[:, 0])
-
-            loss_val = s_loss_val + o_loss_val
+            loss_val, _ = get_loss(x_val_batch, entity_embeddings_lh, predicate_embeddings_lh, model, loss_function)
 
             loss_val.backward()
+
+            writer.add_scalar('Loss/Lookahead', loss_val.item(), (epoch_no * nb_batches) + batch_no)
 
             hyper_optimizer.step()
             hyper_optimizer.zero_grad()
 
-            L1_weight.data.clamp_(0)
-            F2_weight.data.clamp_(0)
-            N3_weight.data.clamp_(0)
+            L1_weight.data.clamp_(1e-10)
+            F2_weight.data.clamp_(1e-10)
+            N3_weight.data.clamp_(1e-10)
+
+            indices = batcher.get_batch(batch_start, batch_end)
+            x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
+
+            loss, factors = get_loss(x_batch, entity_embeddings, predicate_embeddings, model, loss_function)
+            loss += L1_weight * L1_reg(factors) + F2_weight * F2_reg(factors) + N3_weight * N3_reg(factors)
+
+            loss.backward()
+
+            optimizer.step()
+            optimizer.zero_grad()
+
+            loss_value = loss.item()
+            epoch_loss_values += [loss_value]
+
+            writer.add_scalar('Loss/Train', loss_value, (epoch_no * nb_batches) + batch_no)
 
             print(L1_weight.data, F2_weight.data, N3_weight.data)
 
