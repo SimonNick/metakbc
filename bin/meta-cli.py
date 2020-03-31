@@ -133,9 +133,9 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    L1_weight = Parameter(torch.tensor(args.L1, dtype=torch.float64), requires_grad=True)
-    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float64), requires_grad=True)
-    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float64), requires_grad=True)
+    L1_weight = Parameter(torch.tensor(args.L1, dtype=torch.float32), requires_grad=True) if args.L1 is not None else None
+    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float32), requires_grad=True) if args.F2 is not None else None
+    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float32), requires_grad=True) if args.N3 is not None else None
 
     nb_lookahead_steps = args.lookahead_steps
 
@@ -185,7 +185,11 @@ def main(argv):
         param_module.load_state_dict(torch.load(load_path))
 
     parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
-    hyperparameter_lst = nn.ParameterList([L1_weight, F2_weight, N3_weight])
+
+    hyperparameter_lst = ([] if L1_weight is None else [L1_weight]) + \
+                         ([] if F2_weight is None else [F2_weight]) + \
+                         ([] if N3_weight is None else [N3_weight])
+    hyperparameter_lst = nn.ParameterList(hyperparameter_lst)
 
     model_factory = {
         'distmult': lambda: DistMult(),
@@ -249,7 +253,12 @@ def main(argv):
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
                 loss_lh, factors_lh = get_loss(x_batch_lh, entity_embeddings_lh, predicate_embeddings_lh, model, loss_function)
-                loss_lh += L1_weight * L1_reg(factors_lh) + F2_weight * F2_reg(factors_lh) + N3_weight * N3_reg(factors_lh)
+                if L1_weight is not None:
+                    loss_lh += L1_weight * L1_reg(factors_lh)
+                if F2_weight is not None:
+                    loss_lh += F2_weight * F2_reg(factors_lh)
+                if N3_weight is not None:
+                    loss_lh += N3_weight * N3_reg(factors_lh)
 
                 e_tensor_lh, p_tensor_lh, = diff_opt.step(loss_lh, params=parameter_lst)
 
@@ -268,9 +277,14 @@ def main(argv):
             hyper_optimizer.step()
             hyper_optimizer.zero_grad()
 
-            L1_weight.data.clamp_(0)
-            F2_weight.data.clamp_(0)
-            N3_weight.data.clamp_(0.005)
+            if L1_weight is not None:
+                L1_weight.data.clamp_(0)
+
+            if F2_weight is not None:
+                F2_weight.data.clamp_(0)
+
+            if N3_weight is not None:
+                N3_weight.data.clamp_(0)
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
@@ -289,14 +303,15 @@ def main(argv):
             if writer is not None:
                 writer.add_scalar('Loss/Train', loss_value, (epoch_no * nb_batches) + batch_no)
 
-            print(L1_weight.data, F2_weight.data, N3_weight.data)
+                weights = {'L1': L1_weight.data if L1_weight is not None else None,
+                           'F2': F2_weight.data if F2_weight is not None else None,
+                           'N3': N3_weight.data if N3_weight is not None else None}
+                writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, (epoch_no * nb_batches) + batch_no)
 
-            if writer is not None:
                 dev_x = torch.from_numpy(data.dev_X.astype('int64')).to(device)
                 dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Dev', dev_loss, (epoch_no * nb_batches) + batch_no)
 
-            if writer is not None:
                 test_x = torch.from_numpy(data.test_X.astype('int64')).to(device)
                 test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Test', test_loss, (epoch_no * nb_batches) + batch_no)
