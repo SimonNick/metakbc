@@ -184,12 +184,12 @@ def main(argv):
     if load_path is not None:
         param_module.load_state_dict(torch.load(load_path))
 
-    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight])
+    parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight]).to(device)
 
     hyperparameter_lst = ([] if L1_weight is None else [L1_weight]) + \
                          ([] if F2_weight is None else [F2_weight]) + \
                          ([] if N3_weight is None else [N3_weight])
-    hyperparameter_lst = nn.ParameterList(hyperparameter_lst)
+    hyperparameter_lst = nn.ParameterList(hyperparameter_lst).to(device)
 
     model_factory = {
         'distmult': lambda: DistMult(),
