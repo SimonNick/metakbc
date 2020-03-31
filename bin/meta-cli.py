@@ -262,8 +262,7 @@ def main(argv):
                 entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
                 predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
 
-            x_val_batch = torch.from_numpy(data.dev_X.astype('int64')).to(device)
-
+            x_val_batch = torch.from_numpy(data.dev_X[:500, :].astype('int64')).to(device)
             loss_val, _ = get_loss(x_val_batch, entity_embeddings_lh, predicate_embeddings_lh, model, loss_function)
 
             loss_val.backward()
