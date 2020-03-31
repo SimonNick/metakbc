@@ -302,6 +302,7 @@ def main(argv):
                 weights = {'L1': L1_weight.data if L1_weight is not None else None,
                            'F2': F2_weight.data if F2_weight is not None else None,
                            'N3': N3_weight.data if N3_weight is not None else None}
+                print(weights)
                 writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, (epoch_no * nb_batches) + batch_no)
 
                 dev_x = torch.from_numpy(data.dev_X[:100, :].astype('int64')).to(device)
