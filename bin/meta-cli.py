@@ -229,11 +229,8 @@ def main(argv):
                            model=model, batch_size=eval_batch_size, device=device)
         if writer is not None:
             writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, 0)
-
-            # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
-            #                      global_step=0, tag='Entities')
-            # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
-            #                      global_step=0, tag='Predicates')
+            # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]), global_step=0, tag='Entities')
+            # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]), global_step=0, tag='Predicates')
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
@@ -308,11 +305,11 @@ def main(argv):
                            'N3': N3_weight.data if N3_weight is not None else None}
                 writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, (epoch_no * nb_batches) + batch_no)
 
-                dev_x = torch.from_numpy(data.dev_X.astype('int64')).to(device)
+                dev_x = torch.from_numpy(data.dev_X[:100, :].astype('int64')).to(device)
                 dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Dev', dev_loss, (epoch_no * nb_batches) + batch_no)
 
-                test_x = torch.from_numpy(data.test_X.astype('int64')).to(device)
+                test_x = torch.from_numpy(data.test_X[:100, :].astype('int64')).to(device)
                 test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Test', test_loss, (epoch_no * nb_batches) + batch_no)
 
@@ -331,11 +328,8 @@ def main(argv):
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\t{name} results\t{metrics_to_str(metrics)}')
                 if writer is not None:
                     writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, epoch_no * nb_batches)
-
-                    # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
-                    #                      global_step=epoch_no * nb_batches, tag='Entities')
-                    # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
-                    #                      global_step=epoch_no * nb_batches, tag='Predicates')
+                    # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]), global_step=epoch_no * nb_batches, tag='Entities')
+                    # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]), global_step=epoch_no * nb_batches, tag='Predicates')
 
     for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:
         metrics = evaluate(entity_embeddings=entity_embeddings, predicate_embeddings=predicate_embeddings,
