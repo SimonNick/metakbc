@@ -105,6 +105,7 @@ def main(argv):
     parser.add_argument('--save', action='store', type=str, default=None)
 
     parser.add_argument('--quiet', '-q', action='store_true', default=False)
+    parser.add_argument('--tensorboard', action='store', type=str, default=None)
 
     args = parser.parse_args(argv)
 
@@ -145,6 +146,7 @@ def main(argv):
     save_path = args.save
 
     is_quiet = args.quiet
+    tensorboard_path = args.tensorboard
 
     # set the seeds
     np.random.seed(seed)
@@ -157,7 +159,7 @@ def main(argv):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info(f'Device: {device}')
 
-    writer = SummaryWriter('runs/meta_1')
+    writer = SummaryWriter(tensorboard_path) if tensorboard_path is not None else None
 
     data = Data(train_path=train_path, dev_path=dev_path, test_path=test_path,
                 test_i_path=test_i_path, test_ii_path=test_ii_path, input_type=input_type)
@@ -216,6 +218,19 @@ def main(argv):
 
     L1_reg, F2_reg, N3_reg = L1(), F2(), N3()
 
+    for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:
+        metrics = evaluate(entity_embeddings=entity_embeddings, predicate_embeddings=predicate_embeddings,
+                           test_triples=triples, all_triples=data.all_triples,
+                           entity_to_index=data.entity_to_idx, predicate_to_index=data.predicate_to_idx,
+                           model=model, batch_size=eval_batch_size, device=device)
+        if writer is not None:
+            writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, 0)
+
+            # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
+            #                      global_step=0, tag='Entities')
+            # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
+            #                      global_step=0, tag='Predicates')
+
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
         nb_batches = len(batcher.batches)
@@ -247,14 +262,15 @@ def main(argv):
 
             loss_val.backward()
 
-            writer.add_scalar('Loss/Lookahead', loss_val.item(), (epoch_no * nb_batches) + batch_no)
+            if writer is not None:
+                writer.add_scalar('Loss/Lookahead', loss_val.item(), (epoch_no * nb_batches) + batch_no)
 
             hyper_optimizer.step()
             hyper_optimizer.zero_grad()
 
-            L1_weight.data.clamp_(1e-10)
-            F2_weight.data.clamp_(1e-10)
-            N3_weight.data.clamp_(1e-10)
+            L1_weight.data.clamp_(0)
+            F2_weight.data.clamp_(0)
+            N3_weight.data.clamp_(0.005)
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
@@ -270,9 +286,20 @@ def main(argv):
             loss_value = loss.item()
             epoch_loss_values += [loss_value]
 
-            writer.add_scalar('Loss/Train', loss_value, (epoch_no * nb_batches) + batch_no)
+            if writer is not None:
+                writer.add_scalar('Loss/Train', loss_value, (epoch_no * nb_batches) + batch_no)
 
             print(L1_weight.data, F2_weight.data, N3_weight.data)
+
+            if writer is not None:
+                dev_x = torch.from_numpy(data.dev_X.astype('int64')).to(device)
+                dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
+                writer.add_scalar('Loss/Dev', dev_loss, (epoch_no * nb_batches) + batch_no)
+
+            if writer is not None:
+                test_x = torch.from_numpy(data.test_X.astype('int64')).to(device)
+                test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
+                writer.add_scalar('Loss/Test', test_loss, (epoch_no * nb_batches) + batch_no)
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')
@@ -287,6 +314,13 @@ def main(argv):
                                    entity_to_index=data.entity_to_idx, predicate_to_index=data.predicate_to_idx,
                                    model=model, batch_size=eval_batch_size, device=device)
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\t{name} results\t{metrics_to_str(metrics)}')
+                if writer is not None:
+                    writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, epoch_no * nb_batches)
+
+                    # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
+                    #                      global_step=epoch_no * nb_batches, tag='Entities')
+                    # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
+                    #                      global_step=epoch_no * nb_batches, tag='Predicates')
 
     for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:
         metrics = evaluate(entity_embeddings=entity_embeddings, predicate_embeddings=predicate_embeddings,
