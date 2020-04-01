@@ -92,7 +92,9 @@ def main(argv):
     parser.add_argument('--F2', action='store', type=float, default=None)
     parser.add_argument('--N3', action='store', type=float, default=None)
 
-    parser.add_argument('--lookahead-steps', '-S', action='store', type=int, default=0)
+    parser.add_argument('--lookahead-steps', '--LS', '-S', action='store', type=int, default=0)
+    parser.add_argument('--lookahead-learning-rate', '--LL', action='store', type=float, default=None)
+    parser.add_argument('--lookahead-sample-size', '--LSS', action='store', type=float, default=None)
 
     parser.add_argument('--seed', action='store', type=int, default=0)
 
@@ -268,7 +270,7 @@ def main(argv):
             loss_val.backward()
 
             if writer is not None:
-                writer.add_scalar('Loss/Lookahead', loss_val.item(), (epoch_no * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Lookahead', loss_val.item(), ((epoch_no - 1) * nb_batches) + batch_no)
 
             hyper_optimizer.step()
             hyper_optimizer.zero_grad()
@@ -297,21 +299,21 @@ def main(argv):
             epoch_loss_values += [loss_value]
 
             if writer is not None:
-                writer.add_scalar('Loss/Train', loss_value, (epoch_no * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Train', loss_value, ((epoch_no - 1) * nb_batches) + batch_no)
 
                 weights = {'L1': L1_weight.data if L1_weight is not None else None,
                            'F2': F2_weight.data if F2_weight is not None else None,
                            'N3': N3_weight.data if N3_weight is not None else None}
                 print(weights)
-                writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, (epoch_no * nb_batches) + batch_no)
+                writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, ((epoch_no - 1) * nb_batches) + batch_no)
 
                 dev_x = torch.from_numpy(data.dev_X[:100, :].astype('int64')).to(device)
                 dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
-                writer.add_scalar('Loss/Dev', dev_loss, (epoch_no * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Dev', dev_loss, ((epoch_no - 1) * nb_batches) + batch_no)
 
                 test_x = torch.from_numpy(data.test_X[:100, :].astype('int64')).to(device)
                 test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
-                writer.add_scalar('Loss/Test', test_loss, (epoch_no * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Test', test_loss, ((epoch_no - 1) * nb_batches) + batch_no)
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')
@@ -327,9 +329,9 @@ def main(argv):
                                    model=model, batch_size=eval_batch_size, device=device)
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\t{name} results\t{metrics_to_str(metrics)}')
                 if writer is not None:
-                    writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, epoch_no * nb_batches)
-                    # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]), global_step=epoch_no * nb_batches, tag='Entities')
-                    # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]), global_step=epoch_no * nb_batches, tag='Predicates')
+                    writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, (epoch_no - 1) * nb_batches)
+                    # writer.add_embedding(entity_embeddings.weight, sorted(data.entity_to_idx.items(), key=lambda item: item[1]), global_step=(epoch_no - 1) * nb_batches, tag='Entities')
+                    # writer.add_embedding(predicate_embeddings.weight, sorted(data.predicate_to_idx.items(), key=lambda item: item[1]), global_step=(epoch_no - 1) * nb_batches, tag='Predicates')
 
     for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:
         metrics = evaluate(entity_embeddings=entity_embeddings, predicate_embeddings=predicate_embeddings,
