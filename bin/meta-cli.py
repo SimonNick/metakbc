@@ -135,11 +135,18 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    L1_weight = Parameter(torch.tensor(args.L1, dtype=torch.float32), requires_grad=True) if args.L1 is not None else None
-    F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float32), requires_grad=True) if args.F2 is not None else None
-    N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float32), requires_grad=True) if args.N3 is not None else None
+    L1_weight = F2_weight = N3_weight = None
+
+    if args.L1 is not None:
+        L1_weight = Parameter(torch.tensor(args.L1, dtype=torch.float32), requires_grad=True)
+    if args.F2 is not None:
+        F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float32), requires_grad=True)
+    if args.N3 is not None:
+        N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float32), requires_grad=True)
 
     nb_lookahead_steps = args.lookahead_steps
+    lookahead_lr = args.lookahead_learning_rate if args.lookahead_learning_rate is not None else learning_rate
+    lookahead_sample_size = args.lookahead_sample_size
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -216,7 +223,7 @@ def main(argv):
 
     print(optimizer)
 
-    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=0.01)
+    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=lookahead_lr)
 
     print(hyper_optimizer)
 
@@ -264,7 +271,11 @@ def main(argv):
                 entity_embeddings_lh = nn.Embedding.from_pretrained(e_tensor_lh, freeze=False, sparse=False)
                 predicate_embeddings_lh = nn.Embedding.from_pretrained(p_tensor_lh, freeze=False, sparse=False)
 
-            x_val_batch = torch.from_numpy(data.dev_X[:500, :].astype('int64')).to(device)
+            dev_indices = None
+            if lookahead_sample_size is not None:
+                dev_indices = random_state.permutation(data.dev_X.shape[0])[:lookahead_sample_size]
+
+            x_val_batch = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
             loss_val, _ = get_loss(x_val_batch, entity_embeddings_lh, predicate_embeddings_lh, model, loss_function)
 
             loss_val.backward()
@@ -307,11 +318,11 @@ def main(argv):
                 print(weights)
                 writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None}, ((epoch_no - 1) * nb_batches) + batch_no)
 
-                dev_x = torch.from_numpy(data.dev_X[:100, :].astype('int64')).to(device)
+                dev_x = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
                 dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Dev', dev_loss, ((epoch_no - 1) * nb_batches) + batch_no)
 
-                test_x = torch.from_numpy(data.test_X[:100, :].astype('int64')).to(device)
+                test_x = torch.from_numpy(data.test_X[:dev_indices, :].astype('int64')).to(device)
                 test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
                 writer.add_scalar('Loss/Test', test_loss, ((epoch_no - 1) * nb_batches) + batch_no)
 
