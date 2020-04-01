@@ -60,3 +60,19 @@ class N3(Regularizer):
             norm += torch.sum(torch.abs(f) ** 3)
 
         return norm / factors[0].shape[0]
+
+
+class XA(Regularizer):
+    def __init__(self, factor_size: int):
+        super().__init__()
+        self.linear = nn.Linear(factor_size, 1)
+
+    def __call__(self,
+                 factors: List[Tensor]):
+
+        res = 0
+        for f in factors:
+            # res += torch.sum(torch.sigmoid(self.linear(f)))
+            res += torch.sum(self.linear(f))
+
+        return res / factors[0].shape[0]
