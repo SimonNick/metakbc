@@ -94,7 +94,7 @@ class Data:
             if (s, p) not in self.sp_to_o:
                 self.sp_to_o[(s, p)] = []
             if (p, o) not in self.po_to_s:
-                self.sp_to_o[(p, o)] = []
+                self.po_to_s[(p, o)] = []
 
             self.sp_to_o[(s, p)] += [o]
             self.po_to_s[(p, o)] += [s]
