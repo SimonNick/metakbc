@@ -122,7 +122,7 @@ def main(argv):
     args = parser.parse_args(argv)
 
     import pprint
-    pprint.pprint(vars(args))
+    logger.info(pprint.pformat(vars(args)))
 
     train_path = args.train
 
@@ -366,7 +366,7 @@ def main(argv):
                            'F2': F2_weight.data if F2_weight is not None else None,
                            'N3': N3_weight.data if N3_weight is not None else None,
                            'XA': XA_weight.data if XA_weight is not None else None}
-                print(weights)
+                logger.info(str(weights))
                 writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None},
                                    ((epoch_no - 1) * nb_batches) + batch_no)
 
