@@ -65,6 +65,18 @@ def get_loss(X: Tensor,
     sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb, entity_embeddings=emb)
     factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
+    if sp_to_o is not None:
+        sp_mask = torch.zeros_like(sp_scores)
+        for i in range(X.shape[0]):
+            sp_mask[i, sp_to_o[(X[i, 0].item(), X[i, 1].item())]] = -np.inf
+        sp_scores = sp_scores + sp_mask
+
+    if po_to_s is not None:
+        po_mask = torch.zeros_like(po_scores)
+        for i in range(X.shape[0]):
+            po_mask[i, po_to_s[(X[i, 1].item(), X[i, 2].item())]] = -np.inf
+        po_scores = po_scores + po_mask
+
     s_loss = loss_function(sp_scores, X[:, 2])
     o_loss = loss_function(po_scores, X[:, 0])
 
@@ -289,7 +301,9 @@ def main(argv):
                 indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function)
+                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh,
+                                               model, loss_function,
+                                               data.sp_to_o, data.po_to_s)
 
                 if L1_weight is not None:
                     loss_lh += L1_weight * L1_reg(factors_lh)

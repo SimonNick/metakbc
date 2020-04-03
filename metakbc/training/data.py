@@ -87,6 +87,7 @@ class Data:
         self.dev_X = triples_to_X(self.dev_triples, self.entity_to_idx, self.predicate_to_idx)
         self.test_X = triples_to_X(self.test_triples, self.entity_to_idx, self.predicate_to_idx)
 
+        # Move away from here
         self.sp_to_o: Dict[Tuple[int, int], List[int]] = dict()
         self.po_to_s: Dict[Tuple[int, int], List[int]] = dict()
 
