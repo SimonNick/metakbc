@@ -28,7 +28,7 @@ from metakbc.models import BaseModel, DistMult, ComplEx
 from metakbc.regularizers import F2, L1, N3, XA
 from metakbc.evaluation import evaluate
 
-from typing import List, Tuple, Any
+from typing import List, Tuple, Optional, Union, Dict
 
 import logging
 
@@ -47,10 +47,12 @@ def metrics_to_str(metrics):
 
 
 def get_loss(X: Tensor,
-             entity_embeddings: Any,
-             predicate_embeddings: Any,
+             entity_embeddings: Union[Tensor, nn.Embedding],
+             predicate_embeddings: Union[Tensor, nn.Embedding],
              model: BaseModel,
-             loss_function: nn.CrossEntropyLoss) -> Tuple[Tensor, List[Tensor]]:
+             loss_function: nn.CrossEntropyLoss,
+             sp_to_o: Optional[Dict[Tuple[int, int], List[int]]] = None,
+             po_to_s: Optional[Dict[Tuple[int, int], List[int]]] = None) -> Tuple[Tensor, List[Tensor]]:
 
     def lookup(_X, _emb):
         return _emb(_X) if isinstance(_emb, nn.Embedding) else F.embedding(_X, _emb)

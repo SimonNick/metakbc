@@ -90,7 +90,7 @@ class Data:
         self.sp_to_o: Dict[Tuple[int, int], List[int]] = dict()
         self.po_to_s: Dict[Tuple[int, int], List[int]] = dict()
 
-        for s, p, o in range(self.X):
+        for s, p, o in self.X:
             if (s, p) not in self.sp_to_o:
                 self.sp_to_o[(s, p)] = []
             if (p, o) not in self.po_to_s:
