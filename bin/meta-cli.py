@@ -20,7 +20,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import higher
 
-from metakbc.training.data import Data
+from metakbc.training.data import Data, X_to_dicts
 from metakbc.training.batcher import Batcher
 
 from metakbc.models import BaseModel, DistMult, ComplEx
@@ -68,13 +68,19 @@ def get_loss(X: Tensor,
     if sp_to_o is not None:
         sp_mask = torch.zeros_like(sp_scores)
         for i in range(X.shape[0]):
-            sp_mask[i, sp_to_o[(X[i, 0].item(), X[i, 1].item())]] = -np.inf
+            key = (X[i, 0].item(), X[i, 1].item())
+            if key in sp_to_o:
+                indices = [j for j in sp_to_o[key] if j != X[i, 2].item()]
+                sp_mask[i, indices] = -np.inf
         sp_scores = sp_scores + sp_mask
 
     if po_to_s is not None:
         po_mask = torch.zeros_like(po_scores)
         for i in range(X.shape[0]):
-            po_mask[i, po_to_s[(X[i, 1].item(), X[i, 2].item())]] = -np.inf
+            key = (X[i, 1].item(), X[i, 2].item())
+            if key in po_to_s:
+                indices = [j for j in po_to_s[key] if j != X[i, 0].item()]
+                po_mask[i, indices] = -np.inf
         po_scores = po_scores + po_mask
 
     s_loss = loss_function(sp_scores, X[:, 2])
@@ -119,6 +125,7 @@ def main(argv):
     parser.add_argument('--lookahead-steps', '--LS', '-S', action='store', type=int, default=1)
     parser.add_argument('--lookahead-learning-rate', '--LL', action='store', type=float, default=0.01)
     parser.add_argument('--lookahead-sample-size', '--LSS', action='store', type=float, default=None)
+    parser.add_argument('--lookahead-masked', '--LM', action='store_true', default=False)
 
     parser.add_argument('--seed', action='store', type=int, default=0)
 
@@ -176,6 +183,7 @@ def main(argv):
     nb_lookahead_steps = args.lookahead_steps
     lookahead_lr = args.lookahead_learning_rate if args.lookahead_learning_rate is not None else learning_rate
     lookahead_sample_size = args.lookahead_sample_size
+    is_lookahead_masked = args.lookahead_masked
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -259,11 +267,9 @@ def main(argv):
     }
 
     assert optimizer_name in optimizer_factory
-    optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate,
-                                                  initial_accumulator_value=1e-10)
+    optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate, initial_accumulator_value=1e-45)
 
-    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=lookahead_lr,
-                                                        initial_accumulator_value=0)
+    hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=lookahead_lr)
 
     logger.info(optimizer)
     logger.info(hyper_optimizer)
@@ -290,7 +296,10 @@ def main(argv):
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
-            diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device, track_higher_grads=True)
+            # override = {'initial_accumulator_value': [torch.tensor(1.0, requires_grad=False)]}
+            override = None
+            diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device,
+                                             track_higher_grads=True, override=override)
 
             e_tensor_lh = entity_embeddings.weight
             p_tensor_lh = predicate_embeddings.weight
@@ -302,8 +311,7 @@ def main(argv):
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
                 loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh,
-                                               model, loss_function,
-                                               data.sp_to_o, data.po_to_s)
+                                               model, loss_function)
 
                 if L1_weight is not None:
                     loss_lh += L1_weight * L1_reg(factors_lh)
@@ -324,7 +332,12 @@ def main(argv):
                 dev_indices = random_state.permutation(data.dev_X.shape[0])[:lookahead_sample_size]
 
             x_val_batch = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
-            loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function)
+
+            sp_to_o = po_to_s = None
+            if is_lookahead_masked is True:
+                sp_to_o, po_to_s = X_to_dicts(np.concatenate((data.X, data.dev_X), axis=0))
+
+            loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function, sp_to_o, po_to_s)
 
             loss_val.backward()
 

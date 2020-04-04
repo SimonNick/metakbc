@@ -25,6 +25,22 @@ def triples_to_X(triples: List[Tuple[str, str, str]],
     return res
 
 
+def X_to_dicts(X: np.ndarray) -> Tuple[Dict[Tuple[int, int], List[int]], Dict[Tuple[int, int], List[int]]]:
+    sp_to_o: Dict[Tuple[int, int], List[int]] = dict()
+    po_to_s: Dict[Tuple[int, int], List[int]] = dict()
+
+    for s, p, o in X:
+        if (s, p) not in sp_to_o:
+            sp_to_o[(s, p)] = []
+        if (p, o) not in po_to_s:
+            po_to_s[(p, o)] = []
+
+        sp_to_o[(s, p)] += [o]
+        po_to_s[(p, o)] += [s]
+
+    return sp_to_o, po_to_s
+
+
 class Data:
     def __init__(self,
                  train_path: str,
@@ -86,18 +102,5 @@ class Data:
         self.X = triples_to_X(self.train_triples, self.entity_to_idx, self.predicate_to_idx)
         self.dev_X = triples_to_X(self.dev_triples, self.entity_to_idx, self.predicate_to_idx)
         self.test_X = triples_to_X(self.test_triples, self.entity_to_idx, self.predicate_to_idx)
-
-        # Move away from here
-        self.sp_to_o: Dict[Tuple[int, int], List[int]] = dict()
-        self.po_to_s: Dict[Tuple[int, int], List[int]] = dict()
-
-        for s, p, o in self.X:
-            if (s, p) not in self.sp_to_o:
-                self.sp_to_o[(s, p)] = []
-            if (p, o) not in self.po_to_s:
-                self.po_to_s[(p, o)] = []
-
-            self.sp_to_o[(s, p)] += [o]
-            self.po_to_s[(p, o)] += [s]
 
         return
