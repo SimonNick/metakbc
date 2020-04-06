@@ -1,6 +1,7 @@
 torch
 numpy
 scikit-learn
+networkx
 typing
 pytest
 pytest-xdist
