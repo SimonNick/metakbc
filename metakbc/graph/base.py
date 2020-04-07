@@ -35,7 +35,7 @@ def to_networkx(triples: List[Tuple[str, str, str]],
 def get_features(triples: List[Tuple[str, str, str]],
                  entity_to_idx: Dict[str, int],
                  predicate_to_idx: Dict[str, int],
-                 predicates: Optional[Set[str]] = None):
+                 predicates: Optional[Set[str]] = None) -> np.ndarray:
     G = to_networkx(triples, entity_to_idx, predicate_to_idx, predicates, is_multidigraph=False)
     uG = G.to_undirected()
 
