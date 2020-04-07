@@ -37,37 +37,39 @@ def get_features(triples: List[Tuple[str, str, str]],
                  predicate_to_idx: Dict[str, int],
                  predicates: Optional[Set[str]] = None):
     G = to_networkx(triples, entity_to_idx, predicate_to_idx, predicates, is_multidigraph=False)
-    mG = to_networkx(triples, entity_to_idx, predicate_to_idx, predicates, is_multidigraph=True)
+    uG = G.to_undirected()
 
-    pagerank = nx.pagerank(G)
+    mG = to_networkx(triples, entity_to_idx, predicate_to_idx, predicates, is_multidigraph=True)
+    umG = mG.to_undirected()
+
     hubs, authorities = nx.hits(G)
 
-    degree = mG.degree()
-    in_degree = mG.in_degree()
-    out_degree = mG.out_degree()
+    feature_lst = [
+        mG.degree(),
+        mG.in_degree(),
+        mG.out_degree(),
+        nx.pagerank(G),
+        hubs,
+        authorities,
+        nx.degree_centrality(mG),
+        nx.in_degree_centrality(mG),
+        nx.out_degree_centrality(mG),
+        nx.katz_centrality(G),
+        nx.closeness_centrality(mG),
+        nx.current_flow_closeness_centrality(umG),
+        nx.betweenness_centrality(G),
+        nx.current_flow_closeness_centrality(umG),
+        nx.communicability_betweenness_centrality(uG)
+    ]
 
     nb_entities = max(v for _, v in entity_to_idx.items()) + 1
-    nb_features = 6
+    nb_features = len(feature_lst)
 
     res = np.zeros(shape=(nb_entities, nb_features))
 
-    for k, v in degree:
-        res[k, 0] = v
-
-    for k, v in in_degree:
-        res[k, 1] = v
-
-    for k, v in out_degree:
-        res[k, 1] = v
-
-    for k, v in pagerank.items():
-        res[k, 3] = v
-
-    for k, v in hubs.items():
-        res[k, 4] = v
-
-    for k, v in authorities.items():
-        res[k, 5] = v
+    for i, f in enumerate(feature_lst):
+        for k, v in (f.items() if isinstance(f, dict) else f):
+            res[k, i] = v
 
     return res
 
