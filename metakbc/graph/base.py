@@ -20,7 +20,6 @@ def to_networkx(triples: List[Tuple[str, str, str]],
 
     G = nx.MultiDiGraph() if is_multidigraph else nx.DiGraph()
 
-    # entities = sorted({s for (s, _, _) in _triples} | {o for (_, _, o) in _triples})
     entities = sorted({s for (s, _, _) in triples} | {o for (_, _, o) in triples})
     G.add_nodes_from([entity_to_idx[e] for e in entities])
 
