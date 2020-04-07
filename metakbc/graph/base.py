@@ -46,7 +46,7 @@ def get_features(triples: List[Tuple[str, str, str]],
     in_degree = mG.in_degree()
     out_degree = mG.out_degree()
 
-    nb_entities = max(v for _, v in entity_to_idx.items())
+    nb_entities = max(v for _, v in entity_to_idx.items()) + 1
     nb_features = 6
 
     res = np.zeros(shape=(nb_entities, nb_features))
@@ -60,13 +60,13 @@ def get_features(triples: List[Tuple[str, str, str]],
     for k, v in out_degree:
         res[k, 1] = v
 
-    for k, v in pagerank:
+    for k, v in pagerank.items():
         res[k, 3] = v
 
-    for k, v in hubs:
+    for k, v in hubs.items():
         res[k, 4] = v
 
-    for k, v in authorities:
+    for k, v in authorities.items():
         res[k, 5] = v
 
     return res
@@ -79,13 +79,9 @@ if __name__ == '__main__':
         ('b', 'q', 'd')
     ]
 
-    G = to_networkx(triples, {'a': 0, 'b': 1, 'c': 2, 'd': 3}, {'p': 0, 'q': 1}, is_multidigraph=True)
+    entity_to_idx = {'a': 0, 'b': 1, 'c': 2, 'd': 3}
+    predicate_to_idx = {'p': 0, 'q': 1}
 
-    print(G.edges(data=True))
-    print(G.nodes)
+    features = get_features(triples, entity_to_idx, predicate_to_idx)
 
-    # print(nx.pagerank(G))
-    # print(nx.hits(G))
-    print(G.degree())
-    print(G.in_degree())
-    print(G.out_degree())
+    print(features)
