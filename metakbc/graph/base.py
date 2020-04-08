@@ -54,36 +54,21 @@ def get_features(triples: List[Tuple[str, str, str]],
     logger.debug('nx.pagerank(G) ..')
     f4 = nx.pagerank(G)
 
-    # logger.debug('nx.hits_numpy(G) ..')
-    # f5, f6 = nx.hits_numpy(G)
-
     logger.debug('nx.degree_centrality(mG) ..')
-    f7 = nx.degree_centrality(mG)
+    f5 = nx.degree_centrality(mG)
 
     logger.debug('nx.in_degree_centrality(mG) ..')
-    f8 = nx.in_degree_centrality(mG)
+    f6 = nx.in_degree_centrality(mG)
 
     logger.debug('nx.out_degree_centrality(mG) ..')
-    f9 = nx.out_degree_centrality(mG)
+    f7 = nx.out_degree_centrality(mG)
 
-    # logger.debug('nx.katz_centrality_numpy(G) ..')
-    # f10 = nx.katz_centrality_numpy(G)
-
-    # logger.debug('nx.closeness_centrality(mG) ..')
-    # f11 = nx.closeness_centrality(mG)
-
-    # logger.debug('nx.betweenness_centrality(G) ..')
-    # f12 = nx.betweenness_centrality(G)
-
-    # logger.debug('nx.communicability_betweenness_centrality(uG) ..')
-    # f13 = nx.communicability_betweenness_centrality(uG)
-
-    feature_lst = [f1, f2, f3, f4, f7, f8, f9]
+    feature_lst = [f1, f2, f3, f4, f5, f6, f7]
 
     nb_entities = max(v for _, v in entity_to_idx.items()) + 1
     nb_features = len(feature_lst)
 
-    res = np.zeros(shape=(nb_entities, nb_features))
+    res = np.zeros(shape=(nb_entities, nb_features), dtype=np.float32)
 
     for i, f in enumerate(feature_lst):
         for k, v in (f.items() if isinstance(f, dict) else f):
