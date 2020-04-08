@@ -32,10 +32,10 @@ def to_networkx(triples: List[Tuple[str, str, str]],
     return G
 
 # @profile
-def get_features(triples: List[Tuple[str, str, str]],
-                 entity_to_idx: Dict[str, int],
-                 predicate_to_idx: Dict[str, int],
-                 predicates: Optional[Set[str]] = None) -> np.ndarray:
+def get_graph_features(triples: List[Tuple[str, str, str]],
+                       entity_to_idx: Dict[str, int],
+                       predicate_to_idx: Dict[str, int],
+                       predicates: Optional[Set[str]] = None) -> np.ndarray:
     G = to_networkx(triples, entity_to_idx, predicate_to_idx, predicates, is_multidigraph=False)
     uG = G.to_undirected()
 
@@ -87,6 +87,6 @@ if __name__ == '__main__':
     entity_to_idx = {'a': 0, 'b': 1, 'c': 2, 'd': 3}
     predicate_to_idx = {'p': 0, 'q': 1}
 
-    features = get_features(triples, entity_to_idx, predicate_to_idx)
+    features = get_graph_features(triples, entity_to_idx, predicate_to_idx)
 
     print(features)

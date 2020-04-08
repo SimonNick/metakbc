@@ -4,7 +4,7 @@ import os
 import sys
 
 from metakbc.training.data import Data
-from metakbc.graph.base import get_features
+from metakbc.graph.base import get_graph_features
 
 import pytest
 
@@ -22,7 +22,7 @@ def test_features_v1():
                 path = f'{root}/{file}'
                 # print(path)
                 data = Data(train_path=path)
-                features = get_features(data.train_triples, data.entity_to_idx, data.predicate_to_idx)
+                features = get_graph_features(data.train_triples, data.entity_to_idx, data.predicate_to_idx)
                 if nb_features is None:
                     nb_features = features.shape[1]
                 assert features.shape[1] == nb_features
