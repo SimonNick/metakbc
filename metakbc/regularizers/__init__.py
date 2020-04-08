@@ -6,9 +6,14 @@ from metakbc.regularizers.base import F2
 from metakbc.regularizers.base import L1
 from metakbc.regularizers.base import N3
 
+from metakbc.regularizers.adaptive import LinearAdaptiveRegularizer
+from metakbc.regularizers.adaptive import GatedLinearAdaptiveRegularizer
+
 __all__ = [
     'Regularizer',
     'F2',
     'L1',
-    'N3'
+    'N3',
+    'LinearAdaptiveRegularizer',
+    'GatedLinearAdaptiveRegularizer'
 ]
