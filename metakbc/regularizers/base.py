@@ -19,7 +19,7 @@ class Regularizer(nn.Module, ABC):
     @abstractmethod
     def __call__(self,
                  factors: List[Tensor],
-                 dim: int = None):
+                 dim: int = None) -> Tensor:
         raise NotImplementedError
 
 
@@ -29,7 +29,7 @@ class F2(Regularizer):
 
     def __call__(self,
                  factors: List[Tensor],
-                 dim: int = None):
+                 dim: int = None) -> Tensor:
         norm = 0
         for f in factors:
             norm += torch.sum(f ** 2,  dim=[] if dim is None else dim)
@@ -43,7 +43,7 @@ class L1(Regularizer):
 
     def __call__(self,
                  factors: List[Tensor],
-                 dim: int = None):
+                 dim: int = None) -> Tensor:
         norm = 0
         for f in factors:
             norm += torch.sum(torch.abs(f), dim=[] if dim is None else dim)
@@ -57,7 +57,7 @@ class N3(Regularizer):
 
     def __call__(self,
                  factors: List[Tensor],
-                 dim: int = None):
+                 dim: int = None) -> Tensor:
 
         norm = 0
         for f in factors:

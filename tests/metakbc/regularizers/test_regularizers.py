@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
-
 import torch
-from torch import nn
 
 from metakbc.regularizers import L1, F2, N3
 
