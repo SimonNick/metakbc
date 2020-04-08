@@ -18,7 +18,8 @@ class Regularizer(nn.Module, ABC):
 
     @abstractmethod
     def __call__(self,
-                 factors: List[Tensor]):
+                 factors: List[Tensor],
+                 dim: int = None):
         raise NotImplementedError
 
 
@@ -27,10 +28,11 @@ class F2(Regularizer):
         super().__init__()
 
     def __call__(self,
-                 factors: List[Tensor]):
+                 factors: List[Tensor],
+                 dim: int = None):
         norm = 0
         for f in factors:
-            norm += torch.sum(f ** 2)
+            norm += torch.sum(f ** 2,  dim=[] if dim is None else dim)
 
         return norm / factors[0].shape[0]
 
@@ -40,10 +42,11 @@ class L1(Regularizer):
         super().__init__()
 
     def __call__(self,
-                 factors: List[Tensor]):
+                 factors: List[Tensor],
+                 dim: int = None):
         norm = 0
         for f in factors:
-            norm += torch.sum(torch.abs(f))
+            norm += torch.sum(torch.abs(f), dim=[] if dim is None else dim)
 
         return norm / factors[0].shape[0]
 
@@ -53,26 +56,12 @@ class N3(Regularizer):
         super().__init__()
 
     def __call__(self,
-                 factors: List[Tensor]):
+                 factors: List[Tensor],
+                 dim: int = None):
 
         norm = 0
         for f in factors:
-            norm += torch.sum(torch.abs(f) ** 3)
+            print(f.shape)
+            norm += torch.sum(torch.abs(f) ** 3, dim=[] if dim is None else dim)
 
         return norm / factors[0].shape[0]
-
-
-class XA(Regularizer):
-    def __init__(self, factor_size: int):
-        super().__init__()
-        self.linear = nn.Linear(factor_size, 1)
-
-    def __call__(self,
-                 factors: List[Tensor]):
-
-        res = 0
-        for f in factors:
-            # res += torch.sum(torch.sigmoid(self.linear(f)))
-            res += torch.sum(self.linear(f))
-
-        return res / factors[0].shape[0]

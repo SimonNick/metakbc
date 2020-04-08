@@ -118,10 +118,10 @@ def main(argv):
     parser.add_argument('--optimizer', '-o', action='store', type=str, default='adagrad',
                         choices=['adagrad', 'adam', 'sgd'])
 
-    parser.add_argument('--L1', action='store', type=float, default=None)
-    parser.add_argument('--F2', action='store', type=float, default=None)
-    parser.add_argument('--N3', action='store', type=float, default=None)
-    parser.add_argument('--XA', action='store', type=float, default=None)
+    parser.add_argument('--regularizer-type', '--regularizer', '-R', action='store', type=str, default=None,
+                        choices=['L1', 'F2', 'N3'])
+    parser.add_argument('--regularizer-weight-conditioning', '-W', action='store', type=str, default=None,
+                        choices=['graph', 'latent'])
 
     parser.add_argument('--lookahead-steps', '--LS', '-S', action='store', type=int, default=1)
     parser.add_argument('--lookahead-learning-rate', '--LL', action='store', type=float, default=0.01)
@@ -167,19 +167,8 @@ def main(argv):
 
     learning_rate = args.learning_rate
 
-    L1_weight = F2_weight = N3_weight = XA_weight = None
-
-    if args.L1 is not None:
-        L1_weight = Parameter(torch.tensor(args.L1, dtype=torch.float32), requires_grad=True)
-
-    if args.F2 is not None:
-        F2_weight = Parameter(torch.tensor(args.F2, dtype=torch.float32), requires_grad=True)
-
-    if args.N3 is not None:
-        N3_weight = Parameter(torch.tensor(args.N3, dtype=torch.float32), requires_grad=True)
-
-    if args.XA is not None:
-        XA_weight = Parameter(torch.tensor(args.XA, dtype=torch.float32), requires_grad=True)
+    regularizer_type = args.regularizer_type
+    regularizer_weight_conditioning = args.regularizer_weight_conditioning
 
     nb_lookahead_steps = args.lookahead_steps
     lookahead_lr = args.lookahead_learning_rate if args.lookahead_learning_rate is not None else learning_rate
@@ -231,7 +220,19 @@ def main(argv):
     if load_path is not None:
         param_module.load_state_dict(torch.load(load_path))
 
-    L1_reg, F2_reg, N3_reg, XA_reg = L1(), F2(), N3(), XA(factor_size=embedding_size)
+    regularizer_factory = {
+        'L1': lambda *args, **kwargs: L1(*args, **kwargs),
+        'F2': lambda *args, **kwargs: F2(*args, **kwargs),
+        'N3': lambda *args, **kwargs: N3(*args, **kwargs),
+    }
+
+    regularizer = regularizer_factory[regularizer_type]()
+
+    regularizer_weight_model = None
+
+
+
+    N3_weight = XA(factor_size=embedding_size)
 
     parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight]).to(device)
 
