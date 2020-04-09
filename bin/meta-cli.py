@@ -248,7 +248,7 @@ def main(argv):
     if regularizer_weight_type in {'none'}:
         regularizer_ent_weight_model = ConstantAdaptiveRegularizer(regularizer=regularizer)
     else:
-        nb_features = nb_graph_features if regularizer_weight_type in {'graph'} else rank
+        nb_features = nb_graph_features if regularizer_weight_type in {'graph'} else embedding_size
         regularizer_ent_weight_model = GatedLinearAdaptiveRegularizer(regularizer=regularizer, nb_features=nb_features)
 
     regularizer_ent_weight_model = regularizer_ent_weight_model.to(device)
@@ -269,11 +269,12 @@ def main(argv):
 
     logger.info('Model state:')
     for param_tensor in param_module.state_dict():
-        logger.info(f'\t{param_tensor}\t{param_module.state_dict()[param_tensor].size()}')
+        tensor = param_module.state_dict()[param_tensor]
+        logger.info(f'\t{param_tensor}\t{tensor.size()}\t{tensor.device}')
 
     logger.info('Hyperparams')
     for hyperparam_tensor in hyperparameter_lst:
-        logger.info(f'\t{hyperparam_tensor.shape}')
+        logger.info(f'\t{hyperparam_tensor.shape}\t{hyperparam_tensor.device}')
 
     optimizer_factory = {
         'adagrad': lambda *args, **kwargs: optim.Adagrad(*args, **kwargs),
