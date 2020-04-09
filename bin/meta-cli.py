@@ -306,9 +306,7 @@ def main(argv):
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             step_no = ((epoch_no - 1) * nb_batches) + batch_no
 
-            override = None
-            diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device,
-                                             track_higher_grads=True, override=override)
+            diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device, track_higher_grads=True)
 
             e_tensor_lh = entity_embeddings.weight
             p_tensor_lh = predicate_embeddings.weight
