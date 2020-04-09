@@ -100,7 +100,7 @@ def main(argv):
 #$ -e /dev/null
 #$ -t 1-{}
 #$ -l mem=8G
-#$ -l h_rt=24:00:00
+#$ -l h_rt=48:00:00
 
 conda activate cpu
 
