@@ -320,10 +320,9 @@ def main(argv):
                 loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function)
 
                 features_p_lh, features_s_lh, features_o_lh = factors_lh
-
                 if regularizer_weight_type in {'graph'}:
-                    features_s_lh = F.embedding(x_batch_lh[:, 0], e_tensor_lh)
-                    features_o_lh = F.embedding(x_batch_lh[:, 2], e_tensor_lh)
+                    features_s_lh = F.embedding(x_batch_lh[:, 0], graph_features_t)
+                    features_o_lh = F.embedding(x_batch_lh[:, 2], graph_features_t)
 
                 reg_rel_lh = regularizer_rel_weight_model(factors_lh[0], features_p_lh)
 
@@ -364,9 +363,10 @@ def main(argv):
 
             loss, factors = get_loss(x_batch, entity_embeddings, predicate_embeddings, model, loss_function)
 
-            features_p = factors[0]
-            features_s = factors[1]
-            features_o = factors[2]
+            features_p, features_s, features_o = factors
+            if regularizer_weight_type in {'graph'}:
+                features_s = F.embedding(x_batch[:, 0], graph_features_t)
+                features_o = F.embedding(x_batch[:, 2], graph_features_t)
 
             reg_rel = regularizer_rel_weight_model(factors[0], features_p)
 
