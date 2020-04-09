@@ -11,7 +11,7 @@ import numpy as np
 
 import torch
 from torch import nn, optim, Tensor
-from torch.nn import Parameter
+
 import torch.nn.functional as F
 
 import tensorflow as tf
@@ -26,7 +26,16 @@ from metakbc.training.batcher import Batcher
 
 from metakbc.models import BaseModel, DistMult, ComplEx
 
-from metakbc.regularizers import F2, L1, N3, XA
+from metakbc.graph.base import get_graph_features
+
+from metakbc.regularizers import F2, L1, N3
+
+from sklearn.preprocessing import normalize
+
+from metakbc.regularizers import ConstantAdaptiveRegularizer
+from metakbc.regularizers import LinearAdaptiveRegularizer
+from metakbc.regularizers import GatedLinearAdaptiveRegularizer
+
 from metakbc.evaluation import evaluate
 
 from typing import List, Tuple, Optional, Union, Dict
@@ -120,8 +129,8 @@ def main(argv):
 
     parser.add_argument('--regularizer-type', '--regularizer', '-R', action='store', type=str, default=None,
                         choices=['L1', 'F2', 'N3'])
-    parser.add_argument('--regularizer-weight-conditioning', '-W', action='store', type=str, default=None,
-                        choices=['graph', 'latent'])
+    parser.add_argument('--regularizer-weight-type', '-W', action='store', type=str, default='none',
+                        choices=['none', 'graph', 'latent'])
 
     parser.add_argument('--lookahead-steps', '--LS', '-S', action='store', type=int, default=1)
     parser.add_argument('--lookahead-learning-rate', '--LL', action='store', type=float, default=0.01)
@@ -168,7 +177,7 @@ def main(argv):
     learning_rate = args.learning_rate
 
     regularizer_type = args.regularizer_type
-    regularizer_weight_conditioning = args.regularizer_weight_conditioning
+    regularizer_weight_type = args.regularizer_weight_type
 
     nb_lookahead_steps = args.lookahead_steps
     lookahead_lr = args.lookahead_learning_rate if args.lookahead_learning_rate is not None else learning_rate
@@ -200,6 +209,12 @@ def main(argv):
     data = Data(train_path=train_path, dev_path=dev_path, test_path=test_path,
                 test_i_path=test_i_path, test_ii_path=test_ii_path, input_type=input_type)
 
+    graph_features = get_graph_features(data.train_triples, data.entity_to_idx, data.predicate_to_idx)
+    graph_features = normalize(graph_features, axis=0, norm='max')
+    graph_features_t = torch.tensor(graph_features, dtype=torch.float32, requires_grad=False)
+
+    nb_graph_features = graph_features.shape[1]
+
     triples_name_pairs = [
         (data.dev_triples, 'dev'),
         (data.test_triples, 'test'),
@@ -228,21 +243,20 @@ def main(argv):
 
     regularizer = regularizer_factory[regularizer_type]()
 
-    regularizer_weight_model = None
+    regularizer_rel_weight_model = ConstantAdaptiveRegularizer(regularizer=regularizer).to(device)
 
+    if regularizer_weight_type in {'none'}:
+        regularizer_ent_weight_model = ConstantAdaptiveRegularizer(regularizer=regularizer)
+    else:
+        nb_features = nb_graph_features if regularizer_weight_type in {'graph'} else rank
+        regularizer_ent_weight_model = GatedLinearAdaptiveRegularizer(regularizer=regularizer, nb_features=nb_features)
 
-
-    N3_weight = XA(factor_size=embedding_size)
+    regularizer_ent_weight_model = regularizer_ent_weight_model.to(device)
 
     parameter_lst = nn.ParameterList([entity_embeddings.weight, predicate_embeddings.weight]).to(device)
 
-    hyperparameter_lst = ([] if L1_weight is None else [L1_weight]) + \
-                         ([] if F2_weight is None else [F2_weight]) + \
-                         ([] if N3_weight is None else [N3_weight]) + \
-                         ([] if XA_weight is None else [XA_weight] + [p for p in XA_reg.parameters()])
-
-    # XXX
-    # hyperparameter_lst += [p for p in parameter_lst]
+    hyperparameter_lst = [p for p in regularizer_rel_weight_model.parameters()] + \
+                         [p for p in regularizer_ent_weight_model.parameters()]
 
     hyperparameter_lst = nn.ParameterList(hyperparameter_lst).to(device)
 
@@ -251,7 +265,6 @@ def main(argv):
         'complex': lambda: ComplEx()
     }
 
-    assert model_name in model_factory
     model = model_factory[model_name]().to(device)
 
     logger.info('Model state:')
@@ -268,7 +281,6 @@ def main(argv):
         'sgd': lambda *args, **kwargs: optim.SGD(*args, **kwargs)
     }
 
-    assert optimizer_name in optimizer_factory
     optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate, initial_accumulator_value=1e-45)
 
     hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=lookahead_lr)
@@ -285,12 +297,6 @@ def main(argv):
                            model=model, batch_size=eval_batch_size, device=device)
         if writer is not None:
             writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, 0)
-            # writer.add_embedding(entity_embeddings.weight,
-            #                      sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
-            #                      global_step=0, tag='Entities')
-            # writer.add_embedding(predicate_embeddings.weight,
-            #                      sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
-            #                      global_step=0, tag='Predicates')
 
     for epoch_no in range(1, nb_epochs + 1):
         batcher = Batcher(data.nb_examples, batch_size, 1, random_state)
@@ -298,7 +304,8 @@ def main(argv):
 
         epoch_loss_values = []
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
-            # override = {'initial_accumulator_value': [torch.tensor(1.0, requires_grad=False)]}
+            step_no = ((epoch_no - 1) * nb_batches) + batch_no
+
             override = None
             diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device,
                                              track_higher_grads=True, override=override)
@@ -312,20 +319,18 @@ def main(argv):
                 indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh,
-                                               model, loss_function)
+                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function)
 
-                if L1_weight is not None:
-                    loss_lh += L1_weight * L1_reg(factors_lh)
+                features_p_lh = factors_lh[0]
+                features_s_lh = factors_lh[1]
+                features_o_lh = factors_lh[2]
 
-                if F2_weight is not None:
-                    loss_lh += F2_weight * F2_reg(factors_lh)
+                reg_rel_lh = regularizer_rel_weight_model(factors_lh[0], features_p_lh)
 
-                if N3_weight is not None:
-                    loss_lh += N3_weight * N3_reg(factors_lh)
+                reg_s_lh = regularizer_ent_weight_model(factors_lh[1], features_s_lh)
+                reg_o_lh = regularizer_ent_weight_model(factors_lh[2], features_o_lh)
 
-                if XA_weight is not None:
-                    loss_lh += XA_weight * XA_reg(factors_lh)
+                loss_lh += (reg_rel_lh + reg_s_lh + reg_o_lh) / 3.0
 
                 e_tensor_lh, p_tensor_lh = diff_opt.step(loss_lh, params=parameter_lst)
 
@@ -344,41 +349,31 @@ def main(argv):
             loss_val.backward()
 
             if writer is not None:
-                writer.add_scalar('Loss/Lookahead', loss_val.item(), ((epoch_no - 1) * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Lookahead', loss_val.item(), step_no)
 
             hyper_optimizer.step()
 
             optimizer.zero_grad()
             hyper_optimizer.zero_grad()
 
-            if L1_weight is not None:
-                L1_weight.data.clamp_(0)
-
-            if F2_weight is not None:
-                F2_weight.data.clamp_(0)
-
-            if N3_weight is not None:
-                N3_weight.data.clamp_(0)
-
-            if XA_weight is not None:
-                XA_weight.data.clamp_(0)
+            regularizer_rel_weight_model.project_()
+            regularizer_ent_weight_model.project_()
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
 
             loss, factors = get_loss(x_batch, entity_embeddings, predicate_embeddings, model, loss_function)
 
-            if L1_weight is not None:
-                loss += L1_weight * L1_reg(factors)
+            features_p = factors[0]
+            features_s = factors[1]
+            features_o = factors[2]
 
-            if F2_weight is not None:
-                loss += F2_weight * F2_reg(factors)
+            reg_rel = regularizer_rel_weight_model(factors[0], features_p)
 
-            if N3_weight is not None:
-                loss += N3_weight * N3_reg(factors)
+            reg_s = regularizer_ent_weight_model(factors[1], features_s)
+            reg_o = regularizer_ent_weight_model(factors[2], features_o)
 
-            if XA_weight is not None:
-                loss += XA_weight * XA_reg(factors)
+            loss += (reg_rel + reg_s + reg_o) / 3.0
 
             loss.backward()
 
@@ -391,23 +386,21 @@ def main(argv):
             epoch_loss_values += [loss_value]
 
             if writer is not None:
-                writer.add_scalar('Loss/Train', loss_value, ((epoch_no - 1) * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Train', loss_value, step_no)
 
-                weights = {'L1': L1_weight.data if L1_weight is not None else None,
-                           'F2': F2_weight.data if F2_weight is not None else None,
-                           'N3': N3_weight.data if N3_weight is not None else None,
-                           'XA': XA_weight.data if XA_weight is not None else None}
-                logger.info(str(weights))
-                writer.add_scalars('Weights', {k: v for k, v in weights.items() if v is not None},
-                                   ((epoch_no - 1) * nb_batches) + batch_no)
+                rel_weights = regularizer_rel_weight_model.values_()
+                ent_weights = regularizer_ent_weight_model.values_()
+
+                writer.add_scalars('Rel/Weights', {k: v for k, v in rel_weights.items()}, step_no)
+                writer.add_scalars('Ent/Weights', {k: v for k, v in ent_weights.items()}, step_no)
 
                 dev_x = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
                 dev_loss, _ = get_loss(dev_x, entity_embeddings, predicate_embeddings, model, loss_function)
-                writer.add_scalar('Loss/Dev', dev_loss, ((epoch_no - 1) * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Dev', dev_loss, step_no)
 
                 test_x = torch.from_numpy(data.test_X[:dev_indices, :].astype('int64')).to(device)
                 test_loss, _ = get_loss(test_x, entity_embeddings, predicate_embeddings, model, loss_function)
-                writer.add_scalar('Loss/Test', test_loss, ((epoch_no - 1) * nb_batches) + batch_no)
+                writer.add_scalar('Loss/Test', test_loss, step_no)
 
             if not is_quiet:
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\tBatch {batch_no}/{nb_batches}\tLoss {loss_value:.6f}')
@@ -423,13 +416,8 @@ def main(argv):
                                    model=model, batch_size=eval_batch_size, device=device)
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\t{name} results\t{metrics_to_str(metrics)}')
                 if writer is not None:
-                    writer.add_scalars(f'Ranking/{name}', {n.upper().replace("@", "_"): v for n, v in metrics.items()}, (epoch_no - 1) * nb_batches)
-                    # writer.add_embedding(entity_embeddings.weight,
-                    #                      sorted(data.entity_to_idx.items(), key=lambda item: item[1]),
-                    #                      global_step=(epoch_no - 1) * nb_batches, tag='Entities')
-                    # writer.add_embedding(predicate_embeddings.weight,
-                    #                      sorted(data.predicate_to_idx.items(), key=lambda item: item[1]),
-                    #                      global_step=(epoch_no - 1) * nb_batches, tag='Predicates')
+                    ranking_values =  {n.upper().replace("@", "_"): v for n, v in metrics.items()}
+                    writer.add_scalars(f'Ranking/{name}', ranking_values, (epoch_no - 1) * nb_batches)
 
     for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:
         metrics = evaluate(entity_embeddings=entity_embeddings, predicate_embeddings=predicate_embeddings,
