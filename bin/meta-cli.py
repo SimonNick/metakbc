@@ -127,7 +127,7 @@ def main(argv):
     parser.add_argument('--optimizer', '-o', action='store', type=str, default='adagrad',
                         choices=['adagrad', 'adam', 'sgd'])
 
-    parser.add_argument('--regularizer-type', '--regularizer', '-R', action='store', type=str, default=None,
+    parser.add_argument('--regularizer-type', '--regularizer', '-R', action='store', type=str, default='N3',
                         choices=['L1', 'F2', 'N3'])
     parser.add_argument('--regularizer-weight-type', '-W', action='store', type=str, default='none',
                         choices=['none', 'graph', 'latent'])
@@ -321,9 +321,11 @@ def main(argv):
 
                 loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function)
 
-                features_p_lh = factors_lh[0]
-                features_s_lh = factors_lh[1]
-                features_o_lh = factors_lh[2]
+                features_p_lh, features_s_lh, features_o_lh = factors_lh
+
+                if regularizer_weight_type in {'graph'}:
+                    features_s_lh = F.embedding(x_batch_lh[:, 0], e_tensor_lh)
+                    features_o_lh = F.embedding(x_batch_lh[:, 2], e_tensor_lh)
 
                 reg_rel_lh = regularizer_rel_weight_model(factors_lh[0], features_p_lh)
 
@@ -416,7 +418,7 @@ def main(argv):
                                    model=model, batch_size=eval_batch_size, device=device)
                 logger.info(f'Epoch {epoch_no}/{nb_epochs}\t{name} results\t{metrics_to_str(metrics)}')
                 if writer is not None:
-                    ranking_values =  {n.upper().replace("@", "_"): v for n, v in metrics.items()}
+                    ranking_values = {n.upper().replace("@", "_"): v for n, v in metrics.items()}
                     writer.add_scalars(f'Ranking/{name}', ranking_values, (epoch_no - 1) * nb_batches)
 
     for triples, name in [(t, n) for t, n in triples_name_pairs if len(t) > 0]:

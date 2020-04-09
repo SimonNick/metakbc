@@ -61,7 +61,6 @@ class N3(Regularizer):
 
         norm = 0
         for f in factors:
-            print(f.shape)
             norm += torch.sum(torch.abs(f) ** 3, dim=[] if dim is None else dim)
 
         return norm / factors[0].shape[0]
