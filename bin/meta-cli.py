@@ -14,8 +14,8 @@ from torch import nn, optim, Tensor
 
 import torch.nn.functional as F
 
-import tensorflow as tf
-import tensorboard as tb
+# import tensorflow as tf
+# import tensorboard as tb
 
 from torch.utils.tensorboard import SummaryWriter
 
@@ -48,7 +48,7 @@ np.set_printoptions(linewidth=48, precision=5, suppress=True)
 torch.autograd.set_detect_anomaly(True)
 
 torch.set_num_threads(multiprocessing.cpu_count())
-tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
+# tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 
 def metrics_to_str(metrics):
