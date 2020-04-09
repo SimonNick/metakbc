@@ -18,7 +18,7 @@ class ComplEx(BaseModel):
                  device: Optional[torch.device] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
-        eps = torch.tensor(1e-32, dtype=torch.float32, requires_grad=False)
+        eps = torch.tensor(1e-45, dtype=torch.float32, requires_grad=False)
         self.eps = eps.to(device) if device is not None else eps
 
     def score(self,
