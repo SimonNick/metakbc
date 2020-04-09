@@ -3,7 +3,9 @@
 import torch
 
 from metakbc.regularizers import L1, F2, N3
-from metakbc.regularizers.adaptive import LinearAdaptiveRegularizer, GatedLinearAdaptiveRegularizer
+from metakbc.regularizers.adaptive import LinearAdaptiveRegularizer
+from metakbc.regularizers.adaptive import GatedLinearAdaptiveRegularizer
+from metakbc.regularizers.adaptive import ConstantAdaptiveRegularizer
 
 import pytest
 
@@ -23,9 +25,11 @@ def test_adaptive_regularizers_v1():
     T = torch.rand(32, 64)
     reg = N3()
 
+    car = ConstantAdaptiveRegularizer(reg)
     lar = LinearAdaptiveRegularizer(reg, 64)
     glar = GatedLinearAdaptiveRegularizer(reg, 64)
 
+    assert [x for x in car(T, T).shape] == []
     assert [x for x in lar(T, T).shape] == []
     assert [x for x in glar(T, T).shape] == []
 
