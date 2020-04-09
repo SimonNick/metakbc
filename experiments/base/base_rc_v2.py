@@ -48,7 +48,8 @@ def main(argv):
         ct=['none', 'latent', 'graph'],
         mvl=[True, False],
         ls=[0, 1, 2],
-        i=['standard', 'reciprocal'],
+        # i=['standard', 'reciprocal'],
+        i=['standard'],
         V=[3],
         o=['adagrad'],
     )
@@ -99,7 +100,7 @@ def main(argv):
 #$ -e /dev/null
 #$ -t 1-{}
 #$ -l mem=8G
-#$ -l h_rt=8:00:00
+#$ -l h_rt=24:00:00
 
 conda activate cpu
 
