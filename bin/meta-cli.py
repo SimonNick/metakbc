@@ -62,7 +62,8 @@ def get_loss(X: Tensor,
              model: BaseModel,
              loss_function: nn.CrossEntropyLoss,
              sp_to_o: Optional[Dict[Tuple[int, int], List[int]]] = None,
-             po_to_s: Optional[Dict[Tuple[int, int], List[int]]] = None) -> Tuple[Tensor, List[Tensor]]:
+             po_to_s: Optional[Dict[Tuple[int, int], List[int]]] = None,
+             safe: bool = False) -> Tuple[Tensor, List[Tensor]]:
 
     def lookup(_X, _emb):
         return _emb(_X) if isinstance(_emb, nn.Embedding) else F.embedding(_X, _emb)
@@ -73,7 +74,7 @@ def get_loss(X: Tensor,
     emb = entity_embeddings.weight if isinstance(entity_embeddings, nn.Embedding) else entity_embeddings
 
     sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb, entity_embeddings=emb)
-    factors = [model.factor(e) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
+    factors = [model.factor(e, safe=safe) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
     if sp_to_o is not None:
         sp_mask = torch.zeros_like(sp_scores)
@@ -262,7 +263,7 @@ def main(argv):
 
     model_factory = {
         'distmult': lambda: DistMult(),
-        'complex': lambda: ComplEx()
+        'complex': lambda: ComplEx(device=device)
     }
 
     model = model_factory[model_name]().to(device)
@@ -282,7 +283,7 @@ def main(argv):
         'sgd': lambda *args, **kwargs: optim.SGD(*args, **kwargs)
     }
 
-    optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate, initial_accumulator_value=1e-45)
+    optimizer = optimizer_factory[optimizer_name](parameter_lst, lr=learning_rate)
 
     hyper_optimizer = optimizer_factory[optimizer_name](hyperparameter_lst, lr=lookahead_lr)
 
@@ -318,7 +319,7 @@ def main(argv):
                 indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
                 x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function)
+                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function, safe=True)
 
                 features_p_lh, features_s_lh, features_o_lh = factors_lh
                 if regularizer_weight_type in {'graph'}:
@@ -362,7 +363,7 @@ def main(argv):
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
 
-            loss, factors = get_loss(x_batch, entity_embeddings, predicate_embeddings, model, loss_function)
+            loss, factors = get_loss(x_batch, entity_embeddings, predicate_embeddings, model, loss_function, safe=True)
 
             features_p, features_s, features_o = factors
             if regularizer_weight_type in {'graph'}:

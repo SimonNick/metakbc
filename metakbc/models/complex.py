@@ -14,9 +14,12 @@ logger = logging.getLogger(__name__)
 
 class ComplEx(BaseModel):
     def __init__(self,
-                 entity_embeddings: Optional[nn.Embedding] = None) -> None:
+                 entity_embeddings: Optional[nn.Embedding] = None,
+                 device: Optional[torch.device] = None) -> None:
         super().__init__()
         self.entity_embeddings = entity_embeddings
+        eps = torch.tensor(1e-32, dtype=torch.float32, requires_grad=False)
+        self.eps = eps.to(device) if device is not None else eps
 
     def score(self,
               rel: Tensor,
@@ -82,10 +85,15 @@ class ComplEx(BaseModel):
         return score_sp, score_po
 
     def factor(self,
-               embedding_vector: Tensor) -> Tensor:
+               embedding_vector: Tensor,
+               safe: bool = False) -> Tensor:
         rank = embedding_vector.shape[1] // 2
 
         vec_real = embedding_vector[:, :rank]
         vec_img = embedding_vector[:, rank:]
 
-        return torch.sqrt(vec_real ** 2 + vec_img ** 2)
+        sq_factor = vec_real ** 2 + vec_img ** 2
+        if safe is True:
+            sq_factor = torch.max(sq_factor, self.eps)
+
+        return torch.sqrt(sq_factor)

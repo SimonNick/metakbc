@@ -33,5 +33,6 @@ class BaseModel(nn.Module):
 
     @abstractmethod
     def factor(self,
-               embedding_vector: Tensor) -> Tensor:
+               embedding_vector: Tensor,
+               safe: bool = False) -> Tensor:
         raise NotImplementedError
