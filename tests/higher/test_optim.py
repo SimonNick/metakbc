@@ -69,62 +69,6 @@ _test_param_sweep = [
         optim.SGD,
     ),
     (
-        "simple_model_adam",
-        lambda self: self._model,
-        optim.Adam,
-    ),
-    (
-        "simple_model_adam_weight_decay",
-        lambda self: self._model,
-        optim.Adam,
-        {
-            "weight_decay": 0.1
-        },
-    ),
-    (
-        "share_weight_model_adam",
-        lambda self: self._shared_param_model,
-        optim.Adam,
-    ),
-    (
-        "share_weight_seq_model_adam",
-        lambda self: self._shared_param_seq_model,
-        optim.Adam,
-    ),
-    (
-        "partially_used_model_adam",
-        lambda self: self._partially_used_model,
-        optim.Adam,
-    ),
-    (
-        "simple_model_adadelta",
-        lambda self: self._model,
-        optim.Adadelta,
-    ),
-    (
-        "simple_model_adadelta_weight_decay",
-        lambda self: self._model,
-        optim.Adadelta,
-        {
-            "weight_decay": 0.1
-        },
-    ),
-    (
-        "share_weight_model_adadelta",
-        lambda self: self._shared_param_model,
-        optim.Adadelta,
-    ),
-    (
-        "share_weight_seq_model_adadelta",
-        lambda self: self._shared_param_seq_model,
-        optim.Adadelta,
-    ),
-    (
-        "partially_used_model_adadelta",
-        lambda self: self._partially_used_model,
-        optim.Adadelta,
-    ),
-    (
         "simple_model_adagrad",
         lambda self: self._model,
         optim.Adagrad,
@@ -159,62 +103,6 @@ _test_param_sweep = [
         "partially_used_model_adagrad",
         lambda self: self._partially_used_model,
         optim.Adagrad,
-    ),
-    (
-        "simple_model_adamax",
-        lambda self: self._model,
-        optim.Adamax,
-    ),
-    (
-        "simple_model_adamax_weight_decay",
-        lambda self: self._model,
-        optim.Adamax,
-        {
-            "weight_decay": 0.1
-        },
-    ),
-    (
-        "share_weight_model_adamax",
-        lambda self: self._shared_param_model,
-        optim.Adamax,
-    ),
-    (
-        "share_weight_seq_model_adamax",
-        lambda self: self._shared_param_seq_model,
-        optim.Adamax,
-    ),
-    (
-        "partially_used_model_adamax",
-        lambda self: self._partially_used_model,
-        optim.Adamax,
-    ),
-    (
-        "simple_model_asgd",
-        lambda self: self._model,
-        optim.ASGD,
-    ),
-    (
-        "simple_model_asgd_weight_decay",
-        lambda self: self._model,
-        optim.ASGD,
-        {
-            "weight_decay": 0.1
-        },
-    ),
-    (
-        "share_weight_model_asgd",
-        lambda self: self._shared_param_model,
-        optim.ASGD,
-    ),
-    (
-        "share_weight_seq_model_asgd",
-        lambda self: self._shared_param_seq_model,
-        optim.ASGD,
-    ),
-    (
-        "partially_used_model_asgd",
-        lambda self: self._partially_used_model,
-        optim.ASGD,
     ),
     # (
     #     "simple_model_rmsprop",
