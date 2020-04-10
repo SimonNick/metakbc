@@ -1,0 +1,33 @@
+./bin/kbc-cli.py --train data/yago3-10/train.tsv --dev data/yago3-10/dev.tsv --test data/yago3-10/test.tsv -m complex -k 4000 -b 1000 -e 100 --F2 0.01 --N3 0 -l 0.1 -I reciprocal -V 3 -o adagrad -q
+{'F2': 0.01,
+ 'N3': 0.0,
+ 'batch_size': 1000,
+ 'dev': 'data/yago3-10/dev.tsv',
+ 'embedding_size': 4000,
+ 'epochs': 100,
+ 'eval_batch_size': None,
+ 'input_type': 'reciprocal',
+ 'learning_rate': 0.1,
+ 'load': None,
+ 'model': 'complex',
+ 'optimizer': 'adagrad',
+ 'quiet': True,
+ 'save': None,
+ 'seed': 0,
+ 'test': 'data/yago3-10/test.tsv',
+ 'test_i': None,
+ 'test_ii': None,
+ 'train': 'data/yago3-10/train.tsv',
+ 'validate_every': 3}
+INFO:kbc-cli.py:Device: cuda
+INFO:kbc-cli.py:Model state:
+INFO:kbc-cli.py:	entities.weight	torch.Size([123182, 8000])
+INFO:kbc-cli.py:	predicates.weight	torch.Size([74, 8000])
+Traceback (most recent call last):
+  File "./bin/kbc-cli.py", line 247, in <module>
+    main(sys.argv[1:])
+  File "./bin/kbc-cli.py", line 195, in main
+    sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb)
+  File "/home/pminervi/workspace/meta-kbc/metakbc/models/complex.py", line 77, in forward
+    score3_po = (rel_img * arg2_img) @ emb_real.t()
+RuntimeError: CUDA out of memory. Tried to allocate 470.00 MiB (GPU 0; 11.91 GiB total capacity; 10.76 GiB already allocated; 211.06 MiB free; 430.65 MiB cached)
