@@ -212,7 +212,7 @@ def main(argv):
 
     graph_features = get_graph_features(data.train_triples, data.entity_to_idx, data.predicate_to_idx)
     graph_features = normalize(graph_features, axis=0, norm='max')
-    graph_features_t = torch.tensor(graph_features, dtype=torch.float32, requires_grad=False)
+    graph_features_t = torch.tensor(graph_features, dtype=torch.float32, requires_grad=False).to(device)
 
     nb_graph_features = graph_features.shape[1]
 
