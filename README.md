@@ -44,7 +44,7 @@ INFO:meta-cli.py:Epoch 99/100	dev results	MRR 0.369825	H@1 0.276333	H@3 0.406302
 INFO:meta-cli.py:Epoch 99/100	test results	MRR 0.363751	H@1 0.270131	H@3 0.398270	H@5 0.465333	H@10 0.554920
 ```
 
-cd Wordnet:
+Wordnet:
 
 ```bash
 $ ls *.log | xargs grep "dev res" |  awk '{ print $6 " " $1 }' | tr ":" " " |  grep -v H@1 | sort -n | awk '{ print $1 " " $2 }' | tail -n 1
@@ -53,4 +53,15 @@ $ ls *.log | xargs grep "dev res" |  awk '{ print $6 " " $1 }' | tr ":" " " |  g
 $ cat wn18rr_beaker_v1.V=3_b=100_e=100_f2=0_i=reciprocal_k=4000_lr=0.1_m=complex_n3=0.1_o=adagrad.log | grep 488854 -A 1
 INFO:meta-cli.py:Epoch 51/100	dev results	MRR 0.488854	H@1 0.448418	H@3 0.500659	H@5 0.532795	H@10 0.571852
 INFO:meta-cli.py:Epoch 51/100	test results	MRR 0.487476	H@1 0.442246	H@3 0.506541	H@5 0.532706	H@10 0.574665
+```
+
+YAGO:
+
+```bash
+$ ls *.log | xargs grep "dev res" |  awk '{ print $6 " " $1 }' | tr ":" " " |  grep -v H@1 | sort -n | awk '{ print $1 " " $2 }' | tail -n 1
+0.583992 yago3-10_beaker_v1.V=3_b=500_e=100_f2=0_i=standard_k=1000_lr=0.1_m=complex_n3=0.01_o=adagrad.log
+
+$ cat yago3-10_beaker_v1.V=3_b=500_e=100_f2=0_i=standard_k=1000_lr=0.1_m=complex_n3=0.01_o=adagrad.log | grep 583992 -A 1
+INFO:kbc-cli.py:Epoch 84/100	dev results	MRR 0.583992	H@1 0.512900	H@3 0.625300	H@5 0.667600	H@10 0.712700
+INFO:kbc-cli.py:Epoch 84/100	test results	MRR 0.581684	H@1 0.507800	H@3 0.626200	H@5 0.666200	H@10 0.713300
 ```
