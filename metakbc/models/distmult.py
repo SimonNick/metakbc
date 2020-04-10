@@ -51,5 +51,6 @@ class DistMult(BaseModel):
         return score_sp, score_po
 
     def factor(self,
-               embedding_vector: Tensor) -> Tensor:
+               embedding_vector: Tensor,
+               safe: bool = False) -> Tensor:
         return embedding_vector
