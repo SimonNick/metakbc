@@ -456,7 +456,7 @@ class DifferentiableAdagrad(DifferentiableOptimizer):
                     mask = sum_ == 0.
                     _maybe_mask(sum_, mask)
 
-                    eps = _torch.tensor(1e-45, dtype=_torch.float32, requires_grad=False)
+                    eps = _torch.tensor(1e-45, dtype=_torch.float32, requires_grad=False).to(state['sum'].device)
                     safe = _torch.max(state['sum'], eps)
 
                     # std = _add(state['sum'].sqrt(), group['eps'] if 'eps' in group else 1e-10)
