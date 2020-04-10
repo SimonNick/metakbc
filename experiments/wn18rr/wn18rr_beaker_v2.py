@@ -20,7 +20,7 @@ def summary(configuration):
 
 def to_cmd(c, _path=None):
     mask_str = "--LM" if c["mvl"] else ""
-    command = f'PYTHONPATH=. python3 ./bin/kbc-cli.py ' \
+    command = f'PYTHONPATH=. python3 ./bin/meta-cli.py ' \
         f'--train data/wn18rr/train.tsv ' \
         f'--dev data/wn18rr/dev.tsv ' \
         f'--test data/wn18rr/test.tsv ' \
