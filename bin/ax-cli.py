@@ -19,29 +19,28 @@ logger = logging.getLogger(os.path.basename(sys.argv[0]))
 
 
 def handle_alarm(signum, frame):
-    # If the alarm is triggered, we're still in the exec_proc.communicate()
-    # call, so use exec_proc.kill() to end the process.
     frame.f_locals['self'].kill()
 
 
 def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[float]]:
-    lr = p['lr']
-    llr = p['llr']
-    reg = p['reg']
-
     env = os.environ.copy()
     env['PYTHONPATH'] = '.'
 
-    cmd_line = f'python3 ./bin/meta-cli.py --train data/umls/dev.tsv --dev data/umls/dev.tsv --test data/umls/test.tsv ' \
-        f'-m complex -k 1000 -b 100 -e 100 -R {reg} -l {lr} --LL {llr} -W graph -S 0 -I standard -V 1 -o adagrad -q'
+    mask_str = "--LM" if p["mvl"] else ""
+    cmd_line = f'python3 ./bin/meta-cli.py ' \
+        f'--train data/{p["data"]}/train.tsv --dev data/{p["data"]}/dev.tsv --test data/{p["data"]}/test.tsv ' \
+        f'-m complex -k 1000 -b 100 -e 100 -R {p["reg"]} -l {p["lr"]} --LL {p["llr"]} ' \
+        f'-W {p["feat"]} -S {p["s"]} {mask_str} -I standard -V 3 -o adagrad -q'
+    # print(cmd_line)
 
-    max_time = 60 * 10
+    max_time = 60 * 60
 
     stdout = stderr = None
     signal.signal(signal.SIGALRM, handle_alarm)
 
-    cmd_elements = cmd_line.split(' ')
-    proc = subprocess.Popen(cmd_elements, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    # cmd_elements = cmd_line.split(' ')
+    proc = subprocess.Popen(cmd_line, stdin=None, shell=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
 
     signal.alarm(max_time)
 
@@ -53,6 +52,7 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
         signal.alarm(0)
 
     stdout_u = stdout.decode("utf-8")
+    # print(stdout_u)
 
     dev_test_pairs = []
     last_dev = None
@@ -61,21 +61,15 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
         tokens = line.split()
 
         if len(tokens) > 6:
-            dev_value = None
+            def search_for(s: str) -> Optional[float]:
+                return float(tokens[5]) if tokens[2] == s else (float(tokens[4]) if tokens[1] == s else None)
 
-            if tokens[2] == 'dev':
-                dev_value = float(tokens[5])
-            elif tokens[1] == 'dev':
-                dev_value = float(tokens[4])
+            dev_value = search_for('dev')
 
             if dev_value is not None:
                 last_dev = dev_value
 
-            test_value = None
-            if tokens[2] == 'test':
-                test_value = float(tokens[5])
-            elif tokens[1] == 'test':
-                test_value = float(tokens[4])
+            test_value = search_for('test')
 
             if test_value is not None:
                 dev_test_pairs += [(last_dev, test_value)]
@@ -85,8 +79,7 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
 
     for d, t in dev_test_pairs:
         if best_dev is None or d > best_dev:
-            best_dev = d
-            best_test = t
+            best_dev, best_test = d, t
 
     return best_test, None
 
@@ -94,12 +87,19 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
 def main(argv):
     best_parameters, values, experiment, model = optimize(
         parameters=[
-            {"name": "lr", "type": "range", "bounds": [1e-6, 0.4], "log_scale": True},
-            {"name": "llr", "type": "range", "bounds": [1e-6, 0.4], "log_scale": True},
+            {"name": "data", "type": "fixed", "value": argv[0]},
+            {"name": "lr", "type": "range", "bounds": [1e-4, 1.0], "log_scale": True},
+            {"name": "llr", "type": "range", "bounds": [1e-4, 1.0], "log_scale": True},
             {"name": "reg", "type": "choice", "values": ['F2', 'N3']},
-        ], evaluation_function=evaluate, objective_name='MRR', total_trials=100)
+            {"name": "feat", "type": "choice", "values": ['none', 'graph', 'latent']},
+            {"name": "s", "type": "choice", "values": [1, 2, 3]},
+            {"name": "mvl", "type": "choice", "values": [True, False]},
+        ], evaluation_function=evaluate, objective_name='MRR', total_trials=32)
 
     print(best_parameters)
+    print(values)
+    print(experiment)
+    print(model)
 
 
 if __name__ == '__main__':
