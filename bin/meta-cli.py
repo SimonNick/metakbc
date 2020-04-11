@@ -137,6 +137,7 @@ def main(argv):
     parser.add_argument('--lookahead-learning-rate', '--LL', action='store', type=float, default=0.01)
     parser.add_argument('--lookahead-sample-size', '--LSS', action='store', type=float, default=None)
     parser.add_argument('--lookahead-masked', '--LM', action='store_true', default=False)
+    parser.add_argument('--lookahead-every', '--LE', action='store', type=int, default=1)
 
     parser.add_argument('--seed', action='store', type=int, default=0)
 
@@ -184,6 +185,7 @@ def main(argv):
     lookahead_lr = args.lookahead_learning_rate if args.lookahead_learning_rate is not None else learning_rate
     lookahead_sample_size = args.lookahead_sample_size
     is_lookahead_masked = args.lookahead_masked
+    lookahead_every = args.lookahead_every
 
     validate_every = args.validate_every
     input_type = args.input_type
@@ -308,57 +310,58 @@ def main(argv):
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             step_no = ((epoch_no - 1) * nb_batches) + batch_no
 
-            diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device, track_higher_grads=True)
+            if step_no % lookahead_every == 0:
+                diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device, track_higher_grads=True)
 
-            e_tensor_lh = entity_embeddings.weight
-            p_tensor_lh = predicate_embeddings.weight
+                e_tensor_lh = entity_embeddings.weight
+                p_tensor_lh = predicate_embeddings.weight
 
-            for i in range(nb_lookahead_steps):
-                batch_start_lh, batch_end_lh = batcher.batches[(batch_no + i) % nb_batches]
+                for i in range(nb_lookahead_steps):
+                    batch_start_lh, batch_end_lh = batcher.batches[(batch_no + i) % nb_batches]
 
-                indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
-                x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
+                    indices_lh = batcher.get_batch(batch_start_lh, batch_end_lh)
+                    x_batch_lh = torch.from_numpy(data.X[indices_lh, :].astype('int64')).to(device)
 
-                loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function, safe=True)
+                    loss_lh, factors_lh = get_loss(x_batch_lh, e_tensor_lh, p_tensor_lh, model, loss_function, safe=True)
 
-                features_p_lh, features_s_lh, features_o_lh = factors_lh
-                if regularizer_weight_type in {'graph'}:
-                    features_s_lh = F.embedding(x_batch_lh[:, 0], graph_features_t)
-                    features_o_lh = F.embedding(x_batch_lh[:, 2], graph_features_t)
+                    features_p_lh, features_s_lh, features_o_lh = factors_lh
+                    if regularizer_weight_type in {'graph'}:
+                        features_s_lh = F.embedding(x_batch_lh[:, 0], graph_features_t)
+                        features_o_lh = F.embedding(x_batch_lh[:, 2], graph_features_t)
 
-                reg_rel_lh = regularizer_rel_weight_model(factors_lh[0], features_p_lh)
+                    reg_rel_lh = regularizer_rel_weight_model(factors_lh[0], features_p_lh)
 
-                reg_s_lh = regularizer_ent_weight_model(factors_lh[1], features_s_lh)
-                reg_o_lh = regularizer_ent_weight_model(factors_lh[2], features_o_lh)
+                    reg_s_lh = regularizer_ent_weight_model(factors_lh[1], features_s_lh)
+                    reg_o_lh = regularizer_ent_weight_model(factors_lh[2], features_o_lh)
 
-                loss_lh += (reg_rel_lh + reg_s_lh + reg_o_lh) / 3.0
+                    loss_lh += (reg_rel_lh + reg_s_lh + reg_o_lh) / 3.0
 
-                e_tensor_lh, p_tensor_lh = diff_opt.step(loss_lh, params=parameter_lst)
+                    e_tensor_lh, p_tensor_lh = diff_opt.step(loss_lh, params=parameter_lst)
 
-            dev_indices = None
-            if lookahead_sample_size is not None:
-                dev_indices = random_state.permutation(data.dev_X.shape[0])[:lookahead_sample_size]
+                dev_indices = None
+                if lookahead_sample_size is not None:
+                    dev_indices = random_state.permutation(data.dev_X.shape[0])[:lookahead_sample_size]
 
-            x_val_batch = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
+                x_val_batch = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
 
-            sp_to_o = po_to_s = None
-            if is_lookahead_masked is True:
-                sp_to_o, po_to_s = X_to_dicts(np.concatenate((data.X, data.dev_X), axis=0))
+                sp_to_o = po_to_s = None
+                if is_lookahead_masked is True:
+                    sp_to_o, po_to_s = X_to_dicts(np.concatenate((data.X, data.dev_X), axis=0))
 
-            loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function, sp_to_o, po_to_s)
+                loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function, sp_to_o, po_to_s)
 
-            loss_val.backward()
+                loss_val.backward()
 
-            if writer is not None:
-                writer.add_scalar('Loss/Lookahead', loss_val.item(), step_no)
+                if writer is not None:
+                    writer.add_scalar('Loss/Lookahead', loss_val.item(), step_no)
 
-            hyper_optimizer.step()
+                hyper_optimizer.step()
 
-            optimizer.zero_grad()
-            hyper_optimizer.zero_grad()
+                optimizer.zero_grad()
+                hyper_optimizer.zero_grad()
 
-            regularizer_rel_weight_model.project_()
-            regularizer_ent_weight_model.project_()
+                regularizer_rel_weight_model.project_()
+                regularizer_ent_weight_model.project_()
 
             indices = batcher.get_batch(batch_start, batch_end)
             x_batch = torch.from_numpy(data.X[indices, :].astype('int64')).to(device)
