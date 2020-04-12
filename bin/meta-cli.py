@@ -76,11 +76,13 @@ def get_loss(X: Tensor,
     sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb, entity_embeddings=emb)
     factors = [model.factor(e, safe=safe) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
+    X_np = X.cpu().numpy() if (sp_to_o is not None or po_to_s is not None) else None
+
     if sp_to_o is not None:
         sp_mask = torch.zeros_like(sp_scores)
-        for i in range(X.shape[0]):
-            key = (X[i, 0].item(), X[i, 1].item())
-            value = X[i, 2].item()
+        for i in range(X_np.shape[0]):
+            key = (X_np[i, 0], X_np[i, 1])
+            value = X_np[i, 2]
             if key in sp_to_o:
                 indices = [j for j in sp_to_o[key] if j != value]
                 sp_mask[i, indices] = -np.inf
@@ -88,9 +90,9 @@ def get_loss(X: Tensor,
 
     if po_to_s is not None:
         po_mask = torch.zeros_like(po_scores)
-        for i in range(X.shape[0]):
-            key = (X[i, 1].item(), X[i, 2].item())
-            value = X[i, 0].item()
+        for i in range(X_np.shape[0]):
+            key = (X_np[i, 1], X_np[i, 2])
+            value = X_np[i, 0]
             if key in po_to_s:
                 indices = [j for j in po_to_s[key] if j != value]
                 po_mask[i, indices] = -np.inf
