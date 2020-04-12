@@ -63,6 +63,7 @@ def get_loss(X: Tensor,
              loss_function: nn.CrossEntropyLoss,
              sp_to_o: Optional[Dict[Tuple[int, int], List[int]]] = None,
              po_to_s: Optional[Dict[Tuple[int, int], List[int]]] = None,
+             X_np: Optional[np.ndarray] = None,
              safe: bool = False) -> Tuple[Tensor, List[Tensor]]:
 
     def lookup(_X, _emb):
@@ -76,7 +77,9 @@ def get_loss(X: Tensor,
     sp_scores, po_scores = model.forward(xp_batch_emb, xs_batch_emb, xo_batch_emb, entity_embeddings=emb)
     factors = [model.factor(e, safe=safe) for e in [xp_batch_emb, xs_batch_emb, xo_batch_emb]]
 
-    X_np = X.cpu().numpy() if (sp_to_o is not None or po_to_s is not None) else None
+    if sp_to_o is not None or po_to_s is not None:
+        if X_np is None:
+            X_np = X.cpu().numpy()
 
     if sp_to_o is not None:
         sp_mask = torch.zeros_like(sp_scores)
@@ -346,13 +349,15 @@ def main(argv):
                 if lookahead_sample_size is not None:
                     dev_indices = random_state.permutation(data.dev_X.shape[0])[:lookahead_sample_size]
 
-                x_val_batch = torch.from_numpy(data.dev_X[:dev_indices, :].astype('int64')).to(device)
+                x_val_batch_np = data.dev_X[:dev_indices, :]
+                x_val_batch = torch.from_numpy(x_val_batch_np.astype('int64')).to(device)
 
                 sp_to_o = po_to_s = None
                 if is_lookahead_masked is True:
                     sp_to_o, po_to_s = X_to_dicts(np.concatenate((data.X, data.dev_X), axis=0))
 
-                loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function, sp_to_o, po_to_s)
+                loss_val, _ = get_loss(x_val_batch, e_tensor_lh, p_tensor_lh, model, loss_function,
+                                       sp_to_o=sp_to_o, po_to_s=po_to_s, X_np=x_val_batch_np)
 
                 loss_val.backward()
 
