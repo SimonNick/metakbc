@@ -28,7 +28,7 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Dict[str, Tuple[float, 
 
     mask_str = "--LM" if p["mvl"] else ""
     cmd_line = f'python3 ./bin/meta-cli.py ' \
-        f'--train data/{p["data"]}/dev.tsv --dev data/{p["data"]}/dev.tsv --test data/{p["data"]}/test.tsv ' \
+        f'--train data/{p["data"]}/train.tsv --dev data/{p["data"]}/dev.tsv --test data/{p["data"]}/test.tsv ' \
         f'-m complex -k 1000 -b 100 -e 100 -R {p["reg"]} -l {p["lr"]} --LL {p["llr"]} ' \
         f'-W {p["feat"]} -S {p["s"]} {mask_str} --LE {p["le"]} -I standard -V 3 -o adagrad -q'
 
@@ -97,7 +97,7 @@ def main(argv):
             # {"name": "mvl", "type": "choice", "values": [True, False]},
             {"name": "mvl", "type": "fixed", "value": True},
             {"name": "le", "type": "fixed", "value": 10},
-        ], evaluation_function=evaluate, objective_name='dev_MRR', total_trials=12)
+        ], evaluation_function=evaluate, objective_name='dev_MRR', total_trials=16)
 
     print(best_parameters)
     print(values)
