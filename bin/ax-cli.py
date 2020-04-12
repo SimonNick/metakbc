@@ -97,7 +97,7 @@ def main(argv):
             # {"name": "mvl", "type": "choice", "values": [True, False]},
             {"name": "mvl", "type": "fixed", "value": True},
             {"name": "le", "type": "fixed", "value": 10},
-        ], evaluation_function=evaluate, objective_name='dev_MRR', total_trials=16)
+        ], evaluation_function=evaluate, objective_name='dev_MRR', total_trials=24)
 
     print(best_parameters)
     print(values)
