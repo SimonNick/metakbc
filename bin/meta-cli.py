@@ -310,7 +310,7 @@ def main(argv):
         for batch_no, (batch_start, batch_end) in enumerate(batcher.batches, 1):
             step_no = ((epoch_no - 1) * nb_batches) + batch_no
 
-            if step_no % lookahead_every == 0:
+            if lookahead_every > 0 and step_no % lookahead_every == 0:
                 diff_opt = higher.get_diff_optim(optimizer, parameter_lst, device=device, track_higher_grads=True)
 
                 e_tensor_lh = entity_embeddings.weight

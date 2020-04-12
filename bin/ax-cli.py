@@ -22,23 +22,22 @@ def handle_alarm(signum, frame):
     frame.f_locals['self'].kill()
 
 
-def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[float]]:
+def evaluate(p: Dict[str, float], f: Optional[float]) -> Dict[str, Tuple[float, Optional[float]]]:
     env = os.environ.copy()
     env['PYTHONPATH'] = '.'
 
     mask_str = "--LM" if p["mvl"] else ""
     cmd_line = f'python3 ./bin/meta-cli.py ' \
-        f'--train data/{p["data"]}/train.tsv --dev data/{p["data"]}/dev.tsv --test data/{p["data"]}/test.tsv ' \
+        f'--train data/{p["data"]}/dev.tsv --dev data/{p["data"]}/dev.tsv --test data/{p["data"]}/test.tsv ' \
         f'-m complex -k 1000 -b 100 -e 100 -R {p["reg"]} -l {p["lr"]} --LL {p["llr"]} ' \
-        f'-W {p["feat"]} -S {p["s"]} {mask_str} -I standard -V 3 -o adagrad -q'
-    # print(cmd_line)
+        f'-W {p["feat"]} -S {p["s"]} {mask_str} --LE {p["le"]} -I standard -V 3 -o adagrad -q'
 
     max_time = 60 * 60
+    # max_time = 15
 
     stdout = stderr = None
     signal.signal(signal.SIGALRM, handle_alarm)
 
-    # cmd_elements = cmd_line.split(' ')
     proc = subprocess.Popen(cmd_line, stdin=None, shell=True,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
 
@@ -52,7 +51,6 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
         signal.alarm(0)
 
     stdout_u = stdout.decode("utf-8")
-    # print(stdout_u)
 
     dev_test_pairs = []
     last_dev = None
@@ -81,25 +79,30 @@ def evaluate(p: Dict[str, float], f: Optional[float]) -> Tuple[float, Optional[f
         if best_dev is None or d > best_dev:
             best_dev, best_test = d, t
 
-    return best_test, None
+    res = {'dev_MRR': (best_dev, 0.0), 'test_MRR': (best_test, 0.0)}
+    return res
 
 
 def main(argv):
     best_parameters, values, experiment, model = optimize(
         parameters=[
             {"name": "data", "type": "fixed", "value": argv[0]},
-            {"name": "lr", "type": "range", "bounds": [1e-4, 1.0], "log_scale": True},
+            # {"name": "lr", "type": "range", "bounds": [1e-4, 1.0], "log_scale": True},
+            {"name": "lr", "type": "fixed", "value": 0.1},
             {"name": "llr", "type": "range", "bounds": [1e-4, 1.0], "log_scale": True},
             {"name": "reg", "type": "choice", "values": ['F2', 'N3']},
             {"name": "feat", "type": "choice", "values": ['none', 'graph', 'latent']},
-            {"name": "s", "type": "choice", "values": [1, 2, 3]},
-            {"name": "mvl", "type": "choice", "values": [True, False]},
-        ], evaluation_function=evaluate, objective_name='MRR', total_trials=32)
+            # {"name": "s", "type": "choice", "values": [1, 2, 3]},
+            {"name": "s", "type": "fixed", "value": 1},
+            # {"name": "mvl", "type": "choice", "values": [True, False]},
+            {"name": "mvl", "type": "fixed", "value": True},
+            {"name": "le", "type": "fixed", "value": 10},
+        ], evaluation_function=evaluate, objective_name='dev_MRR', total_trials=12)
 
     print(best_parameters)
     print(values)
-    print(experiment)
-    print(model)
+    # print(experiment)
+    # print(model)
 
 
 if __name__ == '__main__':
