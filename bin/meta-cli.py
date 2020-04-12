@@ -80,8 +80,9 @@ def get_loss(X: Tensor,
         sp_mask = torch.zeros_like(sp_scores)
         for i in range(X.shape[0]):
             key = (X[i, 0].item(), X[i, 1].item())
+            value = X[i, 2].item()
             if key in sp_to_o:
-                indices = [j for j in sp_to_o[key] if j != X[i, 2].item()]
+                indices = [j for j in sp_to_o[key] if j != value]
                 sp_mask[i, indices] = -np.inf
         sp_scores = sp_scores + sp_mask
 
@@ -89,8 +90,9 @@ def get_loss(X: Tensor,
         po_mask = torch.zeros_like(po_scores)
         for i in range(X.shape[0]):
             key = (X[i, 1].item(), X[i, 2].item())
+            value = X[i, 0].item()
             if key in po_to_s:
-                indices = [j for j in po_to_s[key] if j != X[i, 0].item()]
+                indices = [j for j in po_to_s[key] if j != value]
                 po_mask[i, indices] = -np.inf
         po_scores = po_scores + po_mask
 
