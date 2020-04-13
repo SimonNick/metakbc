@@ -64,3 +64,15 @@ class N3(Regularizer):
             norm += torch.sum(torch.abs(f) ** 3, dim=[] if dim is None else dim)
 
         return norm / factors[0].shape[0]
+
+
+class InconsistencyLoss(Regularizer):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self,
+                 factors: List[Tensor],
+                 dim: int = None) -> Tensor:
+
+        emb_p = factors[0]
+        return torch.max(torch.abs(emb_p[0] - emb_p[1]))
