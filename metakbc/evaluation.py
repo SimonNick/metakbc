@@ -34,16 +34,16 @@ def add_averages(average_a: float, size_a: int, average_b: float, size_b: int) -
 
 
 def evaluate(dataset: Dataset,
-         splits: List[str],
-         model,
-         batch_size: int) -> dict:
+             splits: List[str],
+             model,
+             batch_size: int) -> dict:
 
     metrics_dict = {s: {m: 0 for m in ["MRR", "HITS@3", "HITS@5", "HITS@10"]} for s in splits}
 
-    for split in splits:
+    for s in splits:
 
         n_samples = 0
-        for batch in dataset.get_batches(split, batch_size, shuffle=False):
+        for batch in dataset.get_batches(s, batch_size, shuffle=False):
         
             batch = batch.to(device)
             s_idx = batch[:, 0]
@@ -58,8 +58,8 @@ def evaluate(dataset: Dataset,
 
             batch_metrics = metrics(scores, idx)
             n_batch_samples = batch.shape[0]
-            for k,v in metrics_dict[split].items():
-                metrics_dict[split][k] = add_averages(v, n_samples, batch_metrics[k], n_batch_samples)
+            for k,v in metrics_dict[s].items():
+                metrics_dict[s][k] = add_averages(v, n_samples, batch_metrics[k], n_batch_samples)
             n_samples += n_batch_samples
 
     return metrics_dict
