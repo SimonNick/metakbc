@@ -93,11 +93,11 @@ class ComplEx(BaseModel):
                       p: Tensor,
                       o: Tensor) -> Tensor:
 
-        rank = p.shape[1] // 2
+        rank = p.shape[0] // 2
 
-        p_real, p_img = p[:, :rank], p[:, rank:]
-        s_real, s_img = s[:, :rank], s[:, rank:]
-        o_real, o_img = o[:, :rank], o[:, rank:]
+        p_real, p_img = p[:rank], p[rank:]
+        s_real, s_img = s[:rank], s[rank:]
+        o_real, o_img = o[:rank], o[rank:]
 
         score1 = torch.sum(p_real * s_real * o_real)
         score2 = torch.sum(p_real * s_img * o_img)
