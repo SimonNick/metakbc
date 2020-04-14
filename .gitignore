@@ -133,3 +133,6 @@ runs/
 
 # Mac
 .DS_Store
+
+# Weights and Bias
+**/wandb
