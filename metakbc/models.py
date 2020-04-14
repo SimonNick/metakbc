@@ -47,6 +47,11 @@ class DistMult(BaseModel):
         self.emb_so = Parameter(torch.empty((size[0], rank)).normal_())
         self.emb_p = Parameter(torch.empty((size[1], rank)).normal_())
 
+    def _scoring_func(self,
+                      s: Tensor,
+                      p: Tensor,
+                      o: Tensor) -> Tensor:
+        return torch.sum(s * p * o)
 
     def score(self,
               s_idx: LongTensor,
@@ -55,7 +60,6 @@ class DistMult(BaseModel):
 
         s, p, o = self.emb_so[s_idx], self.emb_p[p_idx], self.emb_so[o_idx]
         return torch.sum(s * p * o, 1)
-
 
     def score_subjects(self,
                        p_idx: LongTensor,
