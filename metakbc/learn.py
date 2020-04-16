@@ -199,8 +199,8 @@ def learn(dataset: Dataset,
             loss_total = {s: l.item() for s,l in loss_total.items()}
 
             print("\rLoss (train): {:.2f} \t Loss (valid): {:.2f} \t MRR (train): {:.2f} \t MRR (valid): {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR']))
-            print(softmax(w_body, dim=1).detach().numpy())
-            print(softmax(w_head, dim=1).detach().numpy())
+            print(softmax(w_body, dim=1).cpu().detach().numpy())
+            print(softmax(w_head, dim=1).cpu().detach().numpy())
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
