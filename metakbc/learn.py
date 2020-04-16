@@ -37,9 +37,9 @@ def learn(dataset: Dataset,
     n_constraints = 2
     n_predicates = 4
 
-    w_head = torch.empty((n_constraints, n_predicates)).normal_()
+    w_head = torch.empty((n_constraints, n_predicates)).normal_().to(device)
     w_head.requires_grad = True
-    w_body = torch.empty((n_constraints, n_predicates)).normal_()
+    w_body = torch.empty((n_constraints, n_predicates)).normal_().to(device)
     w_body.requires_grad = True
 
     model_ = {
