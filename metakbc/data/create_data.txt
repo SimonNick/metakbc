@@ -1,0 +1,1 @@
+yes father | head -n 200000 | awk '{ print "e" i++ "\t" $1 "\te" i++ }' > train.tsv
