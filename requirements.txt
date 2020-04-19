@@ -8,3 +8,4 @@ ax-platform
 pytest
 pytest-xdist
 pytest-forked
+wandb

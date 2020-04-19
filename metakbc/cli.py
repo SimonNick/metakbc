@@ -3,12 +3,11 @@
 import argparse
 
 from metakbc.learn import learn
-# from metakbc.learn2 import learn
 from metakbc.datasets import Dataset
 
 import wandb
 
-datasets = ['Toy', 'Toy2', 'Toy3', 'Toy2_2']
+datasets = ['Toy', 'Toy2', 'Toy3', 'Toy2_2', 'Toy2_3']
 models = ['DistMult', 'ComplEx']
 optimizers = ['SGD', 'Adagrad']
 
@@ -24,6 +23,7 @@ if __name__ == '__main__':
     parser.add_argument('--meta_optimizer', default="Adagrad",  choices=optimizers,     help="Meta optimizer")
     parser.add_argument('--meta_lr',        default=0.1,        type=float,             help="Learning rate of the meta optimizer")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size")
+    parser.add_argument('--chunk_size',     default=32,         type=int,               help="Chunk size")
     parser.add_argument('--epochs_inner',   default=10,         type=int,               help="Number of inner epochs")
     parser.add_argument('--epochs_outer',   default=10,         type=int,               help="Number of outer epochs")
     parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
@@ -51,6 +51,7 @@ if __name__ == '__main__':
         wandb.config.rank = args.rank
         wandb.config.lam = args.lam
         wandb.config.batch_size = args.batch_size
+        wandb.config.chunk_size = args.chunk_size
 
     learn(Dataset(args.dataset),
           args.model,
@@ -66,4 +67,5 @@ if __name__ == '__main__':
           args.rank,
           args.lam,
           args.batch_size,
+          args.chunk_size,
           args.logging)
