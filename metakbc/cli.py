@@ -26,8 +26,8 @@ if __name__ == '__main__':
     parser.add_argument('--chunk_size',     default=32,         type=int,               help="Chunk size")
     parser.add_argument('--epochs_inner',   default=10,         type=int,               help="Number of inner epochs")
     parser.add_argument('--epochs_outer',   default=10,         type=int,               help="Number of outer epochs")
-    parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
-    parser.add_argument('--epochs_dis',     default=10,         type=int,               help="Number of epochs for the discriminator")
+    # parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
+    # parser.add_argument('--epochs_dis',     default=10,         type=int,               help="Number of epochs for the discriminator")
     parser.add_argument('--valid',          default=3,          type=int,               help="Number of skipped epochs until evaluation")
     parser.add_argument('--rank',           default=4,          type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--lam',            default=0.1,        type=float,             help="Weight of the violation loss")
@@ -45,8 +45,8 @@ if __name__ == '__main__':
         wandb.config.meta_lr = args.meta_lr
         wandb.config.epochs_inner = args.epochs_inner
         wandb.config.epochs_outer = args.epochs_outer
-        wandb.config.epochs_adv = args.epochs_adv
-        wandb.config.epochs_dis = args.epochs_dis
+        # wandb.config.epochs_adv = args.epochs_adv
+        # wandb.config.epochs_dis = args.epochs_dis
         wandb.config.valid = args.valid
         wandb.config.rank = args.rank
         wandb.config.lam = args.lam
@@ -61,8 +61,8 @@ if __name__ == '__main__':
           args.meta_lr,
           args.epochs_inner,
           args.epochs_outer,
-          args.epochs_adv,
-          args.epochs_dis,
+        #   args.epochs_adv,
+        #   args.epochs_dis,
           args.valid,
           args.rank,
           args.lam,
