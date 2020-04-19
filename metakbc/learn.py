@@ -99,15 +99,20 @@ def learn(dataset: Dataset,
 
                         batch_begin += batch_size
 
-                    print("\rOuter epoch: {:4} \t chunk: {} \t inner epoch: {:4} \t loss: {:.3f}".format(e_outer+1,i+1,e_inner+1,loss_total.item()), end="")
+                    print("\rOuter epoch: {:4} \t chunk: {:2} \t inner epoch: {:4} \t loss: {:.3f}".format(e_outer+1,i+1,e_inner+1,loss_total.item()), end="")
 
 
                 # ==========================================
                 # END INNER LOOP / META-OPTIMIZATION
                 # ==========================================
                 loss_valid = 0
-                for batch_valid in dataset.get_batches('valid', batch_size, shuffle=True):
 
+                n_examples = chunk.shape[0]
+                examples = chunk[torch.randperm(n_examples)]
+                batch_begin = 0
+                while batch_begin < n_examples:
+
+                    batch_valid = examples[batch_begin:batch_begin + batch_size]
                     batch_valid = batch_valid.to(device)
                     s_idx_valid = batch_valid[:, 0]
                     p_idx_valid = batch_valid[:, 1]
@@ -116,10 +121,45 @@ def learn(dataset: Dataset,
                     score_s = model.score_subjects(p_idx_valid, o_idx_valid)
                     score_o = model.score_objects(s_idx_valid, p_idx_valid)
                     loss_valid += loss(score_s, s_idx_valid) + loss(score_o, o_idx_valid)
+                    
+                    batch_begin += batch_size
 
                 meta_optim.zero_grad() 
                 loss_valid.backward() 
                 meta_optim.step()
+
+        # ==========================================
+        # END CHUNK LOOP / TRAIN ON FULL DATASET
+        # ==========================================
+    
+        for e_inner in range(n_epochs_inner):
+
+            print("\rTraining on the full dataset ... inner epoch: {:4}".format(e_inner+1), end="")
+
+            for batch in dataset.get_batches('train', batch_size, shuffle=True):
+
+                batch = batch.to(device)
+                s_idx = batch[:, 0]
+                p_idx = batch[:, 1]
+                o_idx = batch[:, 2]
+
+                score_s = model_.score_subjects(p_idx, o_idx)
+                score_o = model_.score_objects(s_idx, p_idx)
+                loss_fact = loss(score_s, s_idx) + loss(score_o, o_idx)
+
+                emb_body = softmax(w_body, dim=1) @ model_.emb_p
+                emb_head = softmax(w_head, dim=1) @ model_.emb_p
+
+                loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
+                loss_total = loss_fact + lam * loss_inc
+
+                optim_.zero_grad()
+                loss_total.backward()
+                optim_.step()
+
+                with torch.no_grad():
+                    model_.emb_p /= model_.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
+                    model_.emb_so /= model_.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
 
         # ==========================================
         # FULL EVALUATION
