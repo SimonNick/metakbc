@@ -38,11 +38,9 @@ def learn(dataset: Dataset,
     n_predicates = dataset.n_predicates
 
     # Hyperparameters that we want to learn
-    w_head = torch.empty((n_constraints, n_predicates)).normal_().to(device)
-    w_head /= 1e2
+    w_head = torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3).to(device)
     w_head.requires_grad = True
-    w_body = torch.empty((n_constraints, n_predicates)).normal_().to(device)
-    w_body /= 1e2
+    w_body = torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3).to(device)
     w_body.requires_grad = True
     # ==========================================
 
