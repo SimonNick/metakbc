@@ -19,9 +19,9 @@ def metrics(scores: Tensor, true_idx: LongTensor) -> dict:
     mrr = torch.mean(1 / ranks.float()).item()
 
     # hits score
-    hits_3  = torch.mean(torch.sum(onehot_match[ :3], dim=1)).item()
-    hits_5  = torch.mean(torch.sum(onehot_match[ :5], dim=1)).item()
-    hits_10 = torch.mean(torch.sum(onehot_match[:10], dim=1)).item()
+    hits_3  = torch.mean(torch.sum(onehot_match[:, :3], dim=1)).item()
+    hits_5  = torch.mean(torch.sum(onehot_match[:, :5], dim=1)).item()
+    hits_10 = torch.mean(torch.sum(onehot_match[:, :10], dim=1)).item()
 
     return {"MRR":     mrr, 
             "HITS@3":  hits_3,
