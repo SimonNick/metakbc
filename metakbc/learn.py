@@ -64,20 +64,20 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
     }[meta_optimizer]()
 
-    # n_batches = int(dataset.get_examples('train').shape[0] / batch_size)
-    # print("Number batches", n_batches)
-    # batch_indices = np.random.permutation(range(n_batches))
+    n_batches = int(dataset.get_examples('train').shape[0] / batch_size)
+    print("Number batches", n_batches)
+    batch_indices = np.random.permutation(range(n_batches))
 
-    # def _get_batches(k, n_batches, batch_indices):
-    #     all_batches = [b for b in dataset.get_batches('train', batch_size, shuffle=False)]
-    #     k = k % int(len(all_batches)/n_batches)
-    #     indices = batch_indices[k*n_batches:(k+1)*n_batches]
-    #     batches = [all_batches[i] for i in indices]
-    #     if (k+1)*n_batches >= len(all_batches):
-    #         # print("generating new batch_indices")
-    #         batch_indices = np.random.permutation(range(n_batches))
-    #     # print("For k={}, n_batches={}, len(all_batches)={}: {}".format(k, n_batches, len(all_batches), indices))
-    #     return batches
+    def _get_batches(k, n_batches, batch_indices):
+        all_batches = [b for b in dataset.get_batches('train', batch_size, shuffle=False)]
+        k = k % int(len(all_batches)/n_batches)
+        indices = batch_indices[k*n_batches:(k+1)*n_batches]
+        batches = [all_batches[i] for i in indices]
+        if (k+1)*n_batches >= len(all_batches):
+            # print("generating new batch_indices")
+            batch_indices = np.random.permutation(range(n_batches))
+        # print("For k={}, n_batches={}, len(all_batches)={}: {}".format(k, n_batches, len(all_batches), indices))
+        return batches
 
     for e_outer in range(n_epochs_outer):
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
@@ -87,9 +87,9 @@ def learn(dataset: Dataset,
             # INNER LOOP
             # ==========================================
             loss = torch.nn.CrossEntropyLoss()
-            # for batch in _get_batches(e_outer, 5, batch_indices):
-            for k, batch in enumerate(dataset.get_batches('train', batch_size, shuffle=True)):
-                if k == n_batches_train: break
+            for batch in _get_batches(e_outer, 5, batch_indices):
+            # for k, batch in enumerate(dataset.get_batches('train', batch_size, shuffle=True)):
+                # if k == n_batches_train: break
 
                 batch = batch.to(device)
                 s_idx = batch[:, 0]
