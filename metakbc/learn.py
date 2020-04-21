@@ -65,20 +65,24 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
     }[meta_optimizer]()
 
+
     for e_outer in range(n_epochs_outer):
 
-        all_batches = [b for b in dataset.get_batches('train', batch_size, shuffle=True)]
-        for k in range(math.ceil(len(all_batches) / n_batches_train)):
+        print("\rOuter epoch: {:4}".format(e_outer+1), end="")
 
-            print("\rOuter epoch: {:4}, k={}".format(e_outer+1,k+1), end="")
+        batches = dataset.get_batches('train', batch_size, shuffle=True)
+        epoch_complete = False
+        while not epoch_complete:
 
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (model_monkeypatch, diff_optim):
 
-                for batch in all_batches[k*n_batches_train:(k+1)*n_batches_train]:
+                # ==========================================
+                # TRAINING
+                # ==========================================
+                for k, batch in enumerate(batches):
 
-                    # ==========================================
-                    # INNER LOOP
-                    # ==========================================
+                    if k == n_batches_train: break
+
                     loss = torch.nn.CrossEntropyLoss()
 
                     batch = batch.to(device)
@@ -101,6 +105,9 @@ def learn(dataset: Dataset,
                     with torch.no_grad():
                         model_monkeypatch.emb_p /= model_monkeypatch.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
                         model_monkeypatch.emb_so /= model_monkeypatch.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
+                
+                else:
+                    epoch_complete = True
 
                 # ==========================================
                 # META-OPTIMIZATION
@@ -123,11 +130,11 @@ def learn(dataset: Dataset,
                 loss_valid.backward() 
                 meta_optim.step()
 
-            # ==========================================
-            # copy learned weights to original model
-            with torch.no_grad():
-                model.emb_so.copy_(model_monkeypatch.emb_so)
-                model.emb_p.copy_(model_monkeypatch.emb_p)
+                # ==========================================
+                # copy learned weights to original model
+                with torch.no_grad():
+                    model.emb_so.copy_(model_monkeypatch.emb_so)
+                    model.emb_p.copy_(model_monkeypatch.emb_p)
 
         if e_outer % n_valid == 0:
     
