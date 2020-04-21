@@ -17,6 +17,7 @@ from typing import List
 
 import wandb
 import sys
+import math
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -64,75 +65,63 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
     }[meta_optimizer]()
 
-    n_batches = int(dataset.get_examples('train').shape[0] / batch_size)
-    print("Number batches", n_batches)
-    batch_indices = np.random.permutation(range(n_batches))
-
-    def _get_batches(k, n_batches, batch_indices):
-        all_batches = [b for b in dataset.get_batches('train', batch_size, shuffle=False)]
-        k = k % int(len(all_batches)/n_batches)
-        indices = batch_indices[k*n_batches:(k+1)*n_batches]
-        batches = [all_batches[i] for i in indices]
-        if (k+1)*n_batches >= len(all_batches):
-            # print("generating new batch_indices")
-            batch_indices = np.random.permutation(range(n_batches))
-        # print("For k={}, n_batches={}, len(all_batches)={}: {}".format(k, n_batches, len(all_batches), indices))
-        return batches
-
     for e_outer in range(n_epochs_outer):
-        print("\rOuter epoch: {:4}".format(e_outer+1), end="")
-        with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (model_monkeypatch, diff_optim):
 
-            # ==========================================
-            # INNER LOOP
-            # ==========================================
-            loss = torch.nn.CrossEntropyLoss()
-            for batch in _get_batches(e_outer, 5, batch_indices):
-            # for k, batch in enumerate(dataset.get_batches('train', batch_size, shuffle=True)):
-                # if k == n_batches_train: break
+        all_batches = [b for b in dataset.get_batches('train', batch_size, shuffle=True)]
+        for k in range(math.ceil(len(all_batches) / n_batches_train)):
 
-                batch = batch.to(device)
-                s_idx = batch[:, 0]
-                p_idx = batch[:, 1]
-                o_idx = batch[:, 2]
+            print("\rOuter epoch: {:4}, k={}".format(e_outer+1,k+1), end="")
 
-                score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
-                score_o = model_monkeypatch.score_objects(s_idx, p_idx)
-                loss_fact = loss(score_s, s_idx) + loss(score_o, o_idx)
+            with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (model_monkeypatch, diff_optim):
 
-                emb_body = softmax(w_body, dim=1) @ model_monkeypatch.emb_p
-                emb_head = softmax(w_head, dim=1) @ model_monkeypatch.emb_p
+                for batch in all_batches[k*n_batches_train:(k+1)*n_batches_train]:
 
-                loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
-                loss_total = loss_fact + lam * loss_inc
+                    # ==========================================
+                    # INNER LOOP
+                    # ==========================================
+                    loss = torch.nn.CrossEntropyLoss()
 
-                diff_optim.step(loss_total)
+                    batch = batch.to(device)
+                    s_idx = batch[:, 0]
+                    p_idx = batch[:, 1]
+                    o_idx = batch[:, 2]
 
-                with torch.no_grad():
-                    model_monkeypatch.emb_p /= model_monkeypatch.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
-                    model_monkeypatch.emb_so /= model_monkeypatch.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
+                    score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
+                    score_o = model_monkeypatch.score_objects(s_idx, p_idx)
+                    loss_fact = loss(score_s, s_idx) + loss(score_o, o_idx)
 
+                    emb_body = softmax(w_body, dim=1) @ model_monkeypatch.emb_p
+                    emb_head = softmax(w_head, dim=1) @ model_monkeypatch.emb_p
 
-            # ==========================================
-            # META-OPTIMIZATION
-            # ==========================================
-            loss_valid = 0
-            loss = torch.nn.CrossEntropyLoss(reduction='sum')
-            for k, batch in enumerate(dataset.get_batches('valid', batch_size, shuffle=True)):
-                if k == n_batches_valid: break
+                    loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
+                    loss_total = loss_fact + lam * loss_inc
 
-                batch = batch.to(device)
-                s_idx = batch[:, 0]
-                p_idx = batch[:, 1]
-                o_idx = batch[:, 2]
+                    diff_optim.step(loss_total)
 
-                score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
-                score_o = model_monkeypatch.score_objects(s_idx, p_idx)
-                loss_valid += loss(score_s, s_idx) + loss(score_o, o_idx)
+                    with torch.no_grad():
+                        model_monkeypatch.emb_p /= model_monkeypatch.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
+                        model_monkeypatch.emb_so /= model_monkeypatch.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
 
-            meta_optim.zero_grad() 
-            loss_valid.backward() 
-            meta_optim.step()
+                # ==========================================
+                # META-OPTIMIZATION
+                # ==========================================
+                loss_valid = 0
+                loss = torch.nn.CrossEntropyLoss(reduction='sum')
+                for k, batch in enumerate(dataset.get_batches('valid', batch_size, shuffle=True)):
+                    if k == n_batches_valid: break
+
+                    batch = batch.to(device)
+                    s_idx = batch[:, 0]
+                    p_idx = batch[:, 1]
+                    o_idx = batch[:, 2]
+
+                    score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
+                    score_o = model_monkeypatch.score_objects(s_idx, p_idx)
+                    loss_valid += loss(score_s, s_idx) + loss(score_o, o_idx)
+
+                meta_optim.zero_grad() 
+                loss_valid.backward() 
+                meta_optim.step()
 
             # ==========================================
             # copy learned weights to original model
