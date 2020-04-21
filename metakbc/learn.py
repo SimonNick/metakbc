@@ -3,14 +3,10 @@
 import torch
 from torch.nn.functional import normalize, softmax, cross_entropy
 
-import numpy as np
-
 from metakbc.models import DistMult, ComplEx
 from metakbc.datasets import Dataset
 from metakbc.evaluation import evaluate
-from metakbc.regularizers import InconsistencyLoss
 
-from higher.optim import DifferentiableSGD
 import higher
 
 from typing import List
