@@ -65,9 +65,7 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
     }[meta_optimizer]()
 
-
     for e_outer in range(n_epochs_outer):
-
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
 
         batches = dataset.get_batches('train', batch_size, shuffle=True)
@@ -132,6 +130,7 @@ def learn(dataset: Dataset,
 
                 # ==========================================
                 # copy learned weights to original model
+                # ==========================================
                 with torch.no_grad():
                     model.emb_so.copy_(model_monkeypatch.emb_so)
                     model.emb_p.copy_(model_monkeypatch.emb_p)
@@ -139,7 +138,7 @@ def learn(dataset: Dataset,
         if e_outer % n_valid == 0:
     
             # ==========================================
-            # FULL EVALUATION
+            # EVALUATION
             # ==========================================
             splits = ['train', 'valid']
             metrics_dict = evaluate(dataset, splits, model, batch_size)
@@ -163,7 +162,7 @@ def learn(dataset: Dataset,
             loss_total = {s: l.item() for s,l in loss_total.items()}
 
             print("\r" + 100*" ", end="")
-            print("\rLoss (train): {:.2f} \t Loss (valid): {:.2f} \t MRR (train): {:.2f} \t MRR (valid): {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR']))
+            print("\rLoss: {:.2f} | {:.2f} \t MRR: {:.2f} | {:.2f} \t HITS@3: {:.2f} | {:.2f} \t HITS@5: {:.2f} | {:.2f} \t HITS@10: {:.2f} | {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
             print(softmax(w_body, dim=1).cpu().detach().numpy())
             print(softmax(w_head, dim=1).cpu().detach().numpy())
 
