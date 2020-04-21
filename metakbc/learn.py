@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
-from torch.nn.functional import normalize, softmax
+from torch.nn.functional import normalize, softmax, cross_entropy
 
 import numpy as np
 
@@ -16,8 +16,6 @@ import higher
 from typing import List
 
 import wandb
-import sys
-import math
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -65,6 +63,7 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
     }[meta_optimizer]()
 
+
     for e_outer in range(n_epochs_outer):
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
 
@@ -72,7 +71,7 @@ def learn(dataset: Dataset,
         epoch_complete = False
         while not epoch_complete:
 
-            with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (model_monkeypatch, diff_optim):
+            with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
 
                 # ==========================================
                 # TRAINING
@@ -81,28 +80,24 @@ def learn(dataset: Dataset,
 
                     if k == n_batches_train: break
 
-                    loss = torch.nn.CrossEntropyLoss()
-
                     batch = batch.to(device)
-                    s_idx = batch[:, 0]
-                    p_idx = batch[:, 1]
-                    o_idx = batch[:, 2]
+                    s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
 
-                    score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
-                    score_o = model_monkeypatch.score_objects(s_idx, p_idx)
-                    loss_fact = loss(score_s, s_idx) + loss(score_o, o_idx)
+                    score_s = fmodel.score_subjects(p_idx, o_idx)
+                    score_o = fmodel.score_objects(s_idx, p_idx)
+                    emb_body = softmax(w_body, dim=1) @ fmodel.emb_p
+                    emb_head = softmax(w_head, dim=1) @ fmodel.emb_p
 
-                    emb_body = softmax(w_body, dim=1) @ model_monkeypatch.emb_p
-                    emb_head = softmax(w_head, dim=1) @ model_monkeypatch.emb_p
-
+                    loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
                     loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
                     loss_total = loss_fact + lam * loss_inc
 
                     diff_optim.step(loss_total)
 
+                    # project to unit sphere
                     with torch.no_grad():
-                        model_monkeypatch.emb_p /= model_monkeypatch.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
-                        model_monkeypatch.emb_so /= model_monkeypatch.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
+                        fmodel.emb_p /= fmodel.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
+                        fmodel.emb_so /= fmodel.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
                 
                 else:
                     epoch_complete = True
@@ -111,18 +106,15 @@ def learn(dataset: Dataset,
                 # META-OPTIMIZATION
                 # ==========================================
                 loss_valid = 0
-                loss = torch.nn.CrossEntropyLoss(reduction='sum')
                 for k, batch in enumerate(dataset.get_batches('valid', batch_size, shuffle=True)):
                     if k == n_batches_valid: break
 
                     batch = batch.to(device)
-                    s_idx = batch[:, 0]
-                    p_idx = batch[:, 1]
-                    o_idx = batch[:, 2]
+                    s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
 
-                    score_s = model_monkeypatch.score_subjects(p_idx, o_idx)
-                    score_o = model_monkeypatch.score_objects(s_idx, p_idx)
-                    loss_valid += loss(score_s, s_idx) + loss(score_o, o_idx)
+                    score_s = fmodel.score_subjects(p_idx, o_idx)
+                    score_o = fmodel.score_objects(s_idx, p_idx)
+                    loss_valid += cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
 
                 meta_optim.zero_grad() 
                 loss_valid.backward() 
@@ -132,8 +124,8 @@ def learn(dataset: Dataset,
                 # copy learned weights to original model
                 # ==========================================
                 with torch.no_grad():
-                    model.emb_so.copy_(model_monkeypatch.emb_so)
-                    model.emb_p.copy_(model_monkeypatch.emb_p)
+                    model.emb_so.copy_(fmodel.emb_so)
+                    model.emb_p.copy_(fmodel.emb_p)
 
         if e_outer % n_valid == 0:
     
@@ -143,24 +135,17 @@ def learn(dataset: Dataset,
             splits = ['train', 'valid']
             metrics_dict = evaluate(dataset, splits, model, batch_size)
             loss_total = {s: 0 for s in splits}
-            loss = torch.nn.CrossEntropyLoss(reduction='sum')
             for s in splits:
                 for batch in dataset.get_batches(s, batch_size, shuffle=False):
-
                     batch = batch.to(device)
-                    s_idx = batch[:, 0]
-                    p_idx = batch[:, 1]
-                    o_idx = batch[:, 2]
-
+                    s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
                     score_s = model.score_subjects(p_idx, o_idx)
                     score_o = model.score_objects(s_idx, p_idx)
-                    loss_total[s] += loss(score_s, s_idx) + loss(score_o, o_idx)
+                    loss_total[s] += (cross_entropy(score_s, s_idx, reduction='sum') + cross_entropy(score_o, o_idx, reduction='sum')).item()
 
             # ==========================================
             # LOGGING
             # ==========================================
-            loss_total = {s: l.item() for s,l in loss_total.items()}
-
             print("\r" + 100*" ", end="")
             print("\rLoss: {:.2f} | {:.2f} \t MRR: {:.2f} | {:.2f} \t HITS@3: {:.2f} | {:.2f} \t HITS@5: {:.2f} | {:.2f} \t HITS@10: {:.2f} | {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
             print(softmax(w_body, dim=1).cpu().detach().numpy())
