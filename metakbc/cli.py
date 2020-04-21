@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # parser.add_argument('--epochs_dis',     default=10,         type=int,               help="Number of epochs for the discriminator")
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size for training and evaluation")
-    parser.add_argument('--lam',            default=0.5,        type=float,             help="Weight of the violation loss")
+    parser.add_argument('--lam',            default=1.0,        type=float,             help="Weight of the violation loss")
     parser.add_argument('--logging',        default=False,      action='store_true',    help="Whether to use wandb.com for logging")
 
     args = parser.parse_args()
