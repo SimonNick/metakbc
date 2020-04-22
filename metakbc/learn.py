@@ -175,7 +175,7 @@ def learn(dataset: Dataset,
             # LOGGING
             # ==========================================
             print("\r" + 100*" ", end="")
-            print("\rLoss: {:.2f} | {:.2f} \t MRR: {:.2f} | {:.2f} \t HITS@3: {:.2f} | {:.2f} \t HITS@5: {:.2f} | {:.2f} \t HITS@10: {:.2f} | {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
+            print("\rLoss: {:.0f} | {:.0f}   MRR: {:.3f} | {:.3f}   HITS@1: {:.3f} | {:.3f}   HITS@3: {:.3f} | {:.3f}   HITS@5: {:.3f} | {:.3f}   HITS@10: {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@1'], metrics_dict['valid']['HITS@1'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
             # print(softmax(w_body, dim=1).cpu().detach().numpy())
             # print(softmax(w_head, dim=1).cpu().detach().numpy())
 

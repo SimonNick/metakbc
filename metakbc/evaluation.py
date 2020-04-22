@@ -21,11 +21,13 @@ def metrics(scores: Tensor, true_idx: LongTensor, masks: Optional[Tensor] = None
     mrr = torch.mean(1 / ranks.float()).item()
 
     # hits score
+    hits_1  = torch.mean(torch.sum(onehot_match[:, :1], dim=1)).item()
     hits_3  = torch.mean(torch.sum(onehot_match[:, :3], dim=1)).item()
     hits_5  = torch.mean(torch.sum(onehot_match[:, :5], dim=1)).item()
     hits_10 = torch.mean(torch.sum(onehot_match[:, :10], dim=1)).item()
 
     return {"MRR":     mrr, 
+            "HITS@1":  hits_3,
             "HITS@3":  hits_3,
             "HITS@5":  hits_5,
             "HITS@10": hits_10}
@@ -41,7 +43,7 @@ def evaluate(dataset: Dataset,
              batch_size: int,
              filters: Optional[dict] = None) -> dict:
 
-    metrics_dict = {s: {m: 0 for m in ["MRR", "HITS@3", "HITS@5", "HITS@10"]} for s in splits}
+    metrics_dict = {s: {m: 0 for m in ["MRR", "HITS@1", "HITS@3", "HITS@5", "HITS@10"]} for s in splits}
 
     for s in splits:
 
