@@ -8,11 +8,12 @@ from typing import Dict, Tuple, List, Optional
 
 DATA_PATH = Path(os.path.dirname(__file__)) / "data"
 file_ext = ".tsv"
+splits = ['train', 'valid', 'test']
 
 
 class Dataset(object):
 
-    def __init__(self, name: str, splits: Optional[List[str]] = ["train", "valid", "test"]) -> None:
+    def __init__(self, name: str) -> None:
 
         self.root = DATA_PATH / name
         self.splits = splits
@@ -34,7 +35,6 @@ class Dataset(object):
         self.predicates_to_id = {x: i for (i, x) in enumerate(self.predicates)}
         self.n_predicates = len(self.predicates)
         self.n_entities = len(self.entities)
-        print("{} entities and {} predicates".format(self.n_entities, self.n_predicates))
 
         self.data = {}
         for split in splits:
@@ -49,13 +49,17 @@ class Dataset(object):
 
             self.data[split] = LongTensor(examples)
 
+        print("\nDataset: {}".format(name))
+        print("entities: {} | predicates: {}".format(self.n_entities, self.n_predicates))
+        print("train: {} | valid: {} | test: {}\n".format(len(self.data['train']), len(self.data['valid']), len(self.data['test'])))
+
     def get_examples(self, split: str) -> LongTensor:
         return self.data[split]
 
     def get_shape(self) -> Tuple:
         return self.n_entities, self.n_predicates, self.n_entities
 
-    def get_batches(self, split: str, batch_size: int, shuffle: bool = True) -> Tensor:
+    def get_batches(self, split: str, batch_size: int, shuffle: bool = False) -> Tensor:
         examples = self.data[split]
         n_examples = examples.shape[0]
         if shuffle: examples = examples[torch.randperm(n_examples)]
