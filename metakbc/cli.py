@@ -7,7 +7,7 @@ from metakbc.datasets import Dataset
 
 import wandb
 
-datasets = ['Toy', 'Toy2', 'Toy3', 'Toy2_2', 'Toy2_3']
+datasets = ['Toy', 'Toy2', 'Toy2_2', 'Toy2_3', 'nations', 'umls']
 models = ['DistMult', 'ComplEx']
 optimizers = ['SGD', 'Adagrad']
 
@@ -28,6 +28,7 @@ if __name__ == '__main__':
     parser.add_argument('--valid',          default=10,         type=int,               help="Number of skipped epochs until evaluation")
     # parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
     # parser.add_argument('--epochs_dis',     default=10,         type=int,               help="Number of epochs for the discriminator")
+    parser.add_argument('--constraints',    default=10,         type=int,               help="Number of constraints")
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size for training and evaluation")
     parser.add_argument('--lam',            default=1.0,        type=float,             help="Weight of the violation loss")
@@ -49,6 +50,7 @@ if __name__ == '__main__':
         wandb.config.valid = args.valid
         # wandb.config.epochs_adv = args.epochs_adv
         # wandb.config.epochs_dis = args.epochs_dis
+        wandb.config.constraints = args.constraints
         wandb.config.rank = args.rank
         wandb.config.batch_size = args.batch_size
         wandb.config.lam = args.lam
@@ -69,6 +71,7 @@ if __name__ == '__main__':
           args.valid,
         #   args.epochs_adv,
         #   args.epochs_dis,
+          args.constraints,
           args.rank,
           args.batch_size,
           args.lam,

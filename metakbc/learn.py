@@ -5,7 +5,8 @@ from torch.nn.functional import normalize, softmax, cross_entropy
 
 from metakbc.models import DistMult, ComplEx
 from metakbc.datasets import Dataset
-from metakbc.evaluation import evaluate
+from metakbc.evaluation import evaluate, build_filters
+from metakbc.regularizers import N3
 
 import higher
 
@@ -28,13 +29,15 @@ def learn(dataset: Dataset,
           n_valid: int,
         #   n_epochs_adv: int,
         #   n_epochs_dis: int,
+          n_constraints: int,
           rank: int,
           batch_size: int,
           lam: float,
           logging: bool) -> None:
 
+    filters = build_filters(dataset)
+
     # ==========================================
-    n_constraints = 2
     n_predicates = dataset.n_predicates
 
     # Hyperparameters that we want to learn
@@ -73,7 +76,6 @@ def learn(dataset: Dataset,
                 # TRAINING
                 # ==========================================
                 for k, batch in enumerate(batches):
-
                     if k == n_batches_train: break
 
                     batch = batch.to(device)
@@ -84,11 +86,16 @@ def learn(dataset: Dataset,
                     emb_body = softmax(w_body, dim=1) @ fmodel.emb_p
                     emb_head = softmax(w_head, dim=1) @ fmodel.emb_p
 
+                    reg = N3()
                     loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
                     loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
-                    loss_total = loss_fact + lam * loss_inc
+                    # loss_reg = reg(fmodel.factors(s_idx, p_idx, o_idx))
+                    loss_reg = 0 
+                    loss_total = loss_fact + lam * loss_inc + 1e-3 * loss_reg
 
                     diff_optim.step(loss_total)
+
+                    # print(fmodel.emb_so.grad)
 
                     # project to unit sphere
                     with torch.no_grad():
@@ -108,8 +115,8 @@ def learn(dataset: Dataset,
                     batch = batch.to(device)
                     s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
 
-                    score_s = fmodel.score_subjects(p_idx, o_idx)
-                    score_o = fmodel.score_objects(s_idx, p_idx)
+                    score_s = model.score_subjects(p_idx, o_idx)
+                    score_o = model.score_objects(s_idx, p_idx)
                     loss_valid += cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
 
                 meta_optim.zero_grad() 
@@ -129,10 +136,10 @@ def learn(dataset: Dataset,
             # EVALUATION
             # ==========================================
             splits = ['train', 'valid']
-            metrics_dict = evaluate(dataset, splits, model, batch_size)
+            metrics_dict = evaluate(dataset, splits, model, batch_size, filters)
             loss_total = {s: 0 for s in splits}
             for s in splits:
-                for batch in dataset.get_batches(s, batch_size, shuffle=False):
+                for batch in dataset.get_batches(s, batch_size):
                     batch = batch.to(device)
                     s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
                     score_s = model.score_subjects(p_idx, o_idx)
@@ -144,8 +151,8 @@ def learn(dataset: Dataset,
             # ==========================================
             print("\r" + 100*" ", end="")
             print("\rLoss: {:.2f} | {:.2f} \t MRR: {:.2f} | {:.2f} \t HITS@3: {:.2f} | {:.2f} \t HITS@5: {:.2f} | {:.2f} \t HITS@10: {:.2f} | {:.2f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
-            print(softmax(w_body, dim=1).cpu().detach().numpy())
-            print(softmax(w_head, dim=1).cpu().detach().numpy())
+            # print(softmax(w_body, dim=1).cpu().detach().numpy())
+            # print(softmax(w_head, dim=1).cpu().detach().numpy())
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
