@@ -73,14 +73,17 @@ def learn(dataset: Dataset,
             # ==========================================
             # ADVERSARY
             # ==========================================
-            x1 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_()).to(device)
-            x2 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_()).to(device)
+            x1 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_())
+            x2 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_())
 
             with torch.no_grad():
                 emb_body = softmax(w_body, dim=1) @ model.emb_p
                 emb_head = softmax(w_head, dim=1) @ model.emb_p
 
             optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5)
+
+            x1 = x1.to(device)
+            x2 = x2.to(device)
 
             for e_adv in range(n_epochs_adv):
 
