@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--batches_train',  default=5,          type=int,               help="How many batches of the training dataset should be used for training")
     parser.add_argument('--batches_valid',  default=5,          type=int,               help="How many batches of the validation dataset should be used for evaluation")
     parser.add_argument('--valid',          default=10,         type=int,               help="Number of skipped epochs until evaluation")
-    # parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
+    parser.add_argument('--epochs_adv',     default=10,         type=int,               help="Number of epochs for the adversary")
     # parser.add_argument('--epochs_dis',     default=10,         type=int,               help="Number of epochs for the discriminator")
     parser.add_argument('--constraints',    default=10,         type=int,               help="Number of constraints")
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         wandb.config.batches_train = args.batches_train
         wandb.config.batches_valid = args.batches_valid
         wandb.config.valid = args.valid
-        # wandb.config.epochs_adv = args.epochs_adv
+        wandb.config.epochs_adv = args.epochs_adv
         # wandb.config.epochs_dis = args.epochs_dis
         wandb.config.constraints = args.constraints
         wandb.config.rank = args.rank
@@ -69,7 +69,7 @@ if __name__ == '__main__':
           args.batches_train,
           args.batches_valid,
           args.valid,
-        #   args.epochs_adv,
+          args.epochs_adv,
         #   args.epochs_dis,
           args.constraints,
           args.rank,

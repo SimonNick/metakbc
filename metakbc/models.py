@@ -75,6 +75,13 @@ class DistMult(BaseModel):
         s, p = self.emb_so[s_idx], self.emb_p[p_idx]
         return (p * s) @ self.emb_so.t()
 
+    def factors(self,
+                s_idx: LongTensor,
+                p_idx: LongTensor,
+                o_idx: LongTensor) -> Tensor:
+
+        return self.emb_so[s_idx], self.emb_p[p_idx], self.emb_so[o_idx]
+
     def forward(self, *args):
         return self.score(*args)
 
@@ -85,24 +92,28 @@ class ComplEx(BaseModel):
     def __init__(self, size: Tuple[int, int, int], rank: int) -> None:
         super().__init__()
 
-        self.emb_so = Parameter(torch.empty((size[0], 2*rank)).normal_())
-        self.emb_p = Parameter(torch.empty((size[1], 2*rank)).normal_())
+        self.emb_so = Parameter(torch.empty((size[0], 2*rank)).normal_(0, 1e-3))
+        self.emb_p = Parameter(torch.empty((size[1], 2*rank)).normal_(0, 1e-3))
+        # self.emb_so = torch.nn.Embedding(size[0], 2*rank, sparse=True)
+        # self.emb_so.weight.data *= 1e-3
+        # self.emb_p = torch.nn.Embedding(size[1], 2*rank, sparse=True)
+        # self.emb_p.weight.data *= 1e-3
 
     def _scoring_func(self,
                       s: Tensor,
                       p: Tensor,
                       o: Tensor) -> Tensor:
 
-        rank = p.shape[0] // 2
+        rank = p.shape[1] // 2
 
-        p_real, p_img = p[:rank], p[rank:]
-        s_real, s_img = s[:rank], s[rank:]
-        o_real, o_img = o[:rank], o[rank:]
+        p_real, p_img = p[:, :rank], p[:, rank:]
+        s_real, s_img = s[:, :rank], s[:, rank:]
+        o_real, o_img = o[:, :rank], o[:, rank:]
 
-        score1 = torch.sum(p_real * s_real * o_real)
-        score2 = torch.sum(p_real * s_img * o_img)
-        score3 = torch.sum(p_img * s_real * o_img)
-        score4 = torch.sum(p_img * s_img * o_real)
+        score1 = torch.sum(p_real * s_real * o_real, dim=1)
+        score2 = torch.sum(p_real * s_img * o_img, dim=1)
+        score3 = torch.sum(p_img * s_real * o_img, dim=1)
+        score4 = torch.sum(p_img * s_img * o_real, dim=1)
 
         res = score1 + score2 + score3 - score4
 
@@ -112,6 +123,8 @@ class ComplEx(BaseModel):
               s_idx: LongTensor,
               p_idx: LongTensor,
               o_idx: LongTensor) -> Tensor:
+
+        raise NotImplementedError
 
         s, p, o = self.emb_so[s_idx], self.emb_p[p_idx], self.emb_so[o_idx]
 
@@ -153,11 +166,13 @@ class ComplEx(BaseModel):
                        s_idx: LongTensor,
                        p_idx: LongTensor) -> Tensor:
 
+        # s, p = self.emb_so(s_idx), self.emb_p(p_idx)
         s, p = self.emb_so[s_idx], self.emb_p[p_idx]
         rank = p.shape[1] // 2
         s_real, s_img = s[:, :rank], s[:, rank:]
         p_real, p_img = p[:, :rank], p[:, rank:]
         emb_real, emb_img = self.emb_so[:, :rank], self.emb_so[:, rank:]
+        # emb_real, emb_img = self.emb_so.weight[:, :rank], self.emb_so.weight[:, rank:]
 
         score1_sp = (p_real * s_real) @ emb_real.t()
         score2_sp = (p_real * s_img) @ emb_img.t()
@@ -167,6 +182,27 @@ class ComplEx(BaseModel):
         score_sp = score1_sp + score2_sp + score3_sp - score4_sp
 
         return score_sp
+
+    def factors(self,
+                s_idx: LongTensor,
+                p_idx: LongTensor,
+                o_idx: LongTensor) -> Tensor:
+
+        # rank = self.emb_p.weight.shape[1] // 2
+        rank = self.emb_p.shape[1] // 2
+
+        # s, p, o = self.emb_so(s_idx), self.emb_p(p_idx), self.emb_so(o_idx)
+        s, p, o = self.emb_so[s_idx], self.emb_p[p_idx], self.emb_so[o_idx]
+
+        p_real, p_img = p[:, :rank], p[:, rank:]
+        s_real, s_img = s[:, :rank], s[:, rank:]
+        o_real, o_img = o[:, :rank], o[:, rank:]
+
+        # p_real, p_img = self.emb_p[:, :rank], self.emb_p[:, rank:]
+        # s_real, s_img = self.emb_so[:, :rank], self.emb_so[:, rank:]
+        # o_real, o_img = self.emb_so[:, :rank], self.emb_so[:, rank:]
+
+        return [torch.sqrt(p_real ** 2 + p_img ** 2), torch.sqrt(s_real ** 2 + s_img ** 2), torch.sqrt(o_real ** 2 + o_img ** 2)]
 
     def forward(self, *args):
         return self.score(*args)

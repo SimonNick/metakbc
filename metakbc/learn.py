@@ -27,7 +27,7 @@ def learn(dataset: Dataset,
           n_batches_train: int,
           n_batches_valid: int,
           n_valid: int,
-        #   n_epochs_adv: int,
+          n_epochs_adv: int,
         #   n_epochs_dis: int,
           n_constraints: int,
           rank: int,
@@ -70,6 +70,34 @@ def learn(dataset: Dataset,
         epoch_complete = False
         while not epoch_complete:
 
+            # ==========================================
+            # ADVERSARY
+            # ==========================================
+            x1 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_())
+            x2 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_())
+
+            with torch.no_grad():
+                emb_body = softmax(w_body, dim=1) @ model.emb_p
+                emb_head = softmax(w_head, dim=1) @ model.emb_p
+
+            optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5)
+
+            for e_adv in range(n_epochs_adv):
+
+                with torch.no_grad():
+                    x1 /= x1.norm(p=2, dim=1).view(-1, 1).detach()
+                    x2 /= x2.norm(p=2, dim=1).view(-1, 1).detach()
+
+                score_body = model._scoring_func(x1, emb_body, x2)
+                score_head = model._scoring_func(x1, emb_head, x2)
+
+                loss_inc = torch.sum(torch.nn.functional.relu(score_body - score_head))
+                loss_inc *= -1 # perform gradient ascent
+
+                optim_adv.zero_grad()
+                loss_inc.backward()
+                optim_adv.step()
+
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
 
                 # ==========================================
@@ -85,22 +113,17 @@ def learn(dataset: Dataset,
                     score_o = fmodel.score_objects(s_idx, p_idx)
                     emb_body = softmax(w_body, dim=1) @ fmodel.emb_p
                     emb_head = softmax(w_head, dim=1) @ fmodel.emb_p
+                    score_body = model._scoring_func(x1, emb_body, x2)
+                    score_head = model._scoring_func(x1, emb_head, x2)
 
                     reg = N3()
                     loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
-                    loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
-                    # loss_reg = reg(fmodel.factors(s_idx, p_idx, o_idx))
-                    loss_reg = 0 
+                    loss_inc = torch.sum(torch.nn.functional.relu(score_body - score_head))
+                    # loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
+                    loss_reg = reg(fmodel.factors(s_idx, p_idx, o_idx))
                     loss_total = loss_fact + lam * loss_inc + 1e-3 * loss_reg
 
                     diff_optim.step(loss_total)
-
-                    # print(fmodel.emb_so.grad)
-
-                    # project to unit sphere
-                    with torch.no_grad():
-                        fmodel.emb_p /= fmodel.emb_p.norm(dim=1, p=2).view(-1, 1).detach()
-                        fmodel.emb_so /= fmodel.emb_so.norm(dim=1, p=2).view(-1, 1).detach()
                 
                 else:
                     epoch_complete = True
