@@ -80,7 +80,7 @@ def learn(dataset: Dataset,
                 emb_body = softmax(w_body, dim=1) @ model.emb_p
                 emb_head = softmax(w_head, dim=1) @ model.emb_p
 
-            optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5).to(device)
+            optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5)
 
             for e_adv in range(n_epochs_adv):
 
