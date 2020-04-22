@@ -73,8 +73,10 @@ def learn(dataset: Dataset,
             # ==========================================
             # ADVERSARY
             # ==========================================
-            x1 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_()).to(device)
-            x2 = torch.nn.Parameter(torch.empty((n_constraints, 2*rank)).normal_()).to(device)
+            x1 = torch.empty((n_constraints, 2*rank)).normal_().to(device)
+            x1.requires_grad = True
+            x2 = torch.empty((n_constraints, 2*rank)).normal_().to(device)
+            x2.requires_grad = True
 
             optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5)
 
