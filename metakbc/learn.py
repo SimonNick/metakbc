@@ -7,6 +7,7 @@ from metakbc.models import DistMult, ComplEx
 from metakbc.datasets import Dataset
 from metakbc.evaluation import evaluate, build_filters
 from metakbc.regularizers import N3
+from metakbc.adversary import Adversary
 
 import higher
 
@@ -35,22 +36,15 @@ def learn(dataset: Dataset,
           lam: float,
           logging: bool) -> None:
 
+    regularizer = N3()
     filters = build_filters(dataset)
-
-    # ==========================================
-    n_predicates = dataset.n_predicates
-
-    # Hyperparameters that we want to learn
-    w_head = torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3).to(device)
-    w_head.requires_grad = True
-    w_body = torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3).to(device)
-    w_body.requires_grad = True
-    # ==========================================
 
     model = {
         "DistMult": lambda: DistMult(size=dataset.get_shape(), rank=rank).to(device),
         "ComplEx": lambda: ComplEx(size=dataset.get_shape(), rank=rank).to(device),
     }[model_str]()
+
+    adversary = Adversary(n_constraints, dataset.n_predicates, rank, n_epochs_adv).to(device)
 
     optim = {
         "SGD": lambda: torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9),
@@ -58,49 +52,36 @@ def learn(dataset: Dataset,
     }[optimizer_str]()
 
     meta_optim = {
-        "SGD": lambda: torch.optim.SGD([w_head, w_body], lr=meta_lr, momentum=0.9),
-        "Adagrad": lambda: torch.optim.Adagrad([w_head, w_body], lr=meta_lr),
+        "SGD": lambda: torch.optim.SGD(adversary.parameters(), lr=meta_lr, momentum=0.9),
+        "Adagrad": lambda: torch.optim.Adagrad(adversary.parameters(), lr=meta_lr),
     }[meta_optimizer]()
 
+    # create initial adverserial examples
+    adversarial_examples = None
 
     for e_outer in range(n_epochs_outer):
+
+        if e_outer % 5 == 0:
+            for name, p in adversary.named_parameters():
+                print()
+                print(softmax(p / adversary.temperature, dim=1).cpu().detach().numpy())
+
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
+
+        adversary.temperature = 1 / 1.05**e_outer
 
         batches = dataset.get_batches('train', batch_size, shuffle=True)
         epoch_complete = False
         while not epoch_complete:
 
             # ==========================================
-            # ADVERSARY
+            # ADVERSERIAL TRAINING
             # ==========================================
-            x1 = torch.empty((n_constraints, 2*rank)).normal_().to(device)
-            x1.requires_grad = True
-            x2 = torch.empty((n_constraints, 2*rank)).normal_().to(device)
-            x2.requires_grad = True
-
-            optim_adv = torch.optim.Adagrad([x1, x2], lr=0.5)
-
-            with torch.no_grad():
-                emb_body = softmax(w_body, dim=1) @ model.emb_p
-                emb_head = softmax(w_head, dim=1) @ model.emb_p
-
-            for e_adv in range(n_epochs_adv):
-
-                with torch.no_grad():
-                    x1 /= x1.norm(p=2, dim=1).view(-1, 1).detach()
-                    x2 /= x2.norm(p=2, dim=1).view(-1, 1).detach()
-
-                score_body = model._scoring_func(x1, emb_body, x2)
-                score_head = model._scoring_func(x1, emb_head, x2)
-
-                loss_inc = torch.sum(torch.nn.functional.relu(score_body - score_head))
-                loss_inc *= -1 # perform gradient ascent
-
-                optim_adv.zero_grad()
-                loss_inc.backward()
-                optim_adv.step()
+            adversarial_examples = adversary.generate_adversarial_examples(model, adversarial_examples=adversarial_examples)
 
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
+
+            # fmodel = model
 
                 # ==========================================
                 # TRAINING
@@ -113,20 +94,15 @@ def learn(dataset: Dataset,
 
                     score_s = fmodel.score_subjects(p_idx, o_idx)
                     score_o = fmodel.score_objects(s_idx, p_idx)
-                    emb_body = softmax(w_body, dim=1) @ fmodel.emb_p
-                    emb_head = softmax(w_head, dim=1) @ fmodel.emb_p
-                    score_body = model._scoring_func(x1, emb_body, x2)
-                    score_head = model._scoring_func(x1, emb_head, x2)
 
-                    reg = N3()
                     loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
-                    loss_inc = torch.sum(torch.nn.functional.relu(score_body - score_head))
-                    # loss_inc = torch.sum(torch.max(torch.abs(emb_body - emb_head), dim=1)[0])
-                    loss_reg = reg(fmodel.factors(s_idx, p_idx, o_idx))
+                    loss_inc = adversary(fmodel, adversarial_examples)
+                    loss_reg = regularizer(fmodel.factors(s_idx, p_idx, o_idx))
                     loss_total = loss_fact + lam * loss_inc + 1e-3 * loss_reg
+                    # print("loss fact: {} | loss inc: {} | loss reg: {}".format(loss_fact.item(), loss_inc.item(), loss_reg.item()))
 
                     diff_optim.step(loss_total)
-                
+            
                 else:
                     epoch_complete = True
 
@@ -140,8 +116,8 @@ def learn(dataset: Dataset,
                     batch = batch.to(device)
                     s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
 
-                    score_s = model.score_subjects(p_idx, o_idx)
-                    score_o = model.score_objects(s_idx, p_idx)
+                    score_s = fmodel.score_subjects(p_idx, o_idx)
+                    score_o = fmodel.score_objects(s_idx, p_idx)
                     loss_valid += cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
 
                 meta_optim.zero_grad() 
@@ -176,6 +152,8 @@ def learn(dataset: Dataset,
             # ==========================================
             print("\r" + 100*" ", end="")
             print("\rLoss: {:.0f} | {:.0f}   MRR: {:.3f} | {:.3f}   HITS@1: {:.3f} | {:.3f}   HITS@3: {:.3f} | {:.3f}   HITS@5: {:.3f} | {:.3f}   HITS@10: {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@1'], metrics_dict['valid']['HITS@1'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
+
+                # print(name, p)
             # print(softmax(w_body, dim=1).cpu().detach().numpy())
             # print(softmax(w_head, dim=1).cpu().detach().numpy())
 
