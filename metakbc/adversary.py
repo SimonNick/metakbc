@@ -24,7 +24,7 @@ class LearnedClause(torch.nn.Module):
         self.n_constraints = n_constraints
         self.loss_func = loss_func
 
-        self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)).to(device) for _ in range(n_relations)])
+        self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
 
     def inconsistency_loss(self, model, temperature, *variables, relu=True) -> Tensor:
         predicate_emb = [softmax(self.weights[i] / temperature, dim=1) @ model.emb_p for i in range(self.n_relations)]
