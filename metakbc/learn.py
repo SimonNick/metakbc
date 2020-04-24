@@ -62,9 +62,10 @@ def learn(dataset: Dataset,
     for e_outer in range(n_epochs_outer):
 
         if e_outer % 5 == 0:
-            for name, p in adversary.named_parameters():
+            for p in adversary.clauses[0].weights:
                 print()
                 print(softmax(p / adversary.temperature, dim=1).cpu().detach().numpy())
+            print(adversary.clauses[0].meta_weights)
 
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
 

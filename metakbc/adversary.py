@@ -25,13 +25,14 @@ class LearnedClause(torch.nn.Module):
         self.loss_func = loss_func
 
         self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
+        self.meta_weights = torch.nn.Parameter(torch.ones(n_constraints)).to(device)
 
     def inconsistency_loss(self, model, temperature, *variables, relu=True) -> Tensor:
         predicate_emb = [softmax(self.weights[i] / temperature, dim=1) @ model.emb_p for i in range(self.n_relations)]
         phis = [lambda x, y, i=i: model._scoring_func(x, predicate_emb[i], y) for i in range(self.n_relations)]
         if relu:
-            return torch.sum(torch.nn.functional.relu(self.loss_func(*variables, *phis)))
-        return torch.sum(self.loss_func(*variables, *phis))
+            return self.meta_weights @ torch.nn.functional.relu(self.loss_func(*variables, *phis))
+        return self.meta_weights @ self.loss_func(*variables, *phis)
 
 
 class Adversary(torch.nn.Module):
