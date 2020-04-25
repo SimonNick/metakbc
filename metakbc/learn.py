@@ -8,6 +8,7 @@ from metakbc.datasets import Dataset
 from metakbc.evaluation import evaluate, build_filters
 from metakbc.regularizers import N3
 from metakbc.adversary import Adversary
+from metakbc.clause import LearnedClause
 
 import higher
 
@@ -22,29 +23,42 @@ def learn(dataset: Dataset,
           model_str: str,
           optimizer_str: str,
           meta_optimizer: str,
+          adv_optimizer: str,
           lr: float,
           meta_lr: float,
+          adv_lr: float,
           n_epochs_outer: int,
           n_batches_train: int,
           n_batches_valid: int,
           n_valid: int,
           n_epochs_adv: int,
         #   n_epochs_dis: int,
-          n_constraints: int,
           rank: int,
           batch_size: int,
           lam: float,
           logging: bool) -> None:
 
+    # ==========================================
+    # A(X1, X2) => B(X1, X2)
+    clause1_func = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x1, x2)
+    clause1 = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause1_func, n_constraints=4, n_predicates=dataset.n_predicates)
+
+    # A(X1, X2) => A(X2, X1)
+    clause2_func = lambda x1, x2, phi1: phi1(x1, x2) - phi1(x2, x1)
+    clause2 = LearnedClause(n_variables=2, n_relations=1, clause_loss_func=clause2_func, n_constraints=10, n_predicates=dataset.n_predicates)
+
+    clauses = [clause1, clause2]
+    # ==========================================
+
     regularizer = N3()
     filters = build_filters(dataset)
+    adversary = Adversary(clauses).to(device)
+    adversarial_examples = None
 
     model = {
         "DistMult": lambda: DistMult(size=dataset.get_shape(), rank=rank).to(device),
         "ComplEx": lambda: ComplEx(size=dataset.get_shape(), rank=rank).to(device),
     }[model_str]()
-
-    adversary = Adversary(n_constraints, dataset.n_predicates, rank, n_epochs_adv).to(device)
 
     optim = {
         "SGD": lambda: torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9),
@@ -56,20 +70,9 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad(adversary.parameters(), lr=meta_lr),
     }[meta_optimizer]()
 
-    # create initial adverserial examples
-    adversarial_examples = None
-
     for e_outer in range(n_epochs_outer):
 
-        if e_outer % 5 == 0:
-            for p in adversary.clauses[0].weights:
-                print()
-                print(softmax(p / adversary.temperature, dim=1).cpu().detach().numpy())
-            print(adversary.clauses[0].meta_weights)
-
         print("\rOuter epoch: {:4}".format(e_outer+1), end="")
-
-        adversary.temperature = 1 / 1.05**e_outer
 
         batches = dataset.get_batches('train', batch_size, shuffle=True)
         epoch_complete = False
@@ -78,11 +81,9 @@ def learn(dataset: Dataset,
             # ==========================================
             # ADVERSERIAL TRAINING
             # ==========================================
-            adversarial_examples = adversary.generate_adversarial_examples(model, adversarial_examples=adversarial_examples)
+            adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
 
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
-
-            # fmodel = model
 
                 # ==========================================
                 # TRAINING
