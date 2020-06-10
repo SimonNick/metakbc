@@ -7,6 +7,12 @@ from torch.nn.functional import softmax
 
 from metakbc.models import BaseModel
 
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+
+import numpy as np
+
 from typing import Tuple, Optional, List, Callable
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -70,3 +76,14 @@ class LearnedClause(torch.nn.Module):
         if relu:
             return torch.sum(torch.nn.functional.relu(self.clause_loss_func(*variables, *phis)))
         return torch.sum(self.clause_loss_func(*variables, *phis))
+
+
+    def visualize_weights(self):
+        fig = plt.figure()
+        for i in range(self.n_relations):
+            softmax_values = softmax(self.weights[i], dim=1).cpu().detach().numpy()
+            ax = fig.add_subplot(1, self.n_relations, i+1)
+            im = ax.matshow(softmax_values, cmap=matplotlib.cm.Greys_r, vmin=0, vmax=1)
+            for (i, j), v in np.ndenumerate(softmax_values):
+                ax.text(j, i, '{:0.2f}'.format(v), ha='center', va='center')
+        return fig
