@@ -155,10 +155,13 @@ def learn(dataset: Dataset,
             print("\r" + 100*" ", end="")
             print("\rLoss: {:.0f} | {:.0f}   MRR: {:.3f} | {:.3f}   HITS@1: {:.3f} | {:.3f}   HITS@3: {:.3f} | {:.3f}   HITS@5: {:.3f} | {:.3f}   HITS@10: {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@1'], metrics_dict['valid']['HITS@1'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
 
-                # print(name, p)
-            # print(softmax(w_body, dim=1).cpu().detach().numpy())
-            # print(softmax(w_head, dim=1).cpu().detach().numpy())
+            # for i, clause in enumerate(clauses):
+            #     for j, w in enumerate(clause.weights):
+            #         print("clause {}, matrix {}:".format(i,j))
+            #         print(softmax(w, dim=1).cpu().detach().numpy())
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
                 wandb.log({**loss_total, 'epoch_outer': e_outer})
+                for i, clause in enumerate(clauses):
+                    wandb.log({'clause_{}'.format(i): clause.visualize_weights(), 'epoch_outer': e_outer})
