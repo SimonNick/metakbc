@@ -9,6 +9,7 @@ from metakbc.evaluation import evaluate, build_filters
 from metakbc.regularizers import N3
 from metakbc.adversary import Adversary
 from metakbc.clause import LearnedClause
+from metakbc.clauses import load_clauses
 
 import higher
 
@@ -19,39 +20,38 @@ import wandb
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def learn(dataset: Dataset,
+def learn(dataset_str: str,
           model_str: str,
+          #
+          method: str,
+          lam: float,
+          #
           optimizer_str: str,
           meta_optimizer: str,
           adv_optimizer: str,
+          #
           lr: float,
           meta_lr: float,
           adv_lr: float,
+          #
           n_epochs_outer: int,
-          n_batches_train: int,
-          n_batches_valid: int,
-          n_valid: int,
+          n_epochs_inner: int, # only for offline metalearning
+          n_batches_train: int, # only for online metalearning
+          n_batches_valid: int, # only for online metalearning
           n_epochs_adv: int,
-        #   n_epochs_dis: int,
+          n_valid: int,
+          #
           rank: int,
           batch_size: int,
-          lam: float,
+          #
+          print_clauses: bool,
           logging: bool) -> None:
 
-    # ==========================================
-    # A(X1, X2) => B(X1, X2)
-    clause1_func = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x1, x2)
-    clause1 = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause1_func, n_constraints=4, n_predicates=dataset.n_predicates)
-
-    # A(X1, X2) => A(X2, X1)
-    clause2_func = lambda x1, x2, phi1: phi1(x1, x2) - phi1(x2, x1)
-    clause2 = LearnedClause(n_variables=2, n_relations=1, clause_loss_func=clause2_func, n_constraints=10, n_predicates=dataset.n_predicates)
-
-    clauses = [clause1, clause2]
-    # ==========================================
-
     regularizer = N3()
+    regularizer_weight = 1e-3
+    dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
+    clauses = load_clauses(dataset)
     adversary = Adversary(clauses).to(device)
     adversarial_examples = None
 
@@ -70,71 +70,103 @@ def learn(dataset: Dataset,
         "Adagrad": lambda: torch.optim.Adagrad(adversary.parameters(), lr=meta_lr),
     }[meta_optimizer]()
 
+
+    def train_model(fmodel, diff_optim, batch, adversarial_examples):
+
+        batch = batch.to(device)
+        s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
+
+        score_s = fmodel.score_subjects(p_idx, o_idx)
+        score_o = fmodel.score_objects(s_idx, p_idx)
+
+        loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
+        loss_inc = adversary(fmodel, adversarial_examples)
+        loss_reg = regularizer(fmodel.factors(s_idx, p_idx, o_idx))
+        loss_total = loss_fact + lam * loss_inc + regularizer_weight * loss_reg
+        # loss_total = loss_fact + 1e-3 * loss_reg
+        # print("loss fact: {} | loss inc: {} | loss reg: {}".format(loss_fact.item(), loss_inc.item(), loss_reg.item()))
+
+        diff_optim.step(loss_total)
+
+
+    def meta_optimize(fmodel):
+
+        loss_valid = 0
+        for batch in dataset.get_batches('valid', batch_size, shuffle=True):
+
+            batch = batch.to(device)
+            s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
+
+            score_s = fmodel.score_subjects(p_idx, o_idx)
+            score_o = fmodel.score_objects(s_idx, p_idx)
+            loss_valid += cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
+
+        meta_optim.zero_grad() 
+        loss_valid.backward() 
+        meta_optim.step()
+
+
+    # ==========================================
+    # TRAINING LOOPS
+    # ==========================================
     for e_outer in range(n_epochs_outer):
 
-        print("\rOuter epoch: {:4}".format(e_outer+1), end="")
-
-        batches = dataset.get_batches('train', batch_size, shuffle=True)
-        epoch_complete = False
-        while not epoch_complete:
-
-            # ==========================================
-            # ADVERSERIAL TRAINING
-            # ==========================================
-            adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
-
+        if method == "offline": # offline metalearning
+        
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
 
-                # ==========================================
-                # TRAINING
-                # ==========================================
-                for k, batch in enumerate(batches):
-                    if k == n_batches_train: break
+                for e_inner in range(n_epochs_inner):
 
-                    batch = batch.to(device)
-                    s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
+                    # ADVERSARIAL TRAINING
+                    adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
 
-                    score_s = fmodel.score_subjects(p_idx, o_idx)
-                    score_o = fmodel.score_objects(s_idx, p_idx)
+                    # create a copy that is saved in the memory
+                    adversarial_examples_copy = [[variable.clone() for variable in variables] for variables in adversarial_examples]
 
-                    loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
-                    loss_inc = adversary(fmodel, adversarial_examples)
-                    loss_reg = regularizer(fmodel.factors(s_idx, p_idx, o_idx))
-                    loss_total = loss_fact + lam * loss_inc + 1e-3 * loss_reg
-                    # print("loss fact: {} | loss inc: {} | loss reg: {}".format(loss_fact.item(), loss_inc.item(), loss_reg.item()))
+                    # TRAINING
+                    for k, batch in enumerate(dataset.get_batches('train', batch_size, shuffle=True)):
+                        print("\rOuter epoch: {:4}, inner epoch: {:4}, batch: {:4}".format(e_outer+1, e_inner+1, k+1), end="")
+                        train_model(fmodel, diff_optim, batch, adversarial_examples_copy)
 
-                    diff_optim.step(loss_total)
-            
-                else:
-                    epoch_complete = True
-
-                # ==========================================
+                    # copy learned weights to original model
+                    with torch.no_grad():
+                        model.emb_so.copy_(fmodel.emb_so)
+                        model.emb_p.copy_(fmodel.emb_p)
+                    
                 # META-OPTIMIZATION
-                # ==========================================
-                loss_valid = 0
-                for k, batch in enumerate(dataset.get_batches('valid', batch_size, shuffle=True)):
-                    if k == n_batches_valid: break
+                meta_optimize(fmodel)
+        
+        else: # online metalearning
 
-                    batch = batch.to(device)
-                    s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
+            print("\rOuter epoch: {:4}".format(e_outer+1), end="")
 
-                    score_s = fmodel.score_subjects(p_idx, o_idx)
-                    score_o = fmodel.score_objects(s_idx, p_idx)
-                    loss_valid += cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
+            batches = dataset.get_batches('train', batch_size, shuffle=True)
+            epoch_complete = False
+            while not epoch_complete:
 
-                meta_optim.zero_grad() 
-                loss_valid.backward() 
-                meta_optim.step()
+                # ADVERSARIAL TRAINING
+                adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
 
-                # ==========================================
-                # copy learned weights to original model
-                # ==========================================
-                with torch.no_grad():
-                    model.emb_so.copy_(fmodel.emb_so)
-                    model.emb_p.copy_(fmodel.emb_p)
+                with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
+
+                    # TRAINING
+                    for k, batch in enumerate(batches):
+                        if k == n_batches_train: break
+                        train_model(fmodel, diff_optim, batch, adversarial_examples)
+                    else:
+                        epoch_complete = True
+
+                    # META LEARNING
+                    meta_optimize(fmodel)
+
+                    # copy learned weights to original model
+                    with torch.no_grad():
+                        model.emb_so.copy_(fmodel.emb_so)
+                        model.emb_p.copy_(fmodel.emb_p)
+
 
         if e_outer % n_valid == 0:
-    
+
             # ==========================================
             # EVALUATION
             # ==========================================
@@ -155,10 +187,12 @@ def learn(dataset: Dataset,
             print("\r" + 100*" ", end="")
             print("\rLoss: {:.0f} | {:.0f}   MRR: {:.3f} | {:.3f}   HITS@1: {:.3f} | {:.3f}   HITS@3: {:.3f} | {:.3f}   HITS@5: {:.3f} | {:.3f}   HITS@10: {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@1'], metrics_dict['valid']['HITS@1'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
 
-            # for i, clause in enumerate(clauses):
-            #     for j, w in enumerate(clause.weights):
-            #         print("clause {}, matrix {}:".format(i,j))
-            #         print(softmax(w, dim=1).cpu().detach().numpy())
+            # print the weights of all clauses
+            if print_clauses:
+                for i, clause in enumerate(clauses):
+                    for j, w in enumerate(clause.weights):
+                        print("clause {}, matrix {}:".format(i,j))
+                        print(softmax(w, dim=1).cpu().detach().numpy())
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
