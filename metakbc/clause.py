@@ -52,7 +52,11 @@ class LearnedClause(torch.nn.Module):
         self.n_constraints = n_constraints
         self.n_predicates = n_predicates
 
-        self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
+        # self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
+
+        self.weights = torch.nn.ParameterList([Parameter(100*torch.eye(3)[i].view(1,3)) for i in range(n_relations)]).to(device)
+        # i.e.
+        # softmax(self.weights) = identity matrix
 
 
     def inconsistency_loss(self, model: BaseModel, *variables, relu: bool = True) -> Tensor:
