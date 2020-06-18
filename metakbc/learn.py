@@ -120,7 +120,7 @@ def learn(dataset_str: str,
                     # ADVERSARIAL TRAINING
                     adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
 
-                    # create a copy that is saved in the memory
+                    # create a copy that is kept in the memory (necessary for meta-optimization)
                     adversarial_examples_copy = [[variable.clone() for variable in variables] for variables in adversarial_examples]
 
                     # TRAINING
