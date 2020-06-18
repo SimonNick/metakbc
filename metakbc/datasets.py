@@ -15,6 +15,7 @@ class Dataset(object):
 
     def __init__(self, name: str) -> None:
 
+        self.name = name
         self.root = DATA_PATH / name
         self.splits = splits
 
