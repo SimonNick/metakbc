@@ -27,7 +27,7 @@ def metrics(scores: Tensor, true_idx: LongTensor, masks: Optional[Tensor] = None
     hits_10 = torch.mean(torch.sum(onehot_match[:, :10], dim=1)).item()
 
     return {"MRR":     mrr, 
-            "HITS@1":  hits_3,
+            "HITS@1":  hits_1,
             "HITS@3":  hits_3,
             "HITS@5":  hits_5,
             "HITS@10": hits_10}
