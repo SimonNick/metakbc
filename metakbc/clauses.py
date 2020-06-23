@@ -23,7 +23,7 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
         return [clause]
 
-    if dataset.name == "Toy_A=>B,C=>D_5000":
+    if dataset.name in ["Toy_A=>B,C=>D_5000", "Toy_A=>B,C=>D_1024"]:
 
         # A(X1, X2) => B(X1, X2)
         clause_func = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x1, x2)
