@@ -52,11 +52,7 @@ class LearnedClause(torch.nn.Module):
         self.n_constraints = n_constraints
         self.n_predicates = n_predicates
 
-        # self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
-
-        self.weights = torch.nn.ParameterList([Parameter(100*torch.eye(3)[i].view(1,3)) for i in range(n_relations)]).to(device)
-        # i.e.
-        # softmax(self.weights) = identity matrix
+        self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
 
 
     def inconsistency_loss(self, model: BaseModel, *variables, relu: bool = True) -> Tensor:
@@ -73,6 +69,9 @@ class LearnedClause(torch.nn.Module):
 
         # construct the predicate embeddings using a weighted sum over all predicates
         predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
+
+        # order = [0, 2, 1]
+        # predicate_embeddings = [model.emb_p[order[i]].view(1, -1) for i in range(self.n_relations)]
 
         # create the phi_k functions used to calculate the loss of the k-th relation
         phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
