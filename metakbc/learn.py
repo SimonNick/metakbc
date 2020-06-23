@@ -55,16 +55,6 @@ def learn(dataset_str: str,
     adversary = Adversary(clauses).to(device)
     adversarial_examples = None
 
-    model = {
-        "DistMult": lambda: DistMult(size=dataset.get_shape(), rank=rank).to(device),
-        "ComplEx": lambda: ComplEx(size=dataset.get_shape(), rank=rank).to(device),
-    }[model_str]()
-
-    optim = {
-        "SGD": lambda: torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9),
-        "Adagrad": lambda: torch.optim.Adagrad(model.parameters(), lr=lr),
-    }[optimizer_str]()
-
     meta_optim = {
         "SGD": lambda: torch.optim.SGD(adversary.parameters(), lr=meta_lr, momentum=0.9),
         "Adagrad": lambda: torch.optim.Adagrad(adversary.parameters(), lr=meta_lr),
@@ -83,8 +73,6 @@ def learn(dataset_str: str,
         loss_inc = adversary(fmodel, adversarial_examples)
         loss_reg = regularizer(fmodel.factors(s_idx, p_idx, o_idx))
         loss_total = loss_fact + lam * loss_inc + regularizer_weight * loss_reg
-        # loss_total = loss_fact + 1e-3 * loss_reg
-        # print("loss fact: {} | loss inc: {} | loss reg: {}".format(loss_fact.item(), loss_inc.item(), loss_reg.item()))
 
         diff_optim.step(loss_total)
 
@@ -106,13 +94,40 @@ def learn(dataset_str: str,
         meta_optim.step()
 
 
+    def create_model():
+
+        model = {
+            "DistMult": lambda: DistMult(size=dataset.get_shape(), rank=rank).to(device),
+            "ComplEx": lambda: ComplEx(size=dataset.get_shape(), rank=rank).to(device),
+        }[model_str]()
+
+        optim = {
+            "SGD": lambda: torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9),
+            "Adagrad": lambda: torch.optim.Adagrad(model.parameters(), lr=lr),
+        }[optimizer_str]()
+
+        return model, optim
+
+
+    if method == "online":
+        model, optim = create_model()
+
+    # original_model, _ = create_model()
+
     # ==========================================
     # TRAINING LOOPS
     # ==========================================
     for e_outer in range(n_epochs_outer):
 
         if method == "offline": # offline metalearning
-        
+
+            # create new model every time
+            model, optim = create_model()
+            # # copy learned weights to original model
+            # with torch.no_grad():
+            #     model.emb_so.copy_(original_model.emb_so)
+            #     model.emb_p.copy_(original_model.emb_p)
+
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
 
                 for e_inner in range(n_epochs_inner):
@@ -121,7 +136,7 @@ def learn(dataset_str: str,
                     adversarial_examples = adversary.generate_adversarial_examples(model, n_epochs_adv, adv_optimizer, adv_lr, adversarial_examples=adversarial_examples)
 
                     # create a copy that is kept in the memory (necessary for meta-optimization)
-                    adversarial_examples_copy = [[variable.clone() for variable in variables] for variables in adversarial_examples]
+                    adversarial_examples_copy = [[variable.clone().detach() for variable in variables] for variables in adversarial_examples]
 
                     # TRAINING
                     for k, batch in enumerate(dataset.get_batches('train', batch_size, shuffle=True)):
@@ -170,7 +185,7 @@ def learn(dataset_str: str,
             # ==========================================
             # EVALUATION
             # ==========================================
-            splits = ['train', 'valid']
+            splits = ['train', 'valid', 'test']
             metrics_dict = evaluate(dataset, splits, model, batch_size, filters)
             loss_total = {s: 0 for s in splits}
             for s in splits:
@@ -185,7 +200,7 @@ def learn(dataset_str: str,
             # LOGGING
             # ==========================================
             print("\r" + 100*" ", end="")
-            print("\rLoss: {:.0f} | {:.0f}   MRR: {:.3f} | {:.3f}   HITS@1: {:.3f} | {:.3f}   HITS@3: {:.3f} | {:.3f}   HITS@5: {:.3f} | {:.3f}   HITS@10: {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['train']['HITS@1'], metrics_dict['valid']['HITS@1'], metrics_dict['train']['HITS@3'], metrics_dict['valid']['HITS@3'], metrics_dict['train']['HITS@5'], metrics_dict['valid']['HITS@5'], metrics_dict['train']['HITS@10'], metrics_dict['valid']['HITS@10']))
+            print("\rLoss: {:.2f} | {:.2f} | {:.2f}   MRR: {:.3f} | {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], loss_total['test'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['test']['MRR']))
 
             # print the weights of all clauses
             if print_clauses:
