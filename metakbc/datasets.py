@@ -24,8 +24,13 @@ class Dataset(object):
             file_name = split + file_ext
             file_path = self.root / file_name
             with open(file_path, 'r') as to_read:
-                for line in to_read.readlines():
-                    s, p, o = line.strip().split('\t')
+                for i, line in enumerate(to_read.readlines()):
+                    try:
+                        s, p, o = line.strip().split('\t')
+                    except Exception as e:
+                        print("Error reading dataset {} at line {}: {}".format(split, i, line))
+                        print(e)
+                        exit(-1)
                     entities.add(s)
                     entities.add(o)
                     predicates.add(p)
