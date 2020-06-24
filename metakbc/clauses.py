@@ -7,7 +7,7 @@ from typing import List
 
 def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
-    if dataset.name == "Toy_A,B=>C_16":
+    if dataset.name in ["Toy_A,B=>C_16", "Toy_A,B=>C_1024"]:
 
         # A(X1, X2), B(X2, X3) => C(X1, X3)
         clause_func = lambda x1, x2, x3, phi1, phi2, phi3: torch.min(phi1(x1, x2), phi2(x2, x3)) - phi3(x1, x3)
