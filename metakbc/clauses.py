@@ -27,7 +27,7 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
         # A(X1, X2) => B(X1, X2)
         clause_func = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x1, x2)
-        clause = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause_func, n_constraints=1, n_predicates=dataset.n_predicates)
+        clause = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause_func, n_constraints=5, n_predicates=dataset.n_predicates)
 
         return [clause]
 
