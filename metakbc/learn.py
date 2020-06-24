@@ -195,6 +195,7 @@ def learn(dataset_str: str,
                     score_s = model.score_subjects(p_idx, o_idx)
                     score_o = model.score_objects(s_idx, p_idx)
                     loss_total[s] += (cross_entropy(score_s, s_idx, reduction='sum') + cross_entropy(score_o, o_idx, reduction='sum')).item()
+                loss_total[s] /= len(dataset.get_examples(s))
 
             # ==========================================
             # LOGGING
