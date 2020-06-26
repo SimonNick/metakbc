@@ -7,12 +7,6 @@ from torch.nn.functional import softmax
 
 from metakbc.models import BaseModel
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
-
-import numpy as np
-
 from typing import Tuple, Optional, List, Callable
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -70,8 +64,9 @@ class LearnedClause(torch.nn.Module):
         # construct the predicate embeddings using a weighted sum over all predicates
         predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
 
-        # order = [0, 2, 1]
+        # order = [0, 1, 2, 3, 4, 5]
         # predicate_embeddings = [model.emb_p[order[i]].view(1, -1) for i in range(self.n_relations)]
+        # predicate_embeddings = self.weights
 
         # create the phi_k functions used to calculate the loss of the k-th relation
         phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
@@ -79,14 +74,3 @@ class LearnedClause(torch.nn.Module):
         if relu:
             return torch.sum(torch.nn.functional.relu(self.clause_loss_func(*variables, *phis)))
         return torch.sum(self.clause_loss_func(*variables, *phis))
-
-
-    def visualize_weights(self):
-        fig = plt.figure()
-        for i in range(self.n_relations):
-            softmax_values = softmax(self.weights[i], dim=1).cpu().detach().numpy()
-            ax = fig.add_subplot(1, self.n_relations, i+1)
-            im = ax.matshow(softmax_values, cmap=matplotlib.cm.Greys_r, vmin=0, vmax=1)
-            for (i, j), v in np.ndenumerate(softmax_values):
-                ax.text(j, i, '{:0.2f}'.format(v), ha='center', va='center')
-        return fig
