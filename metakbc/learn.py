@@ -214,5 +214,5 @@ def learn(dataset_str: str,
                     wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
     
     if logging:
-        # plot hinton matrix at the end
+        # plot hinton visualisation of the embeddings of the last model
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})

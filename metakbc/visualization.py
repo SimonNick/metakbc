@@ -26,6 +26,9 @@ def visualize_embeddings(model: BaseModel):
 
     for ax, matrix in zip(axes, [model.emb_so.cpu().detach().numpy(), model.emb_p.cpu().detach().numpy()]):
 
+        if matrix.shape[0] > 100:
+            matrix = matrix[:100]
+
         max_weight = 2 ** np.ceil(np.log(np.abs(matrix).max()) / np.log(2))
 
         ax.patch.set_facecolor('gray')
