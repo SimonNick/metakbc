@@ -15,7 +15,7 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
         return [clause]
 
-    if dataset.name == "Toy_A,B=>C,D,E=>F_1024":
+    if dataset.name in ["Toy_A,B=>C,D,E=>F_1024", "Toy2_A,B=>C,D,E=>F_1024"]:
 
         # A(X1, X2), B(X2, X3) => C(X1, X3)
         clause_func = lambda x1, x2, x3, phi1, phi2, phi3: torch.min(phi1(x1, x2), phi2(x2, x3)) - phi3(x1, x3)
@@ -27,7 +27,7 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
         # A(X1, X2) => B(X1, X2)
         clause_func = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x1, x2)
-        clause = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause_func, n_constraints=5, n_predicates=dataset.n_predicates)
+        clause = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause_func, n_constraints=1, n_predicates=dataset.n_predicates)
 
         return [clause]
 
@@ -41,7 +41,3 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
     else:
         error("Not implemented")
-
-        # A(X1, X2) => A(X2, X1)
-        # clause2_func = lambda x1, x2, phi1: phi1(x1, x2) - phi1(x2, x1)
-        # clause2 = LearnedClause(n_variables=2, n_relations=1, clause_loss_func=clause2_func, n_constraints=10, n_predicates=dataset.n_predicates)
