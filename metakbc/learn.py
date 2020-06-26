@@ -10,7 +10,7 @@ from metakbc.regularizers import N3
 from metakbc.adversary import Adversary
 from metakbc.clause import LearnedClause
 from metakbc.clauses import load_clauses
-from metakbc.visualization import visualize_embeddings, visualize_clause
+from metakbc.visualization import visualize_embeddings, visualize_clause, PCA_entity_embeddings
 
 import higher
 
@@ -216,3 +216,4 @@ def learn(dataset_str: str,
     if logging:
         # plot hinton visualisation of the embeddings of the last model
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
+        wandb.log({'PCA embeddings': wandb.Image(PCA_entity_embeddings(model, dataset)), 'epoch_outer': e_outer})
