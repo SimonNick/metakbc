@@ -10,6 +10,7 @@ from metakbc.regularizers import N3
 from metakbc.adversary import Adversary
 from metakbc.clause import LearnedClause
 from metakbc.clauses import load_clauses
+from metakbc.visualization import visualize_embeddings, visualize_clause
 
 import higher
 
@@ -111,8 +112,8 @@ def learn(dataset_str: str,
 
     if method == "online":
         model, optim = create_model()
-
-    # original_model, _ = create_model()
+    else:
+        model = None
 
     # ==========================================
     # TRAINING LOOPS
@@ -123,10 +124,6 @@ def learn(dataset_str: str,
 
             # create new model every time
             model, optim = create_model()
-            # # copy learned weights to original model
-            # with torch.no_grad():
-            #     model.emb_so.copy_(original_model.emb_so)
-            #     model.emb_p.copy_(original_model.emb_p)
 
             with higher.innerloop_ctx(model, optim, copy_initial_weights=True) as (fmodel, diff_optim):
 
@@ -214,4 +211,8 @@ def learn(dataset_str: str,
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
                 wandb.log({**loss_total, 'epoch_outer': e_outer})
                 for i, clause in enumerate(clauses):
-                    wandb.log({'clause_{}'.format(i): clause.visualize_weights(), 'epoch_outer': e_outer})
+                    wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
+    
+    if logging:
+        # plot hinton matrix at the end
+        wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
