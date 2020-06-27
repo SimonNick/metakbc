@@ -1,4 +1,4 @@
-Munich	located_in	Europe
-Rome	located_in	Europe
-Zurich	located_in	Europe
-London	located_in	Europe
+e0000	rel_C	e0002
+e0003	rel_C	e0005
+e0006	rel_C	e0008
+e0009	rel_C	e0011
