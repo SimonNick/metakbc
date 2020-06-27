@@ -7,7 +7,7 @@ from metakbc.learn import learn
 import wandb
 import datetime
 
-datasets = ['Toy_A,B=>C_16', 'Toy_A,B=>C_1024', 'Toy_A=>B_10', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A=>B,C=>D_5000', 'Toy_A,B=>C,D,E=>F_1024', 'Toy_A,B=>C,D,E=>F_32', 'nations', 'umls', 'countries']
+datasets = ['Toy_A,B=>C_16', 'Toy_A,B=>C_1024', 'Toy_A=>B_10', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A=>B,C=>D_5000', 'Toy_A,B=>C,D,E=>F_1024', 'Toy_A,B=>C,D,E=>F_32', 'Toy_mixed', 'nations', 'umls', 'countries']
 models = ['DistMult', 'ComplEx']
 optimizers = ['SGD', 'Adagrad']
 methods = ['offline', 'online']
