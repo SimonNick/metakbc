@@ -15,7 +15,7 @@ def load_clauses(dataset: Dataset) -> List[LearnedClause]:
 
         return [clause]
 
-    if dataset.name in ["Toy_A,B=>C,D,E=>F_1024", "Toy2_A,B=>C,D,E=>F_1024"]:
+    if dataset.name in ["Toy_A,B=>C,D,E=>F_1024", "Toy_A,B=>C,D,E=>F_32"]:
 
         # A(X1, X2), B(X2, X3) => C(X1, X3)
         clause_func = lambda x1, x2, x3, phi1, phi2, phi3: torch.min(phi1(x1, x2), phi2(x2, x3)) - phi3(x1, x3)
