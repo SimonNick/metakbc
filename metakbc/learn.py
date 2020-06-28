@@ -222,10 +222,9 @@ def learn(dataset_str: str,
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
                 wandb.log({**loss_total, 'epoch_outer': e_outer})
                 wandb.log({"lambda": lam.item(), 'epoch_outer': e_outer})
-                for i, clause in enumerate(clauses):
-                    wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
     
     if logging:
-        # plot hinton visualisation of the embeddings of the last model
+        for i, clause in enumerate(clauses):
+            wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
         wandb.log({'PCA embeddings': wandb.Image(PCA_entity_embeddings(model, dataset)), 'epoch_outer': e_outer})
