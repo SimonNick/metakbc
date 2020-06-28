@@ -138,3 +138,6 @@ runs/
 **/wandb
 **/_old
 **/.vscode
+
+test.ipynb
+create_data.txt
