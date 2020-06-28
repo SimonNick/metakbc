@@ -22,6 +22,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--method',         default='offline',  choices=methods,        help="Whether to do offline or online metalearning")
     parser.add_argument('--lam',            default=1.0,        type=float,             help="Weight of the violation loss")
+    parser.add_argument('--no_learn_lam',   default=False,      action='store_true',    help="Don't learn the lambda")
 
     parser.add_argument('--optimizer',      default="Adagrad",  choices=optimizers,     help="Optimizer")
     parser.add_argument('--meta_optimizer', default="Adagrad",  choices=optimizers,     help="Meta optimizer")
@@ -55,6 +56,7 @@ if __name__ == '__main__':
 
         wandb.config.method = args.method
         wandb.config.lam = args.lam
+        wandb.config.learn_lam = not args.no_learn_lam
 
         wandb.config.optimizer = args.optimizer
         wandb.config.meta_optimizer = args.meta_optimizer
@@ -87,6 +89,7 @@ if __name__ == '__main__':
           #
           args.method,
           args.lam,
+          not args.no_learn_lam,
           #
           args.optimizer,
           args.meta_optimizer,

@@ -26,6 +26,7 @@ def learn(dataset_str: str,
           #
           method: str,
           lam: float,
+          learn_lam: bool,
           #
           optimizer_str: str,
           meta_optimizer: str,
@@ -49,7 +50,8 @@ def learn(dataset_str: str,
           logging: bool) -> None:
 
     lam = torch.Tensor([lam]).to(device)
-    lam.requires_grad = True
+    if learn_lam:
+        lam.requires_grad = True
     regularizer = N3()
     regularizer_weight = 1e-3
     dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
@@ -60,7 +62,7 @@ def learn(dataset_str: str,
     adversarial_examples = None
 
     meta_optim = {
-        "SGD": lambda: torch.optim.SGD(adversary.parameters(), lr=meta_lr, momentum=0.9),
+        "SGD": lambda: torch.optim.SGD([*adversary.parameters(), lam], lr=meta_lr, momentum=0.9),
         "Adagrad": lambda: torch.optim.Adagrad([*adversary.parameters(), lam], lr=meta_lr),
     }[meta_optimizer]()
 
