@@ -48,9 +48,12 @@ def learn(dataset_str: str,
           print_clauses: bool,
           logging: bool) -> None:
 
+    lam = torch.Tensor([lam])
+    lam.requires_grad = True
     regularizer = N3()
     regularizer_weight = 1e-3
     dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
+    # dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
     clauses = load_clauses(dataset)
     adversary = Adversary(clauses).to(device)
@@ -58,7 +61,7 @@ def learn(dataset_str: str,
 
     meta_optim = {
         "SGD": lambda: torch.optim.SGD(adversary.parameters(), lr=meta_lr, momentum=0.9),
-        "Adagrad": lambda: torch.optim.Adagrad(adversary.parameters(), lr=meta_lr),
+        "Adagrad": lambda: torch.optim.Adagrad([*adversary.parameters(), lam], lr=meta_lr),
     }[meta_optimizer]()
 
 
@@ -199,7 +202,7 @@ def learn(dataset_str: str,
             # LOGGING
             # ==========================================
             print("\r" + 100*" ", end="")
-            print("\rLoss: {:.2f} | {:.2f} | {:.2f}   MRR: {:.3f} | {:.3f} | {:.3f}".format(loss_total['train'], loss_total['valid'], loss_total['test'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['test']['MRR']))
+            print("\rLoss: {:.2f} | {:.2f} | {:.2f}   MRR: {:.3f} | {:.3f} | {:.3f}   Lambda: {:.3f}".format(loss_total['train'], loss_total['valid'], loss_total['test'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['test']['MRR'], lam.item()))
 
             # print the weights of all clauses
             if print_clauses:
