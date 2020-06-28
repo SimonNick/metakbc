@@ -214,6 +214,7 @@ def learn(dataset_str: str,
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
                 wandb.log({**loss_total, 'epoch_outer': e_outer})
+                wandb.log({"lambda": lam.item(), 'epoch_outer': e_outer})
                 for i, clause in enumerate(clauses):
                     wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
     
