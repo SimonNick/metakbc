@@ -64,10 +64,6 @@ class LearnedClause(torch.nn.Module):
         # construct the predicate embeddings using a weighted sum over all predicates
         predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
 
-        # order = [0, 1, 2, 3, 4, 5]
-        # predicate_embeddings = [model.emb_p[order[i]].view(1, -1) for i in range(self.n_relations)]
-        # predicate_embeddings = self.weights
-
         # create the phi_k functions used to calculate the loss of the k-th relation
         phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
 
