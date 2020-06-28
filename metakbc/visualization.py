@@ -30,8 +30,8 @@ def visualize_embeddings(model: BaseModel):
 
     for ax, matrix in zip(axes, [model.emb_so.cpu().detach().numpy(), model.emb_p.cpu().detach().numpy()]):
 
-        if matrix.shape[0] > 100:
-            matrix = matrix[:100]
+        # if matrix.shape[0] > 100:
+        #     matrix = matrix[:100]
 
         matrix = matrix.T
 
