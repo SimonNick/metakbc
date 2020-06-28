@@ -8,12 +8,11 @@ from typing import Dict, Tuple, List, Optional
 
 DATA_PATH = Path(os.path.dirname(__file__)) / "data"
 file_ext = ".tsv"
-splits = ['train', 'valid', 'test']
 
 
 class Dataset(object):
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, splits: List[str] = ['train', 'valid', 'test']) -> None:
 
         self.name = name
         self.root = DATA_PATH / name
