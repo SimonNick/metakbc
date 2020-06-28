@@ -13,13 +13,14 @@ from metakbc.datasets import Dataset
 from sklearn.decomposition import PCA
 
 def visualize_clause(clause: LearnedClause):
-    fig = plt.figure()
+
+    fig = plt.figure(figsize=(30,30))
     for i in range(clause.n_relations):
         softmax_values = torch.softmax(clause.weights[i], dim=1).cpu().detach().numpy()
         ax = fig.add_subplot(1, clause.n_relations, i+1)
         im = ax.matshow(softmax_values, cmap=matplotlib.cm.Greys_r, vmin=0, vmax=1)
-        for (i, j), v in np.ndenumerate(softmax_values):
-            ax.text(j, i, '{:0.2f}'.format(v), ha='center', va='center')
+        # for (i, j), v in np.ndenumerate(softmax_values):
+        #     ax.text(j, i, '{:0.2f}'.format(v), ha='center', va='center')
     return fig
 
 def visualize_embeddings(model: BaseModel):
