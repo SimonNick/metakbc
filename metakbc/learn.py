@@ -48,7 +48,7 @@ def learn(dataset_str: str,
           print_clauses: bool,
           logging: bool) -> None:
 
-    lam = torch.Tensor([lam])
+    lam = torch.Tensor([lam]).to(device)
     lam.requires_grad = True
     regularizer = N3()
     regularizer_weight = 1e-3
