@@ -54,6 +54,7 @@ def learn(dataset_str: str,
         lam.requires_grad = True
     regularizer = N3()
     regularizer_weight = 1e-3
+    minimum_lambda = 1e-3
     dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
     # dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
@@ -98,6 +99,10 @@ def learn(dataset_str: str,
         meta_optim.zero_grad() 
         loss_valid.backward() 
         meta_optim.step()
+
+        # prevent lambda from becoming negative
+        with torch.no_grad():
+            lam[0] = torch.clamp(lam, minimum_lambda) 
 
 
     def create_model():
