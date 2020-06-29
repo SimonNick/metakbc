@@ -55,7 +55,6 @@ def learn(dataset_str: str,
     regularizer = N3()
     regularizer_weight = 1e-3
     minimum_lambda = 1e-6
-    # dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
     dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
     clauses = load_clauses(dataset)
@@ -192,11 +191,9 @@ def learn(dataset_str: str,
             # ==========================================
             # EVALUATION
             # ==========================================
-            splits = ['train', 'valid', 'test']
-            # splits = ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K']
-            metrics_dict = evaluate(dataset, splits, model, batch_size, filters)
-            loss_total = {s: 0 for s in splits}
-            for s in splits:
+            metrics_dict = evaluate(dataset, dataset.splits, model, batch_size, filters)
+            loss_total = {s: 0 for s in dataset.splits}
+            for s in dataset.splits:
                 for batch in dataset.get_batches(s, batch_size):
                     batch = batch.to(device)
                     s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
