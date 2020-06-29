@@ -55,8 +55,8 @@ def learn(dataset_str: str,
     regularizer = N3()
     regularizer_weight = 1e-3
     minimum_lambda = 1e-6
-    dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
-    # dataset = Dataset(dataset_str)
+    # dataset = Dataset(dataset_str, ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K'])
+    dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
     clauses = load_clauses(dataset)
     adversary = Adversary(clauses).to(device)
@@ -192,8 +192,8 @@ def learn(dataset_str: str,
             # ==========================================
             # EVALUATION
             # ==========================================
-            # splits = ['train', 'valid', 'test']
-            splits = ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K']
+            splits = ['train', 'valid', 'test']
+            # splits = ['train', 'valid', 'test', 'rel_A', 'rel_B=>C', 'rel_D=>E', 'rel_F,G=>H', 'rel_I,J=>K']
             metrics_dict = evaluate(dataset, splits, model, batch_size, filters)
             loss_total = {s: 0 for s in splits}
             for s in splits:
