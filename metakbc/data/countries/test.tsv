@@ -1,125 +1,215 @@
-bosnia_and_herzegovina	locatedIn	africa	0
-bosnia_and_herzegovina	locatedIn	americas	0
-bosnia_and_herzegovina	locatedIn	asia	0
-bosnia_and_herzegovina	locatedIn	europe	1
-bosnia_and_herzegovina	locatedIn	oceania	0
-canada	locatedIn	africa	0
-canada	locatedIn	americas	1
-canada	locatedIn	asia	0
-canada	locatedIn	europe	0
-canada	locatedIn	oceania	0
-co-operative_republic_of_guyana	locatedIn	africa	0
-co-operative_republic_of_guyana	locatedIn	americas	1
-co-operative_republic_of_guyana	locatedIn	asia	0
-co-operative_republic_of_guyana	locatedIn	europe	0
-co-operative_republic_of_guyana	locatedIn	oceania	0
-democratic_peoples_republic_of_korea	locatedIn	africa	0
-democratic_peoples_republic_of_korea	locatedIn	americas	0
-democratic_peoples_republic_of_korea	locatedIn	asia	1
-democratic_peoples_republic_of_korea	locatedIn	europe	0
-democratic_peoples_republic_of_korea	locatedIn	oceania	0
-democratic_republic_of_the_congo	locatedIn	africa	1
-democratic_republic_of_the_congo	locatedIn	americas	0
-democratic_republic_of_the_congo	locatedIn	asia	0
-democratic_republic_of_the_congo	locatedIn	europe	0
-democratic_republic_of_the_congo	locatedIn	oceania	0
-federal_democratic_republic_of_ethiopia	locatedIn	africa	1
-federal_democratic_republic_of_ethiopia	locatedIn	americas	0
-federal_democratic_republic_of_ethiopia	locatedIn	asia	0
-federal_democratic_republic_of_ethiopia	locatedIn	europe	0
-federal_democratic_republic_of_ethiopia	locatedIn	oceania	0
-kingdom_of_belgium	locatedIn	africa	0
-kingdom_of_belgium	locatedIn	americas	0
-kingdom_of_belgium	locatedIn	asia	0
-kingdom_of_belgium	locatedIn	europe	1
-kingdom_of_belgium	locatedIn	oceania	0
-lebanese_republic	locatedIn	africa	0
-lebanese_republic	locatedIn	americas	0
-lebanese_republic	locatedIn	asia	1
-lebanese_republic	locatedIn	europe	0
-lebanese_republic	locatedIn	oceania	0
-macao_special_administrative_region_of_the_peoples_republic_of_china	locatedIn	africa	0
-macao_special_administrative_region_of_the_peoples_republic_of_china	locatedIn	americas	0
-macao_special_administrative_region_of_the_peoples_republic_of_china	locatedIn	asia	1
-macao_special_administrative_region_of_the_peoples_republic_of_china	locatedIn	europe	0
-macao_special_administrative_region_of_the_peoples_republic_of_china	locatedIn	oceania	0
-nation_of_brunei,_abode_of_peace	locatedIn	africa	0
-nation_of_brunei,_abode_of_peace	locatedIn	americas	0
-nation_of_brunei,_abode_of_peace	locatedIn	asia	1
-nation_of_brunei,_abode_of_peace	locatedIn	europe	0
-nation_of_brunei,_abode_of_peace	locatedIn	oceania	0
-netherlands	locatedIn	africa	0
-netherlands	locatedIn	americas	0
-netherlands	locatedIn	asia	0
-netherlands	locatedIn	europe	1
-netherlands	locatedIn	oceania	0
-republic_of_albania	locatedIn	africa	0
-republic_of_albania	locatedIn	americas	0
-republic_of_albania	locatedIn	asia	0
-republic_of_albania	locatedIn	europe	1
-republic_of_albania	locatedIn	oceania	0
-republic_of_cameroon	locatedIn	africa	1
-republic_of_cameroon	locatedIn	americas	0
-republic_of_cameroon	locatedIn	asia	0
-republic_of_cameroon	locatedIn	europe	0
-republic_of_cameroon	locatedIn	oceania	0
-republic_of_chad	locatedIn	africa	1
-republic_of_chad	locatedIn	americas	0
-republic_of_chad	locatedIn	asia	0
-republic_of_chad	locatedIn	europe	0
-republic_of_chad	locatedIn	oceania	0
-republic_of_ecuador	locatedIn	africa	0
-republic_of_ecuador	locatedIn	americas	1
-republic_of_ecuador	locatedIn	asia	0
-republic_of_ecuador	locatedIn	europe	0
-republic_of_ecuador	locatedIn	oceania	0
-republic_of_haiti	locatedIn	africa	0
-republic_of_haiti	locatedIn	americas	1
-republic_of_haiti	locatedIn	asia	0
-republic_of_haiti	locatedIn	europe	0
-republic_of_haiti	locatedIn	oceania	0
-republic_of_kazakhstan	locatedIn	africa	0
-republic_of_kazakhstan	locatedIn	americas	0
-republic_of_kazakhstan	locatedIn	asia	1
-republic_of_kazakhstan	locatedIn	europe	0
-republic_of_kazakhstan	locatedIn	oceania	0
-republic_of_kenya	locatedIn	africa	1
-republic_of_kenya	locatedIn	americas	0
-republic_of_kenya	locatedIn	asia	0
-republic_of_kenya	locatedIn	europe	0
-republic_of_kenya	locatedIn	oceania	0
-republic_of_kosovo	locatedIn	africa	0
-republic_of_kosovo	locatedIn	americas	0
-republic_of_kosovo	locatedIn	asia	0
-republic_of_kosovo	locatedIn	europe	1
-republic_of_kosovo	locatedIn	oceania	0
-republic_of_malawi	locatedIn	africa	1
-republic_of_malawi	locatedIn	americas	0
-republic_of_malawi	locatedIn	asia	0
-republic_of_malawi	locatedIn	europe	0
-republic_of_malawi	locatedIn	oceania	0
-republic_of_nicaragua	locatedIn	africa	0
-republic_of_nicaragua	locatedIn	americas	1
-republic_of_nicaragua	locatedIn	asia	0
-republic_of_nicaragua	locatedIn	europe	0
-republic_of_nicaragua	locatedIn	oceania	0
-republic_of_peru	locatedIn	africa	0
-republic_of_peru	locatedIn	americas	1
-republic_of_peru	locatedIn	asia	0
-republic_of_peru	locatedIn	europe	0
-republic_of_peru	locatedIn	oceania	0
-republic_of_the_union_of_myanmar	locatedIn	africa	0
-republic_of_the_union_of_myanmar	locatedIn	americas	0
-republic_of_the_union_of_myanmar	locatedIn	asia	1
-republic_of_the_union_of_myanmar	locatedIn	europe	0
-republic_of_the_union_of_myanmar	locatedIn	oceania	0
-state_of_palestine	locatedIn	africa	0
-state_of_palestine	locatedIn	americas	0
-state_of_palestine	locatedIn	asia	1
-state_of_palestine	locatedIn	europe	0
-state_of_palestine	locatedIn	oceania	0
-tunisian_republic	locatedIn	africa	1
-tunisian_republic	locatedIn	americas	0
-tunisian_republic	locatedIn	asia	0
-tunisian_republic	locatedIn	europe	0
-tunisian_republic	locatedIn	oceania	0
+Federal Republic of Germany	located_in	Europe
+Ukraine	located_in	Europe
+Kingdom of Cambodia	located_in	Asia
+United Mexican States	located_in	Americas
+Republic of Azerbaijan	located_in	Asia
+Federal Democratic Republic of Ethiopia	located_in	Africa
+Territory of the Wallis and Futuna Islands	located_in	Oceania
+Commonwealth of Dominica	located_in	Americas
+French Republic	located_in	Europe
+Canada	located_in	Americas
+Islamic Republic of Afghanistan	located_in	Asia
+Bosnia and Herzegovina	is_neighbor_of	Montenegro
+Republic of Paraguay	located_in	Americas
+Belize	located_in	Americas
+Islamic Republic of Afghanistan	is_neighbor_of	Islamic Republic of Iran
+Republic of Rwanda	located_in	Africa
+Islamic Republic of Iran	located_in	Asia
+Romania	is_neighbor_of	Hungary
+Federal Republic of Germany	is_neighbor_of	Czech Republic
+Islamic Republic of Mauritania	located_in	Africa
+Republic of Indonesia	located_in	Asia
+Falkland Islands	located_in	Americas
+Gabonese Republic	is_neighbor_of	Republic of Cameroon
+Republic of Haiti	located_in	Americas
+Collectivity of Saint Barthélemy	located_in	Americas
+Republic of South Sudan	is_neighbor_of	Republic of the Sudan
+People's Republic of China	is_neighbor_of	Republic of the Union of Myanmar
+Argentine Republic	is_neighbor_of	Republic of Paraguay
+Kingdom of Saudi Arabia	is_neighbor_of	State of Qatar
+Federal Democratic Republic of Ethiopia	is_neighbor_of	State of Eritrea
+Republic of Finland	located_in	Europe
+Republic of Macedonia	is_neighbor_of	Republic of Kosovo
+Solomon Islands	located_in	Oceania
+French Polynesia	located_in	Oceania
+Montenegro	is_neighbor_of	Republic of Croatia
+Federal Democratic Republic of Ethiopia	is_neighbor_of	Republic of South Sudan
+Republic of Uzbekistan	is_neighbor_of	Islamic Republic of Afghanistan
+Niue	located_in	Oceania
+Republic of Bulgaria	is_neighbor_of	Republic of Turkey
+Republic of Belarus	is_neighbor_of	Russian Federation
+Republic of the Sudan	located_in	Africa
+Republic of Madagascar	located_in	Africa
+Ukraine	is_neighbor_of	Slovak Republic
+Republic of Guatemala	is_neighbor_of	Republic of Honduras
+United Kingdom of Great Britain and Northern Ireland	located_in	Europe
+Nation of Brunei, Abode of Peace	located_in	Asia
+Burkina Faso	is_neighbor_of	Republic of Niger
+Sultanate of Oman	located_in	Asia
+Bailiwick of Jersey	located_in	Europe
+United Kingdom of Great Britain and Northern Ireland	is_neighbor_of	Republic of Ireland
+Burkina Faso	located_in	Africa
+French Republic	is_neighbor_of	Kingdom of Belgium
+Principality of Liechtenstein	located_in	Europe
+Republic of Honduras	located_in	Americas
+United Arab Emirates	is_neighbor_of	Kingdom of Saudi Arabia
+Republic of El Salvador	located_in	Americas
+Republic of the Maldives	located_in	Asia
+Ukraine	is_neighbor_of	Republic of Belarus
+Turks and Caicos Islands	located_in	Americas
+Republic of El Salvador	is_neighbor_of	Republic of Guatemala
+Federal Republic of Germany	is_neighbor_of	French Republic
+Republic of Guatemala	located_in	Americas
+United Arab Emirates	is_neighbor_of	Sultanate of Oman
+Republic of Uganda	is_neighbor_of	Republic of Rwanda
+Bosnia and Herzegovina	located_in	Europe
+Russian Federation	is_neighbor_of	Republic of Latvia
+Federal Democratic Republic of Ethiopia	is_neighbor_of	Republic of the Sudan
+Republic of Macedonia	is_neighbor_of	Republic of Bulgaria
+Republic of South Sudan	is_neighbor_of	Republic of Uganda
+Slovak Republic	is_neighbor_of	Czech Republic
+Arab Republic of Egypt	is_neighbor_of	State of Palestine
+Republic of Turkey	is_neighbor_of	Republic of Azerbaijan
+Republic of Benin	is_neighbor_of	Republic of Niger
+United Kingdom of Great Britain and Northern Ireland	is_neighbor_of	Republic of Cyprus
+Federal Republic of Nigeria	is_neighbor_of	Republic of Benin
+Republic of China (Taiwan)	located_in	Asia
+Republic of the Philippines	located_in	Asia
+Macao Special Administrative Region of the People's Republic of China	is_neighbor_of	People's Republic of China
+Federal Republic of Nigeria	is_neighbor_of	Republic of Niger
+Hungary	is_neighbor_of	Republic of Croatia
+Greenland	located_in	Americas
+Republic of Mauritius	located_in	Africa
+Republic of Turkey	located_in	Asia
+Country of Curaçao	located_in	Americas
+Republic of Singapore	located_in	Asia
+New Zealand	located_in	Oceania
+Montenegro	is_neighbor_of	Republic of Kosovo
+Kingdom of Norway	is_neighbor_of	Republic of Finland
+Principality of Andorra	is_neighbor_of	French Republic
+Kingdom of Norway	is_neighbor_of	Russian Federation
+Republic of Peru	located_in	Americas
+State of Qatar	located_in	Asia
+Republic of Guinea-Bissau	located_in	Africa
+Republic of Namibia	located_in	Africa
+Russian Federation	located_in	Europe
+Republic of Turkey	is_neighbor_of	Syrian Arab Republic
+Grenada	located_in	Americas
+Islamic Republic of Afghanistan	is_neighbor_of	People's Republic of China
+Republic of Côte d'Ivoire	located_in	Africa
+Romania	located_in	Europe
+Kingdom of Saudi Arabia	located_in	Asia
+Hungary	is_neighbor_of	Slovak Republic
+Republic of Benin	is_neighbor_of	Burkina Faso
+Kingdom of Cambodia	is_neighbor_of	Socialist Republic of Vietnam
+Syrian Arab Republic	located_in	Asia
+Kingdom of Belgium	located_in	Europe
+People's Republic of China	is_neighbor_of	Russian Federation
+Belize	is_neighbor_of	United Mexican States
+Republic of Djibouti	is_neighbor_of	State of Eritrea
+Plurinational State of Bolivia	is_neighbor_of	Argentine Republic
+Republic of Benin	located_in	Africa
+Grand Duchy of Luxembourg	is_neighbor_of	French Republic
+Republic of Belarus	located_in	Europe
+Vatican City State	located_in	Europe
+People's Republic of China	is_neighbor_of	Hong Kong Special Administrative Region of the People's Republic of China
+Republic of Ireland	located_in	Europe
+Republic of Djibouti	located_in	Africa
+Federation of Saint Christopher and Nevisa	located_in	Americas
+State of Eritrea	located_in	Africa
+Grand Duchy of Luxembourg	is_neighbor_of	Kingdom of Belgium
+Republic of Guatemala	is_neighbor_of	United Mexican States
+Gabonese Republic	is_neighbor_of	Republic of the Congo
+Federal Republic of Germany	is_neighbor_of	Grand Duchy of Luxembourg
+Republic of Senegal	is_neighbor_of	Republic of Guinea-Bissau
+Grand Duchy of Luxembourg	located_in	Europe
+Republic of the Congo	located_in	Africa
+Hungary	located_in	Europe
+Republic of Malta	located_in	Europe
+Federal Democratic Republic of Nepal	located_in	Asia
+People's Republic of China	is_neighbor_of	Socialist Republic of Vietnam
+Republic of Senegal	is_neighbor_of	Republic of Guinea
+Republic of Kosovo	located_in	Europe
+Republic of Fiji	located_in	Oceania
+Ukraine	is_neighbor_of	Russian Federation
+Independent State of Papua New Guinea	located_in	Oceania
+Republic of Yemen	located_in	Asia
+Republic of Finland	is_neighbor_of	Russian Federation
+Antigua and Barbuda	located_in	Americas
+Republic of Senegal	is_neighbor_of	Islamic Republic of Mauritania
+People's Republic of China	located_in	Asia
+Republic of Cuba	located_in	Americas
+Kingdom of Norway	located_in	Europe
+Romania	is_neighbor_of	Ukraine
+Republic of Namibia	is_neighbor_of	Republic of South Africa
+Republic of Guinea-Bissau	is_neighbor_of	Republic of Guinea
+Republic of the Sudan	is_neighbor_of	State of Eritrea
+Bosnia and Herzegovina	is_neighbor_of	Republic of Croatia
+Republic of Niger	located_in	Africa
+Republic of South Africa	is_neighbor_of	Kingdom of Lesotho
+Republic of Yemen	is_neighbor_of	Sultanate of Oman
+Republic of Macedonia	located_in	Europe
+Republic of Côte d'Ivoire	is_neighbor_of	Republic of Guinea
+Slovak Republic	located_in	Europe
+Republic of Croatia	located_in	Europe
+State of Palestine	located_in	Asia
+Commonwealth of the Bahamas	located_in	Americas
+United Arab Emirates	located_in	Asia
+Republic of the Union of Myanmar	located_in	Asia
+Arab Republic of Egypt	located_in	Africa
+Kingdom of Lesotho	located_in	Africa
+Sultanate of Oman	is_neighbor_of	Kingdom of Saudi Arabia
+Romania	is_neighbor_of	Republic of Bulgaria
+Guam	located_in	Oceania
+Republic of Trinidad and Tobago	located_in	Americas
+Republic of Uzbekistan	located_in	Asia
+Republic of South Africa	located_in	Africa
+Montenegro	located_in	Europe
+Socialist Republic of Vietnam	located_in	Asia
+Federal Republic of Germany	is_neighbor_of	Kingdom of Belgium
+Federal Republic of Nigeria	is_neighbor_of	Republic of Cameroon
+Republic of Cameroon	is_neighbor_of	Republic of the Congo
+Independent State of Papua New Guinea	is_neighbor_of	Republic of Indonesia
+Czech Republic	located_in	Europe
+Federal Republic of Nigeria	located_in	Africa
+Plurinational State of Bolivia	is_neighbor_of	Republic of Peru
+Dominican Republic	is_neighbor_of	Republic of Haiti
+Territory of Christmas Island	located_in	Oceania
+Republic of Cameroon	located_in	Africa
+Ukraine	is_neighbor_of	Hungary
+Sint Maarten	located_in	Americas
+Republic of Latvia	located_in	Europe
+Republic of Guinea	located_in	Africa
+Republic of Yemen	is_neighbor_of	Kingdom of Saudi Arabia
+Republic of Bulgaria	located_in	Europe
+Dominican Republic	located_in	Americas
+Principality of Andorra	located_in	Europe
+Republic of Malawi	located_in	Africa
+Hong Kong Special Administrative Region of the People's Republic of China	located_in	Asia
+Republic of Azerbaijan	is_neighbor_of	Islamic Republic of Iran
+Plurinational State of Bolivia	located_in	Americas
+Republic of Cyprus	located_in	Europe
+Kingdom of Denmark	located_in	Europe
+Co-operative Republic of Guyana	located_in	Americas
+Republic of Senegal	located_in	Africa
+Federal Republic of Germany	is_neighbor_of	Kingdom of Denmark
+Gabonese Republic	located_in	Africa
+Republic of South Sudan	located_in	Africa
+Republic of Belarus	is_neighbor_of	Republic of Latvia
+Republic of Côte d'Ivoire	is_neighbor_of	Burkina Faso
+Most Serene Republic of San Marino	located_in	Europe
+Territory of the Cocos (Keeling) Islands	located_in	Oceania
+Republic of Azerbaijan	is_neighbor_of	Russian Federation
+Republic of Uganda	located_in	Africa
+Republic of El Salvador	is_neighbor_of	Republic of Honduras
+Virgin Islands	located_in	Americas
+Plurinational State of Bolivia	is_neighbor_of	Republic of Paraguay
+Republic of Korea	located_in	Asia
+Belize	is_neighbor_of	Republic of Guatemala
+Tuvalu	located_in	Oceania
+Republic of Turkey	is_neighbor_of	Islamic Republic of Iran
+Republic of Djibouti	is_neighbor_of	Federal Democratic Republic of Ethiopia
+Pitcairn Group of Islands	located_in	Oceania
+Argentine Republic	located_in	Americas
+Arab Republic of Egypt	is_neighbor_of	Republic of the Sudan
+Jamaica	located_in	Americas
