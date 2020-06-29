@@ -12,14 +12,18 @@ file_ext = ".tsv"
 
 class Dataset(object):
 
-    def __init__(self, name: str, splits: List[str] = ['train', 'valid', 'test']) -> None:
+    def __init__(self, name: str, splits: List[str] = None) -> None:
 
         self.name = name
         self.root = DATA_PATH / name
-        self.splits = splits
+
+        if splits == None:
+            self.splits = [file_path.stem for file_path in self.root.glob('*' + file_ext)]
+        if not ("train" in self.splits and "valid" in self.splits and "test" in self.splits):
+            raise(ValueError("splits does not contain train, valid and test"))
 
         entities, predicates = set(), set()
-        for split in splits:
+        for split in self.splits:
             file_name = split + file_ext
             file_path = self.root / file_name
             with open(file_path, 'r') as to_read:
@@ -27,9 +31,7 @@ class Dataset(object):
                     try:
                         s, p, o = line.strip().split('\t')
                     except Exception as e:
-                        print("Error reading dataset {} at line {}: {}".format(split, i, line))
-                        print(e)
-                        exit(-1)
+                        raise(IOError("Error reading split {} at line {}: {}".format(split, i, line)))
                     entities.add(s)
                     entities.add(o)
                     predicates.add(p)
@@ -42,7 +44,7 @@ class Dataset(object):
         self.n_entities = len(self.entities)
 
         self.data = {}
-        for split in splits:
+        for split in self.splits:
             file_name = split + file_ext
             file_path = self.root / file_name
 
