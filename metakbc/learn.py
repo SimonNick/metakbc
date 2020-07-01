@@ -99,9 +99,10 @@ def learn(dataset_str: str,
         loss_valid.backward() 
         meta_optim.step()
 
-        # prevent lambda from becoming negative
-        with torch.no_grad():
-            lam[0] = torch.clamp(lam, minimum_lambda) 
+        if learn_lam:
+            # prevent lambda from becoming negative
+            with torch.no_grad():
+                lam[0] = torch.clamp(lam, minimum_lambda) 
 
 
     def create_model():
