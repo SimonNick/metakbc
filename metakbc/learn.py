@@ -25,6 +25,7 @@ def learn(dataset_str: str,
           model_str: str,
           #
           method: str,
+          rule_method: str,
           lam: float,
           learn_lam: bool,
           #
@@ -57,7 +58,7 @@ def learn(dataset_str: str,
     minimum_lambda = 1e-6
     dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
-    clauses = load_clauses(dataset)
+    clauses = load_clauses(dataset, rule_method)
     adversary = Adversary(clauses).to(device)
     adversarial_examples = None
 
@@ -212,9 +213,12 @@ def learn(dataset_str: str,
             # print the weights of all clauses
             if print_clauses:
                 for i, clause in enumerate(clauses):
-                    for j, w in enumerate(clause.weights):
-                        print("clause {}, matrix {}:".format(i,j))
-                        print(softmax(w, dim=1).cpu().detach().numpy())
+                    if rule_method == 'linear':
+                        for j, w in enumerate(clause.weights):
+                            print("clause {}, matrix {}:".format(i,j))
+                            print(softmax(w, dim=1).cpu().detach().numpy())
+                    elif rule_method == 'combinatorial':
+                        print(torch.sigmoid(clause.weights).cpu().detach().numpy())
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})

@@ -11,6 +11,7 @@ datasets = ['Toy_A,B=>C_16', 'Toy_A,B=>C_1024', 'Toy_A=>B_10', 'Toy_A=>B_1024', 
 models = ['DistMult', 'ComplEx']
 optimizers = ['SGD', 'Adagrad']
 methods = ['offline', 'online']
+rule_methods = ['attention', 'combinatorial']
 
 
 if __name__ == '__main__':
@@ -21,6 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('--model',          default="ComplEx",  choices=models,         help="Model")
 
     parser.add_argument('--method',         default='offline',  choices=methods,        help="Whether to do offline or online metalearning")
+    parser.add_argument('--rule_method',    default='attention',choices=rule_methods,   help="The type of rule learning method")
     parser.add_argument('--lam',            default=1.0,        type=float,             help="Weight of the violation loss")
     parser.add_argument('--no_learn_lam',   default=False,      action='store_true',    help="Don't learn the lambda")
 
@@ -55,6 +57,7 @@ if __name__ == '__main__':
         wandb.config.model = args.model
 
         wandb.config.method = args.method
+        wandb.config.rule_method = args.rule_method
         wandb.config.lam = args.lam
         wandb.config.learn_lam = not args.no_learn_lam
 
@@ -88,6 +91,7 @@ if __name__ == '__main__':
           args.model,
           #
           args.method,
+          args.rule_method,
           args.lam,
           not args.no_learn_lam,
           #

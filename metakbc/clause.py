@@ -9,11 +9,14 @@ from metakbc.models import BaseModel
 
 from typing import Tuple, Optional, List, Callable
 
+import numpy as np
+import itertools
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class LearnedClause(torch.nn.Module):
 
-    def __init__(self, n_variables: int, n_relations: int, clause_loss_func: Callable, n_constraints: int, n_predicates: int) -> None:
+    def __init__(self, n_variables: int, n_relations: int, clause_loss_func: Callable, n_constraints: int, n_predicates: int, method: str = "linear") -> None:
         '''
         Represents a learned clause of a given shape.
 
@@ -26,6 +29,7 @@ class LearnedClause(torch.nn.Module):
                 M scoring functions of signature phi_k(X,Y) used to calculate the score of the k-th relation evaluated on X and Y.
             n_constraints: The number of clauses of the given shape that should be learned
             n_predicates: The number of total predicates in the dataset
+            method: Defines how to learn the rules. Either as a linear combination of the predicates, or learning all combinations.
 
         Example:
             The clause (Head :- Body) of the shape
@@ -45,8 +49,16 @@ class LearnedClause(torch.nn.Module):
         self.clause_loss_func = clause_loss_func
         self.n_constraints = n_constraints
         self.n_predicates = n_predicates
+        self.method = method
 
-        self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
+        if self.method == "attention":
+
+            self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
+
+        elif self.method == "combinatorial":
+
+            n_permutations = np.prod([n_predicates - i for i in range(n_relations)])
+            self.weights = torch.nn.Parameter(torch.empty((n_permutations)).normal_(-5, 1e-6))
 
 
     def inconsistency_loss(self, model: BaseModel, *variables, relu: bool = True) -> Tensor:
@@ -61,12 +73,32 @@ class LearnedClause(torch.nn.Module):
             Sum of the inconsistency losses
         '''
 
-        # construct the predicate embeddings using a weighted sum over all predicates
-        predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
+        if self.method == "attention":
 
-        # create the phi_k functions used to calculate the loss of the k-th relation
-        phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
+            # construct the predicate embeddings using a weighted sum over all predicates
+            predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
 
-        if relu:
-            return torch.sum(torch.nn.functional.relu(self.clause_loss_func(*variables, *phis)))
-        return torch.sum(self.clause_loss_func(*variables, *phis))
+            # create the phi_k functions used to calculate the loss of the k-th relation
+            phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
+
+            if relu:
+                return torch.sum(torch.nn.functional.relu(self.clause_loss_func(*variables, *phis)))
+            return torch.sum(self.clause_loss_func(*variables, *phis))
+
+
+        elif self.method == "combinatorial":
+
+            # construct phis for all predicates
+            phis = [lambda x, y, i=i: model._scoring_func(x, model.emb_p[i].view(1, -1), y) for i in range(self.n_predicates)]
+
+            # generate all possible cominations of the phis
+            phi_combinations = itertools.permutations(phis, self.n_relations)
+
+            inc_loss = 0
+            for i, phi_combination in enumerate(phi_combinations):
+                if relu:
+                    inc_loss += torch.sigmoid(self.weights[i]) * torch.nn.functional.relu(self.clause_loss_func(*variables, *phi_combination))
+                else:
+                    inc_loss += torch.sigmoid(self.weights[i]) * self.clause_loss_func(*variables, *phi_combination)
+
+            return torch.sum(inc_loss)
