@@ -2,6 +2,7 @@
 
 import torch
 from torch.nn.functional import normalize, softmax, cross_entropy
+from torch.nn.utils import clip_grad_value_
 
 from metakbc.models import DistMult, ComplEx
 from metakbc.datasets import Dataset
@@ -98,6 +99,7 @@ def learn(dataset_str: str,
 
         meta_optim.zero_grad() 
         loss_valid.backward() 
+        clip_grad_value_(adversary.parameters(), 1e-2)
         meta_optim.step()
 
         if learn_lam:
