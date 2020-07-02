@@ -99,7 +99,7 @@ def learn(dataset_str: str,
 
         meta_optim.zero_grad() 
         loss_valid.backward() 
-        clip_grad_value_(adversary.parameters(), 1e-2)
+        clip_grad_value_(adversary.parameters(), 1e-1)
         meta_optim.step()
 
         if learn_lam:
