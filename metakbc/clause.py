@@ -52,38 +52,41 @@ class LearnedClause(torch.nn.Module):
         self.method = method
 
         if self.method == "attention":
-
-            self.weights = torch.nn.ParameterList([Parameter(torch.empty((n_constraints, n_predicates)).normal_(0, 1e-3)) for _ in range(n_relations)]).to(device)
-
+            self.weights = Parameter(torch.empty((n_relations, n_constraints, n_predicates)).normal_(0, 1e-3)).to(device)
         elif self.method == "combinatorial":
-
             n_permutations = np.prod([n_predicates - i for i in range(n_relations)])
-            self.weights = torch.nn.Parameter(torch.empty((n_permutations)).normal_(-5, 1e-6))
+            self.weights = Parameter(torch.empty((n_permutations)).normal_(-5, 1e-6))
 
 
-    def inconsistency_loss(self, model: BaseModel, *variables, relu: bool = True) -> Tensor:
+    def inconsistency_loss(self, model: BaseModel, variables: Tensor, relu: bool = True, sum_loss: bool = True) -> Tensor:
         '''
         Calculates the inconsistency loss of the clause. If several constraints are learned it returns the sum of inconsistency losses.
 
         Args:
             model: The model used for the calculation of the scores
-            *variables: The variables x1, ..., xN used for evaluations of the clause
+            variables: The variables used for evaluations of the clause with shape (n_variables, n_constraints, rank)
             relu: Whether or not to pass the inconsistency losses through a ReLU function before summing them
+            sum_loss: Whether or not to sum all individual losses
         Returns:
-            Sum of the inconsistency losses
+            Inconsistency loss
         '''
 
         if self.method == "attention":
 
             # construct the predicate embeddings using a weighted sum over all predicates
-            predicate_embeddings = [softmax(self.weights[i], dim=1) @ model.emb_p for i in range(self.n_relations)]
+            predicate_embeddings = softmax(self.weights, dim=2) @ model.emb_p
 
             # create the phi_k functions used to calculate the loss of the k-th relation
             phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
 
             if relu:
-                return torch.sum(torch.nn.functional.relu(self.clause_loss_func(*variables, *phis)))
-            return torch.sum(self.clause_loss_func(*variables, *phis))
+                loss = torch.nn.functional.relu(self.clause_loss_func(*[v for v in variables], *phis))
+            else:
+                loss = self.clause_loss_func(*[v for v in variables], *phis)
+
+            if sum_loss:
+                return torch.sum(loss)
+            return loss
 
 
         elif self.method == "combinatorial":
