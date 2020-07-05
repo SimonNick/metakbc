@@ -55,7 +55,7 @@ class LearnedClause(torch.nn.Module):
             self.weights = Parameter(torch.empty((n_relations, n_constraints, n_predicates)).normal_(0, 1e-3)).to(device)
         elif self.method == "combinatorial":
             n_permutations = np.prod([n_predicates - i for i in range(n_relations)])
-            self.weights = Parameter(torch.empty((n_permutations)).normal_(-5, 1e-6))
+            self.weights = Parameter(torch.empty((n_permutations)).normal_(-5, 1e-6)).to(device)
 
 
     def inconsistency_loss(self, model: BaseModel, variables: Tensor, relu: bool = True, sum_loss: bool = True) -> Tensor:
