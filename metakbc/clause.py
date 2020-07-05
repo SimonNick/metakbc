@@ -97,11 +97,13 @@ class LearnedClause(torch.nn.Module):
             # generate all possible cominations of the phis
             phi_combinations = itertools.permutations(phis, self.n_relations)
 
-            inc_loss = 0
+            loss = 0
             for i, phi_combination in enumerate(phi_combinations):
                 if relu:
-                    inc_loss += torch.sigmoid(self.weights[i]) * torch.nn.functional.relu(self.clause_loss_func(*variables, *phi_combination))
+                    loss += torch.sigmoid(self.weights[i]) * torch.nn.functional.relu(self.clause_loss_func(*variables, *phi_combination))
                 else:
-                    inc_loss += torch.sigmoid(self.weights[i]) * self.clause_loss_func(*variables, *phi_combination)
+                    loss += torch.sigmoid(self.weights[i]) * self.clause_loss_func(*variables, *phi_combination)
 
-            return torch.sum(inc_loss)
+            if sum_loss:
+                return torch.sum(loss)
+            return loss
