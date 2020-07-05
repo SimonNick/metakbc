@@ -80,9 +80,9 @@ class LearnedClause(torch.nn.Module):
             phis = [lambda x, y, i=i: model._scoring_func(x, predicate_embeddings[i], y) for i in range(self.n_relations)]
 
             if relu:
-                loss = torch.nn.functional.relu(self.clause_loss_func(*[v for v in variables], *phis))
+                loss = torch.nn.functional.relu(self.clause_loss_func(*variables, *phis))
             else:
-                loss = self.clause_loss_func(*[v for v in variables], *phis)
+                loss = self.clause_loss_func(*variables, *phis)
 
             if sum_loss:
                 return torch.sum(loss)
