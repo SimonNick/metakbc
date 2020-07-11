@@ -48,6 +48,7 @@ def learn(dataset_str: str,
           #
           rank: int,
           batch_size: int,
+          reg_weight: float,
           #
           print_clauses: bool,
           logging: bool) -> None:
@@ -56,7 +57,6 @@ def learn(dataset_str: str,
     if learn_lam:
         lam.requires_grad = True
     regularizer = N3()
-    regularizer_weight = 1e-3
     minimum_lambda = 1e-6
     dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
@@ -82,7 +82,7 @@ def learn(dataset_str: str,
         loss_fact = cross_entropy(score_s, s_idx) + cross_entropy(score_o, o_idx)
         loss_inc = adversary(fmodel, adversarial_embeddings)
         loss_reg = regularizer(fmodel.factors(s_idx, p_idx, o_idx))
-        loss_total = loss_fact + lam * loss_inc + regularizer_weight * loss_reg
+        loss_total = loss_fact + lam * loss_inc + reg_weight * loss_reg
 
         diff_optim.step(loss_total)
 
