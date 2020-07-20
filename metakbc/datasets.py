@@ -16,10 +16,11 @@ class Dataset(object):
 
         self.name = name
         self.root = DATA_PATH / name
+        self.splits = splits
 
-        if splits == None:
+        if self.splits == None:
             self.splits = [file_path.stem for file_path in self.root.glob('*' + file_ext)]
-        if not ("train" in self.splits and "valid" in self.splits and "test" in self.splits):
+        if not ('train' in self.splits and 'valid' in self.splits and 'test' in self.splits):
             raise(ValueError("splits does not contain train, valid and test"))
 
         entities, predicates = set(), set()
