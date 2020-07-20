@@ -6,6 +6,7 @@ from metakbc.learn import learn
 
 import wandb
 import datetime
+import json
 
 datasets = ['Toy_A,B=>C_16', 'Toy_A,B=>C_1024', 'Toy_A=>B_10', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A=>B,C=>D_5000', 'Toy_A,B=>C,D,E=>F_1024', 'Toy_A,B=>C,D,E=>F_32', 'Toy_A=>A_10', 'Toy_A=>A_1024', 'Toy_mixed', 'nations', 'umls', 'countries']
 models = ['DistMult', 'ComplEx']
@@ -49,6 +50,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--print_clauses',  default=False,      action='store_true',    help="Whether to print the weights of the clauses during training")
     parser.add_argument('--logging',        default=False,      action='store_true',    help="Whether to use wandb.com for logging")
+    parser.add_argument('--save_output',    default=False,      action='store_true',    help="Whether to store the final results in a file")
+    parser.add_argument('--output_file',    default='output',   type=str,               help="Name of the output file")
 
     args = parser.parse_args()
 
@@ -92,7 +95,7 @@ if __name__ == '__main__':
         print("{} = {}".format(arg, getattr(args, arg)), end=", ")
     print("")
 
-    learn(args.dataset,
+    metrics_dict, loss_total = learn(args.dataset,
           args.model,
           #
           args.method,
@@ -122,3 +125,10 @@ if __name__ == '__main__':
           #
           args.print_clauses,
           args.logging)
+
+    if args.save_output:
+        args_dict = {arg: getattr(args, arg) for arg in vars(args)}
+        total_dict = {'args': args_dict, 'metrics': metrics_dict, 'loss': loss_total}
+
+        with open(args.output_file, 'w') as json_file:
+            json.dump(total_dict, json_file)

@@ -248,3 +248,5 @@ def learn(dataset_str: str,
             wandb.log({'clause_{}'.format(i): visualize_clause(clause), 'epoch_outer': e_outer})
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
         wandb.log({'PCA embeddings': wandb.Image(PCA_entity_embeddings(model, dataset)), 'epoch_outer': e_outer})
+
+    return metrics_dict, loss_total
