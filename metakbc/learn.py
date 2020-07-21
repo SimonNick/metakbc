@@ -208,7 +208,7 @@ def learn(dataset_str: str,
                         model.emb_p.copy_(fmodel.emb_p)
 
 
-        if e_outer % n_valid == 0:
+        if (n_valid == 0 and e_outer == n_epochs_outer -1 ) or (n_valid is not 0 and e_outer % n_valid == 0):
 
             # ==========================================
             # EVALUATION
