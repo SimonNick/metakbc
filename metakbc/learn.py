@@ -32,8 +32,8 @@ def learn(dataset_str: str,
           learn_lam: bool,
           #
           optimizer_str: str,
-          meta_optimizer: str,
-          adv_optimizer: str,
+          meta_optimizer_str: str,
+          adv_optimizer_str: str,
           #
           lr: float,
           meta_lr: float,
@@ -68,7 +68,7 @@ def learn(dataset_str: str,
     meta_optim = {
         "SGD": lambda: torch.optim.SGD([*adversary.parameters(), lam], lr=meta_lr, momentum=0.9),
         "Adagrad": lambda: torch.optim.Adagrad([*adversary.parameters(), lam], lr=meta_lr),
-    }[meta_optimizer]()
+    }[meta_optimizer_str]()
 
 
     def train_model(fmodel, diff_optim, batch, adversarial_embeddings):
@@ -146,7 +146,7 @@ def learn(dataset_str: str,
 
                     # ADVERSARIAL TRAINING
                     if adv_method == 'embedding':
-                        adversarial_embeddings = adversary.generate_adversarial_embeddings(model, n_epochs_adv, adv_optimizer, adv_lr, init_random=True, adversarial_embeddings=adversarial_embeddings)
+                        adversarial_embeddings = adversary.generate_adversarial_embeddings(model, n_epochs_adv, adv_optimizer_str, adv_lr, init_random=True, adversarial_embeddings=adversarial_embeddings)
                         
                         # create a copy that is kept in the memory (necessary for meta-optimization)
                         adversarial_embeddings_copy = [variables.clone().detach() for variables in adversarial_embeddings]
@@ -181,7 +181,7 @@ def learn(dataset_str: str,
 
                 # ADVERSARIAL TRAINING
                 if adv_method == 'embedding':
-                    adversarial_embeddings = adversary.generate_adversarial_embeddings(model, n_epochs_adv, adv_optimizer, adv_lr, init_random=True, adversarial_embeddings=adversarial_embeddings)
+                    adversarial_embeddings = adversary.generate_adversarial_embeddings(model, n_epochs_adv, adv_optimizer_str, adv_lr, init_random=True, adversarial_embeddings=adversarial_embeddings)
                 else:
                     adversarial_examples = adversary.generate_adversarial_examples(dataset, model, n_epochs_adv, adversarial_examples=adversarial_examples)
 
