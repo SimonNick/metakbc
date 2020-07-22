@@ -61,7 +61,7 @@ grid = [
     {
         "name": "learn_lam",
         "type": "fixed",
-        "value": False,
+        "value": True,
     },
     {
         "name": "optimizer_str",
