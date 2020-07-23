@@ -40,13 +40,14 @@ if __name__ == '__main__':
     parser.add_argument('--epochs_outer',   default=100,        type=int,               help="Number of outer epochs")
     parser.add_argument('--epochs_inner',   default=100,        type=int,               help="Number of inner epochs for offline metalearning")
     parser.add_argument('--batches_train',  default=5,          type=int,               help="How many batches of the training dataset should be used for training for online metalearning")
-    parser.add_argument('--batches_valid',  default=5,          type=int,               help="How many batches of the validation dataset should be used for evaluation for online metalearning")
     parser.add_argument('--epochs_adv',     default=100,        type=int,               help="Number of epochs for the adversary")
     parser.add_argument('--valid',          default=5,          type=int,               help="Number of skipped epochs until evaluation")
 
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size for training and evaluation")
     parser.add_argument('--reg_weight',     default=1e-3,       type=float,             help="Weight of the N3 regularizer")
+
+    parser.add_argument('--seed',           default=42,         type=int,               help="Used seed")
 
     parser.add_argument('--print_clauses',  default=False,      action='store_true',    help="Whether to print the weights of the clauses during training")
     parser.add_argument('--logging',        default=False,      action='store_true',    help="Whether to use wandb.com for logging")
@@ -80,13 +81,14 @@ if __name__ == '__main__':
             wandb.config.n_epochs_inner = args.epochs_inner
         else:
             wandb.config.batches_train = args.batches_train
-            wandb.config.batches_valid = args.batches_valid
         wandb.config.epochs_adv = args.epochs_adv
         wandb.config.valid = args.valid
 
         wandb.config.rank = args.rank
         wandb.config.batch_size = args.batch_size
         wandb.config.reg_weight = args.reg_weight
+
+        wandb.config.seed = args.seed
         
         wandb.print_clauses = args.print_clauses
 
@@ -114,13 +116,14 @@ if __name__ == '__main__':
           args.epochs_outer,
           args.epochs_inner,
           args.batches_train,
-          args.batches_valid,
           args.epochs_adv,
           args.valid,
           #
           args.rank,
           args.batch_size,
           args.reg_weight,
+          #
+          args.seed,
           #
           args.print_clauses,
           args.logging)

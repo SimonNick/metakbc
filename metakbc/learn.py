@@ -13,6 +13,9 @@ from metakbc.clause import LearnedClause
 from metakbc.clauses import load_clauses
 from metakbc.visualization import visualize_embeddings, visualize_clause, PCA_entity_embeddings
 
+import numpy as np
+import random
+
 import higher
 
 from typing import List
@@ -20,6 +23,8 @@ from typing import List
 import wandb
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+SEED = 42
 
 
 def learn(dataset_str: str,
@@ -42,7 +47,6 @@ def learn(dataset_str: str,
           n_epochs_outer: int,
           n_epochs_inner: int, # only for offline metalearning
           n_batches_train: int, # only for online metalearning
-          n_batches_valid: int, # only for online metalearning
           n_epochs_adv: int,
           n_valid: int,
           #
@@ -50,8 +54,15 @@ def learn(dataset_str: str,
           batch_size: int,
           reg_weight: float,
           #
+          seed: int,
+          #
           print_clauses: bool,
           logging: bool) -> None:
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
     lam = torch.Tensor([lam]).to(device)
     if learn_lam:
