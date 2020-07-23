@@ -9,3 +9,4 @@ pytest
 pytest-xdist
 pytest-forked
 wandb
+matplotlib
