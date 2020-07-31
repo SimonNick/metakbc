@@ -18,7 +18,7 @@ import random
 
 import higher
 
-from typing import List
+from typing import List, Tuple
 
 import wandb
 
@@ -57,7 +57,8 @@ def learn(dataset_str: str,
           seed: int,
           #
           print_clauses: bool,
-          logging: bool) -> None:
+          logging: bool,
+          report_highest: bool) -> Tuple[dict, dict, int]:
 
     random.seed(seed)
     np.random.seed(seed)
@@ -75,6 +76,9 @@ def learn(dataset_str: str,
     adversary = Adversary(clauses).to(device)
     adversarial_embeddings = None
     adversarial_examples = None
+    report_metrics_dict = None
+    report_loss_total = None
+    report_epoch = 0
 
     meta_optim = {
         "SGD": lambda: torch.optim.SGD([*adversary.parameters(), lam], lr=meta_lr, momentum=0.9),
@@ -219,7 +223,7 @@ def learn(dataset_str: str,
                         model.emb_p.copy_(fmodel.emb_p)
 
 
-        if (n_valid == 0 and e_outer == n_epochs_outer -1 ) or (n_valid is not 0 and e_outer % n_valid == 0):
+        if (n_valid == 0 and e_outer == n_epochs_outer - 1) or (n_valid is not 0 and e_outer % n_valid == 0) or report_highest:
 
             # ==========================================
             # EVALUATION
@@ -253,6 +257,11 @@ def learn(dataset_str: str,
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
                 wandb.log({**loss_total, 'epoch_outer': e_outer})
                 wandb.log({"lambda": lam.item(), 'epoch_outer': e_outer})
+
+            if (report_highest and (report_epoch == 0 or (metrics_dict['test']['MRR'] > report_metrics_dict['test']['MRR']))) or not report_highest:
+                report_metrics_dict = metrics_dict
+                report_loss_total = loss_total
+                report_epoch = e_outer + 1
     
     if logging:
         for i, clause in enumerate(clauses):
@@ -260,4 +269,4 @@ def learn(dataset_str: str,
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
         wandb.log({'PCA embeddings': wandb.Image(PCA_entity_embeddings(model, dataset)), 'epoch_outer': e_outer})
 
-    return metrics_dict, loss_total
+    return report_metrics_dict, report_loss_total, report_epoch
