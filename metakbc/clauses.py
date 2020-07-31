@@ -87,5 +87,17 @@ def load_clauses(dataset: Dataset, method: str) -> List[LearnedClause]:
 
         return [clause1, clause2]
 
+    if dataset.name == "umls":
+
+        # A(X1, X2) => B(X1, X2)
+        clause_func1 = lambda x1, x2, phi1, phi2: phi1(x1, x2) - phi2(x2, x1)
+        clause1 = LearnedClause(n_variables=2, n_relations=2, clause_loss_func=clause_func1, n_constraints=100, n_predicates=dataset.n_predicates, method=method)
+
+        # A(X1, X2), A(X2, X3) => A(X1, X3)
+        clause_func2 = lambda x1, x2, x3, phi1: torch.min(phi1(x1, x2), phi1(x2, x3)) - phi1(x1, x3)
+        clause2 = LearnedClause(n_variables=3, n_relations=1, clause_loss_func=clause_func2, n_constraints=200, n_predicates=dataset.n_predicates, method=method)
+
+        return [clause1, clause2]
+
     else:
         error("Not implemented")
