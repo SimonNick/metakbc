@@ -38,7 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--adv_lr',         default=0.05,       type=float,             help="Learning rate of the adversary optimizer")
 
     parser.add_argument('--epochs_outer',   default=100,        type=int,               help="Number of outer epochs")
-    parser.add_argument('--epochs_inner',   default=100,        type=int,               help="Number of inner epochs for offline metalearning")
+    parser.add_argument('--epochs_inner',   default=5,          type=int,               help="Number of inner epochs for offline metalearning")
     parser.add_argument('--batches_train',  default=5,          type=int,               help="How many batches of the training dataset should be used for training for online metalearning")
     parser.add_argument('--epochs_adv',     default=100,        type=int,               help="Number of epochs for the adversary")
     parser.add_argument('--valid',          default=5,          type=int,               help="Number of skipped epochs until evaluation")
