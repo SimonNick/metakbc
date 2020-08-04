@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--method',         default='offline',  choices=methods,        help="Whether to do offline or online metalearning")
     parser.add_argument('--rule_method',    default='attention',choices=rule_methods,   help="The type of rule learning method")
     parser.add_argument('--adv_method',     default='embedding',choices=adv_methods,    help="The method for adversarial training")
-    parser.add_argument('--lam',            default=1.0,        type=float,             help="Weight of the violation loss")
+    parser.add_argument('--lam',            default=0.5,        type=float,             help="Weight of the violation loss")
     parser.add_argument('--no_learn_lam',   default=False,      action='store_true',    help="Don't learn the lambda")
 
     parser.add_argument('--optimizer',      default="Adagrad",  choices=optimizers,     help="Optimizer")
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs_inner',   default=5,          type=int,               help="Number of inner epochs for offline metalearning")
     parser.add_argument('--batches_train',  default=5,          type=int,               help="How many batches of the training dataset should be used for training for online metalearning")
     parser.add_argument('--epochs_adv',     default=100,        type=int,               help="Number of epochs for the adversary")
-    parser.add_argument('--valid',          default=5,          type=int,               help="Number of skipped epochs until evaluation")
+    parser.add_argument('--valid',          default=1,          type=int,               help="Number of skipped epochs until evaluation")
 
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size for training and evaluation")
