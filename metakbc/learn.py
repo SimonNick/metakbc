@@ -57,8 +57,7 @@ def learn(dataset_str: str,
           seed: int,
           #
           print_clauses: bool,
-          logging: bool,
-          report_highest: bool) -> Tuple[dict, dict, int]:
+          logging: bool) -> Tuple[dict, dict]:
 
     random.seed(seed)
     np.random.seed(seed)
@@ -76,9 +75,8 @@ def learn(dataset_str: str,
     adversary = Adversary(clauses).to(device)
     adversarial_embeddings = None
     adversarial_examples = None
-    report_metrics_dict = None
-    report_loss_total = None
-    report_epoch = 0
+    all_metrics = dict()
+    all_losses = dict()
 
     meta_optim = {
         "SGD": lambda: torch.optim.SGD([*adversary.parameters(), lam], lr=meta_lr, momentum=0.9),
@@ -223,27 +221,27 @@ def learn(dataset_str: str,
                         model.emb_p.copy_(fmodel.emb_p)
 
 
-        if (n_valid == 0 and e_outer == n_epochs_outer - 1) or (n_valid is not 0 and e_outer % n_valid == 0) or report_highest:
+        if (n_valid == 0 and e_outer == n_epochs_outer - 1) or (n_valid is not 0 and e_outer % n_valid == 0):
 
             # ==========================================
             # EVALUATION
             # ==========================================
             metrics_dict = evaluate(dataset, dataset.splits, model, batch_size, filters)
-            loss_total = {s: 0 for s in dataset.splits}
+            losses_dict = {s: 0 for s in dataset.splits}
             for s in dataset.splits:
                 for batch in dataset.get_batches(s, batch_size):
                     batch = batch.to(device)
                     s_idx, p_idx, o_idx = batch[:, 0], batch[:, 1], batch[:, 2]
                     score_s = model.score_subjects(p_idx, o_idx)
                     score_o = model.score_objects(s_idx, p_idx)
-                    loss_total[s] += (cross_entropy(score_s, s_idx, reduction='sum') + cross_entropy(score_o, o_idx, reduction='sum')).item()
-                loss_total[s] /= len(dataset.get_examples(s))
+                    losses_dict[s] += (cross_entropy(score_s, s_idx, reduction='sum') + cross_entropy(score_o, o_idx, reduction='sum')).item()
+                losses_dict[s] /= len(dataset.get_examples(s))
 
             # ==========================================
             # LOGGING
             # ==========================================
             print("\r" + 100*" ", end="")
-            print("\rLoss: {:.2f} | {:.2f} | {:.2f}   MRR: {:.3f} | {:.3f} | {:.3f}   Lambda: {:.3f}".format(loss_total['train'], loss_total['valid'], loss_total['test'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['test']['MRR'], lam.item()))
+            print("\rLoss: {:.2f} | {:.2f} | {:.2f}   MRR: {:.3f} | {:.3f} | {:.3f}   Lambda: {:.3f}".format(losses_dict['train'], losses_dict['valid'], losses_dict['test'], metrics_dict['train']['MRR'], metrics_dict['valid']['MRR'], metrics_dict['test']['MRR'], lam.item()))
 
             # print the weights of all clauses
             if print_clauses:
@@ -255,13 +253,11 @@ def learn(dataset_str: str,
 
             if logging:
                 wandb.log({**metrics_dict, 'epoch_outer': e_outer})
-                wandb.log({**loss_total, 'epoch_outer': e_outer})
+                wandb.log({**losses_dict, 'epoch_outer': e_outer})
                 wandb.log({"lambda": lam.item(), 'epoch_outer': e_outer})
 
-            if (report_highest and (report_epoch == 0 or (metrics_dict['test']['MRR'] > report_metrics_dict['test']['MRR']))) or not report_highest:
-                report_metrics_dict = metrics_dict
-                report_loss_total = loss_total
-                report_epoch = e_outer + 1
+            all_metrics[e_outer + 1] = metrics_dict
+            all_losses[e_outer + 1] = losses_dict
     
     if logging:
         for i, clause in enumerate(clauses):
@@ -269,4 +265,4 @@ def learn(dataset_str: str,
         wandb.log({'embeddings': wandb.Image(visualize_embeddings(model)), 'epoch_outer': e_outer})
         wandb.log({'PCA embeddings': wandb.Image(PCA_entity_embeddings(model, dataset)), 'epoch_outer': e_outer})
 
-    return report_metrics_dict, report_loss_total, report_epoch
+    return all_metrics, all_losses

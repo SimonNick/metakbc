@@ -51,8 +51,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--print_clauses',  default=False,      action='store_true',    help="Whether to print the weights of the clauses during training")
     parser.add_argument('--logging',        default=False,      action='store_true',    help="Whether to use wandb.com for logging")
-    parser.add_argument('--output_file',    default=None,       type=str,               help="Name of the JSON output file where final results and used parameters should be stored")
-    parser.add_argument('--report_highest', default=False,      action='store_true',    help="Whether to report the epoch with best performance on the test set. This requires evaluating the model at every (outer) epoch")
+    parser.add_argument('--output_file',    default=None,       type=str,               help="Name of the JSON output file where all results and used parameters should be stored")
 
     args = parser.parse_args()
 
@@ -97,7 +96,7 @@ if __name__ == '__main__':
         print("{} = {}".format(arg, getattr(args, arg)), end=", ")
     print("")
 
-    metrics_dict, loss_total, epoch_highest = learn(args.dataset,
+    metrics, losses = learn(args.dataset,
           args.model,
           #
           args.method,
@@ -127,13 +126,12 @@ if __name__ == '__main__':
           args.seed,
           #
           args.print_clauses,
-          args.logging,
-          args.report_highest)
+          args.logging)
 
     if args.output_file is not None:
         print("\nStoring results in '{}'".format(args.output_file))
         args_dict = {arg: getattr(args, arg) for arg in vars(args)}
-        total_dict = {'args': args_dict, 'metrics': metrics_dict, 'loss': loss_total, 'epoch_highest': epoch_highest}
+        total_dict = {'args': args_dict, 'metrics': metrics, 'losses': losses}
 
         with open(args.output_file, 'w') as json_file:
             json.dump(total_dict, json_file, indent='\t')
