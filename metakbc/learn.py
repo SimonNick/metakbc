@@ -15,6 +15,7 @@ from metakbc.visualization import visualize_embeddings, visualize_clause, PCA_en
 
 import numpy as np
 import random
+import os
 
 import higher
 
@@ -57,10 +58,13 @@ def learn(dataset_str: str,
           print_clauses: bool,
           logging: bool) -> Tuple[dict, dict]:
 
+    os.environ['PYTHONHASHSEED']=str(seed)
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
     lam = torch.Tensor([lam]).to(device)
     if learn_lam:
