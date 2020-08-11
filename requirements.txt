@@ -1,12 +1,9 @@
-torch
-numpy
-scikit-learn
-networkx
+numpy==1.19.0
+torch==1.6.0
+torchvision==0.7.0
+higher==0.2.1
 typing
-parameterized
-ax-platform
 pytest
-pytest-xdist
-pytest-forked
 wandb
 matplotlib
+scikit-learn

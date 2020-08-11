@@ -24,8 +24,6 @@ import wandb
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-SEED = 42
-
 
 def learn(dataset_str: str,
           model_str: str,
