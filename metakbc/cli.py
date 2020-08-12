@@ -8,7 +8,7 @@ import wandb
 import datetime
 import json
 
-datasets = ['Toy_A=>B_16', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A,B=>C_16', 'Toy_A,B=>C_1024',  'Toy_A,B=>C,D,E=>F_1024', 'Toy_mixed', 'nations', 'umls', 'countries']
+datasets = ['Toy_A=>B_16', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A,B=>C_16', 'Toy_A,B=>C_1024',  'Toy_A,B=>C,D,E=>F_1024', 'Toy_mixed', 'nations', 'umls', 'countries', 'kinships']
 models = ['DistMult', 'ComplEx']
 optimizers = ['SGD', 'Adagrad']
 methods = ['offline', 'online']
