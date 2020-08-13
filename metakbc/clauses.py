@@ -67,7 +67,7 @@ def load_clauses(dataset: Dataset, method: str) -> List[LearnedClause]:
 
         return [clause1, clause2]
 
-    if dataset.name == "kinships":
+    if dataset.name == "kinship":
 
         # A(X1, X2) => A(X2, X1)
         clause_func1 = lambda x1, x2, phi1: (phi1(x1, x2) - phi1(x2, x1))
