@@ -7,6 +7,7 @@ from metakbc.learn import learn
 import wandb
 import datetime
 import json
+import time
 
 datasets = ['Toy_A=>B_16', 'Toy_A=>B_1024', 'Toy_A=>B,C=>D_1024', 'Toy_A,B=>C_16', 'Toy_A,B=>C_1024',  'Toy_A,B=>C,D,E=>F_1024', 'Toy_mixed', 'nations', 'umls', 'countries', 'kinship']
 models = ['DistMult', 'ComplEx']
@@ -96,6 +97,8 @@ if __name__ == '__main__':
         print("{} = {}".format(arg, getattr(args, arg)), end=", ")
     print("")
 
+    start_time = time.time()
+
     metrics, losses = learn(args.dataset,
           args.model,
           #
@@ -127,11 +130,14 @@ if __name__ == '__main__':
           #
           args.print_clauses,
           args.logging)
+    
+    execution_time = time.time() - start_time
+    print("\nTotal execution time: {:.0f}s".format(execution_time))
 
     if args.output_file is not None:
-        print("\nStoring results in '{}'".format(args.output_file))
+        print("Storing results in '{}'".format(args.output_file))
         args_dict = {arg: getattr(args, arg) for arg in vars(args)}
-        total_dict = {'args': args_dict, 'metrics': metrics, 'losses': losses}
+        total_dict = {'args': args_dict, 'metrics': metrics, 'losses': losses, 'time': execution_time}
 
         with open(args.output_file, 'w') as json_file:
             json.dump(total_dict, json_file, indent='\t')
