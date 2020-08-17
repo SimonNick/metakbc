@@ -52,6 +52,7 @@ def learn(dataset_str: str,
           rank: int,
           batch_size: int,
           reg_weight: float,
+          n_constraints: int,
           #
           seed: int,
           #
@@ -73,7 +74,7 @@ def learn(dataset_str: str,
     minimum_lambda = 1e-6
     dataset = Dataset(dataset_str)
     filters = build_filters(dataset)
-    clauses = load_clauses(dataset, rule_method)
+    clauses = load_clauses(dataset, rule_method, n_constraints)
     adversary = Adversary(clauses).to(device)
     adversarial_embeddings = None
     adversarial_examples = None

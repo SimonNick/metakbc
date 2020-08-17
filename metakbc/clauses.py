@@ -5,7 +5,7 @@ from metakbc.datasets import Dataset
 
 from typing import List
 
-def load_clauses(dataset: Dataset, method: str) -> List[LearnedClause]:
+def load_clauses(dataset: Dataset, method: str, n_constraints: int) -> List[LearnedClause]:
 
     if dataset.name in ["Toy_A=>B_16", "Toy_A=>B_1024"]:
 
@@ -35,7 +35,7 @@ def load_clauses(dataset: Dataset, method: str) -> List[LearnedClause]:
 
         # A(X1, X2), B(X2, X3) => C(X1, X3)
         clause_func = lambda x1, x2, x3, phi1, phi2, phi3: torch.min(phi1(x1, x2), phi2(x2, x3)) - phi3(x1, x3)
-        clause = LearnedClause(n_variables=3, n_relations=3, clause_loss_func=clause_func, n_constraints=10, n_predicates=dataset.n_predicates, method=method)
+        clause = LearnedClause(n_variables=3, n_relations=3, clause_loss_func=clause_func, n_constraints=n_constraints, n_predicates=dataset.n_predicates, method=method)
 
         return [clause]
 

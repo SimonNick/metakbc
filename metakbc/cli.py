@@ -47,6 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--rank',           default=100,        type=int,               help="Rank of the tensor decomposition")
     parser.add_argument('--batch_size',     default=32,         type=int,               help="Batch size for training and evaluation")
     parser.add_argument('--reg_weight',     default=1e-3,       type=float,             help="Weight of the N3 regularizer")
+    parser.add_argument('--n_constraints',  default=10,         type=int,               help="Number of instances of a rule")
 
     parser.add_argument('--seed',           default=42,         type=int,               help="Used seed")
 
@@ -88,6 +89,7 @@ if __name__ == '__main__':
         wandb.config.rank = args.rank
         wandb.config.batch_size = args.batch_size
         wandb.config.reg_weight = args.reg_weight
+        wandb.config.n_constraints = args.n_constraints
 
         wandb.config.seed = args.seed
         
@@ -125,6 +127,7 @@ if __name__ == '__main__':
           args.rank,
           args.batch_size,
           args.reg_weight,
+          args.n_constraints,
           #
           args.seed,
           #
